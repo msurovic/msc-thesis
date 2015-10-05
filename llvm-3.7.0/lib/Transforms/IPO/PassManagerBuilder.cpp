@@ -128,6 +128,12 @@ PassManagerBuilder::PassManagerBuilder() {
     VerifyOutput = false;
     MergeFunctions = false;
     PrepareForLTO = false;
+
+    // Initialization of the global cryptographically
+    // secure pseudo-random generator
+    if(!AesSeed.empty()) {
+        llvm::cryptoutils->prng_seed(AesSeed.c_str());
+    }
 }
 
 PassManagerBuilder::~PassManagerBuilder() {
@@ -193,9 +199,14 @@ void PassManagerBuilder::populateFunctionPassManager(
 }
 
 void PassManagerBuilder::populateModulePassManager(
-    legacy::PassManagerBase &MPM) {
+  legacy::PassManagerBase &MPM) {
   // If all optimizations are disabled, just run the always-inline pass and,
   // if enabled, the function merging pass.
+
+  MPM.add(createSplitBasicBlock(Split));
+  MPM.add(createBogus(BogusControlFlow));
+  MPM.add(createFlattening(Flattening));
+
   if (OptLevel == 0) {
     if (Inliner) {
       MPM.add(Inliner);
@@ -211,6 +222,8 @@ void PassManagerBuilder::populateModulePassManager(
       MPM.add(createMergeFunctionsPass());
     else if (!GlobalExtensions->empty() || !Extensions.empty())
       MPM.add(createBarrierNoopPass());
+
+    MPM.add(createSubstitution(Substitution));
 
     addExtensionsToPM(EP_EnabledOnOptLevel0, MPM);
     return;
@@ -443,6 +456,7 @@ void PassManagerBuilder::populateModulePassManager(
   if (MergeFunctions)
     MPM.add(createMergeFunctionsPass());
 
+  MPM.add(createSubstitution(Substitution));
   addExtensionsToPM(EP_OptimizerLast, MPM);
 }
 

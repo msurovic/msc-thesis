@@ -2,6 +2,11 @@ Copy  /include/Transforms/Obfuscation
 Copy  /include/CryptoUtils.h
 Copy  /lib/Transforms/Obfuscation
 
+Add "subdirectories = ... Obfuscation" to /lib/Transforms/LLVMBuild.txt
+Add "add_subdirectory(Obfuscation)" to /lib/Transforms/CMakeLists.txt
+Add "required_libraries = ... Obfuscation" to /lib/Transforms/IPO/LLVMBuild.txt
+Add "PARALLEL_DIRS = ... Obfuscation" to /lib/Transforms/Makefile
+
 Add the following to /lib/Transforms/IPO/PassManagerBuilder.cpp
       
       #include "llvm/Transforms/Obfuscation/BogusControlFlow.h"
@@ -9,6 +14,10 @@ Add the following to /lib/Transforms/IPO/PassManagerBuilder.cpp
       #include "llvm/Transforms/Obfuscation/Split.h"
       #include "llvm/Transforms/Obfuscation/Substitution.h"
       #include "llvm/CryptoUtils.h"
+
+      --static cl::opt<bool> EnableLoopDistribute(
+      --    "enable-loop-distribute", cl::init(false), cl::Hidden,
+      --    cl::desc("Enable the new, experimental LoopDistribution Pass"));
 
       // Flags for obfuscation
       static cl::opt<bool> Flattening("fla", cl::init(false),
@@ -25,3 +34,29 @@ Add the following to /lib/Transforms/IPO/PassManagerBuilder.cpp
 
       static cl::opt<bool> Split("spli", cl::init(false),
                                  cl::desc("Enable basic block splitting"));
+
+
+      --void PassManagerBuilder::populateModulePassManager(
+      
+      MPM.add(createSplitBasicBlock(Split));
+      MPM.add(createBogus(BogusControlFlow));
+      MPM.add(createFlattening(Flattening));
+
+      --else if (!GlobalExtensions->empty() || !Extensions.empty())
+      --  MPM.add(createBarrierNoopPass());
+
+      MPM.add(createSubstitution(Substitution));
+
+      --MergeFunctions = false;
+      --PrepareForLTO = false;
+
+      // Initialization of the global cryptographically
+      // secure pseudo-random generator
+      if(!AesSeed.empty()) {
+          llvm::cryptoutils->prng_seed(AesSeed.c_str());
+      }
+
+      --if (MergeFunctions)
+      --  MPM.add(createMergeFunctionsPass());
+
+      MPM.add(createSubstitution(Substitution));

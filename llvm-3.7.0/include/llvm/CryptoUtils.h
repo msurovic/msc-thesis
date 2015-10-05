@@ -24,10 +24,6 @@
 #include <cstdio>
 #include <string>
 
-// Custom fix
-// #define ENDIAN_LITTLE
-// Custom fix
-
 namespace llvm {
 
 class CryptoUtils;
