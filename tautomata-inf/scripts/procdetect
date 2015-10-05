@@ -1,0 +1,103 @@
+#!/usr/bin/tclsh
+
+# $Id: sdgstats 487 2011-01-20 06:21:52Z babic $
+#
+# Parameters:
+#
+# inp       -- Input file with results
+# inv       -- Inverse cummulative sum (false by default)
+# out       -- Output file prefix
+
+array set params {
+    inp     ""
+    inv     0
+    out     "cummulative"
+}
+
+# Parameter processing loop
+foreach arg $argv {
+    if {[regexp -- {^-inp=(.*)} $arg dummy match]} {
+        set params(inp) $match
+    } elseif {[regexp -- {^-inv} $arg]} {
+        set params(inv) 1
+    } elseif {[regexp -- {^-out=(.*)} $arg dummy match]} {
+        set params(out) $match
+    }
+}
+
+if {![file exists $params(inp)]} {
+    puts stderr "Input file \"$params(inp)\" does not exist."
+    exit 1
+}
+
+proc process { arrName k } {
+    global params
+    upvar $arrName valarr
+
+    set allvals {}
+    foreach { val num } [array get valarr] {
+        lappend allvals $val
+    }
+
+    if {$params(inv) == 0} {
+        set allvals [lsort -real $allvals]
+    } else {
+        set allvals [lsort -real -decreasing $allvals]
+    }
+
+    set content {}
+    
+    set totalsum 0
+    foreach val $allvals {
+        incr totalsum $valarr($val)
+    }
+
+    set sum 0
+    foreach val $allvals {
+        incr sum $valarr($val)
+        set perc [expr double($sum) / $totalsum]
+        set valarr($val) $perc
+        lappend content "$val $perc"
+    }
+
+    set flekname "$params(out)-$k.dat"
+    if {[catch {open $flekname w} fp]} {
+        puts stderr "Could not create $flekname"
+    } else {
+        puts $fp [join $content \n]
+        close $fp
+    }
+}
+
+if {[catch {open $params(inp) r} ifp]} {
+    puts stderr "Could not open $params(inp)"
+} else {
+    set lines [split [read $ifp] \n]
+    close $ifp
+
+    set k -1
+    array set values {}
+
+    foreach ln $lines {
+        if {[regexp -- {---- Detailed Stats for k=(\d+).*} $ln match N]} {
+            if {$k != -1} {
+                process values $k
+            }
+            set k $N
+            array unset values
+            array set values { }
+        } elseif {[regexp -- {--- Statistics ---} $ln]} {
+            if {$k != -1} {
+                process values $k
+            }
+            set k -1
+            exit 1
+        } elseif {[regexp {^[^\.]*\.sdg : (\d\.\d+).*} $ln match N]} {
+            if {[llength [array names values $N]] == 1} {
+                incr values($N)
+            } else {
+                set values($N) 1
+            }
+        }
+    }
+}

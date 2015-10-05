@@ -1,0 +1,60 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\selectlanguage}[1]{\relax}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem{Babic11}
+Babi\'c, D.; Reynaud, D.; Song, D.: {Malware Analysis with Tree Automata
+  Inference}. In \emph{CAV'11: Proceedings of the 23rd Int. Conference on
+  Computer Aided Verification}, Lecture Notes in Computer Science, Springer,
+  2011, s. 116--131.
+
+\bibitem{RevGen}
+Chipounov, V.; Candea, G.: {Enabling sophisticated analyses of x86 binaries
+  with RevGen}. In \emph{International Conference on Dependable Systems and
+  Networks Workshops}, 2011.
+
+\bibitem{Cohen86}
+Cohen, F.: \emph{Computer Viruses}. Dizertaèní práce, University of Southern
+  California, 1986.
+
+\bibitem{Filiol12}
+Filiol, E.: Malicious cryptology and mathematics. \emph{Cryptography and
+  Security in Computing}, 2012, iSBN~978-953-51-0179-6.
+
+\bibitem{Jacob08}
+Jacob, G.; Debar, H.; Filiol, E.: Behavioral detection of malware: from a
+  survey towards an established taxonomy. \emph{Journal in Computer Virology},
+  roèník~4, è.~3, 2008: s. 251--266, ISSN 1772-9890.
+
+\bibitem{Konstantinou08}
+Konstantinou, E.: \emph{Metamorphic Virus: Analysis and Detection}. Dizertaèní
+  práce, Royal Holloway, University of London, 2008.
+
+\bibitem{Moser07}
+Moser, A.; Kruegel, C.; Kirda, E.: {\selectlanguage{english}Limits of Static
+  Analysis for Malware Detection}. \emph{Computer Security Applications
+  Conference, 2007. ACSAC 2007. Twenty-Third Annual}, 2007: s. 421 -- 430, ISSN
+  1063-9527.
+
+\bibitem{Schiffman10}
+Schiffman, M.: A Brief History of Malware Obfuscation. [online], Naposledy
+  nav¹tíveno 14. 1. 2015.
+\newline\urlprefix\url{http://blogs.cisco.com/security/a_brief_history_of_malware_obfuscation_part_1_of_2}
+
+\bibitem{Durfina11}
+\v{D}urfina, L.; K\v{r}oustek, J.; Zemek, P.; aj.: Design of a Retargetable
+  Decompiler for a Static Platform-Independent Malware Analysis.
+  \emph{International Journal of Security and Its Applications}, roèník~5,
+  è.~4, 2011: s. 91--106.
+
+\bibitem{You10}
+You, I.; Yim, K.: Malware Obfuscation Techniques: A Brief Survey. In
+  \emph{BWCCA}, IEEE, 2010, s. 297 -- 300.
+
+\end{thebibliography}

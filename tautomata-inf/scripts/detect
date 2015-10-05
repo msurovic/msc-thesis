@@ -1,0 +1,215 @@
+#!/usr/bin/tclsh
+
+# $Id: detect 467 2011-01-19 07:44:53Z babic $
+#
+# Parameters:
+#
+# train     -- directory containing training instances
+# test      -- directory containing test instances
+# cutoff    -- min depth used for detection
+# infer     -- path to sdginfer executable
+# min       -- min k
+# max       -- max k
+# num       -- number of benchmarks to consider       
+
+
+array set params {
+    train       ""
+    test        ""
+    min         3
+    max         3
+    cutoff      3
+    infer       ""
+    num         10000
+}
+
+# Parameter processing loop
+foreach arg $argv {
+    if {[regexp -- {^-train=(.*)} $arg dummy match]} {
+        set params(train) $match
+    } elseif {[regexp -- {^-test=(.*)} $arg dummy match]} {
+        set params(test) $match
+    } elseif {[regexp -- {^-min=(\d+)} $arg dummy match]} {
+        set params(min) $match
+    } elseif {[regexp -- {^-max=(\d+)} $arg dummy match]} {
+        set params(max) $match
+    } elseif {[regexp -- {^-cutoff=(\d+)} $arg dummy match]} {
+        set params(cutoff) $match
+    } elseif {[regexp -- {^-infer=(.*)} $arg dummy match]} {
+        set params(infer) $match
+    } elseif {[regexp -- {^-num=(\d+)} $arg dummy match]} {
+        set params(num) $match
+    }
+}
+
+# Check whether the needed files/directories exist
+if {![file exists $params(train)]} {
+    puts stderr "Src directory \"$params(train)\" does not exist."
+    exit 1
+}
+
+if {![file exists $params(test)]} {
+    puts stderr "Dst directory \"$params(test)\" does not exist."
+    exit 1
+}
+
+if {![file exists $params(infer)]} {
+    puts stderr "Couldn't find the \"$params(infer)\" executable."
+    exit 1
+}
+
+# Seed the random number generator
+expr srand(23273480119)
+
+# findFiles
+# basedir - the directory to start looking in
+# pattern - A pattern, as defined by the glob command, that the files must match
+proc findFiles { basedir pattern } {
+    # Fix the directory name, this ensures the directory name is in the
+    # native format for the platform and contains a final directory seperator
+    set basedir [string trimright [file join [file normalize $basedir] { }]]
+    set fileList {}
+
+    # Look in the current directory for matching files, -type {f r}
+    # means ony readable normal files are looked at, -nocomplain stops
+    # an error being thrown if the returned list is empty
+    foreach fileName [glob -nocomplain -type {f r} -path $basedir $pattern] {
+        lappend fileList $fileName
+    }
+
+    # Now look for any sub direcories in the current directory
+    foreach dirName [glob -nocomplain -type {d  r} -path $basedir *] {
+        # Recusively call the routine on the sub directory and append any
+        # new files to the results
+        set subDirList [findFiles $dirName $pattern]
+        if { [llength $subDirList] > 0 } {
+            foreach subDirFile $subDirList {
+                lappend fileList $subDirFile
+            }
+        }
+    }
+    return $fileList
+}
+
+# Donald Fellow's K combinator
+proc Kcomb { x y } { set x }
+
+proc shuffle { lst } {
+    set n [llength $lst]
+    while { $n > 0 } {
+        set j [expr {int( rand() * $n )}]
+        lappend slist [lindex $lst $j]
+        incr n -1
+        set temp [lindex $lst $n]
+        set lst [lreplace [Kcomb $lst [set lst {}]] $j $j $temp]
+    }
+    return $slist
+}
+
+set basetraindir [string trimright [file join [file normalize $params(train)] { }]]
+set files [shuffle [findFiles $params(test) *.sdg]]
+if {[llength $files] > $params(num)} {
+    set len [expr $params(num) - 1]
+    set files [lrange $files end-$len end]
+}
+set files [lsort -dictionary $files]
+array set expresults { }
+set detailedresults { }
+set undetected 0
+
+for {set i $params(min)} {$i <= $params(max)} {incr i} {
+
+    set sum 0.0
+    set runs 0
+
+    foreach flek $files {
+        # Hack for getting only a sample of results for large sets
+        #if {[expr {rand() > 0.01}]} {
+        #    continue;
+        #}
+
+        if {[llength [array names expresults $flek]] == 0} {
+            set expresults($flek) [format "%20s" $flek]
+        }
+
+        #puts [list exec $params(infer) --train=$basetraindir --testfile=$flek --k=$i --stats]
+        catch {
+            eval [list exec $params(infer) --train=$basetraindir --testfile=$flek --k=$i --stats]
+        } result
+
+        set testsetstart 0
+        array set terms     { }
+        array set matched   { }
+
+        # Parse result
+        foreach ln [split $result \n] {
+            if {[regexp {^S ---- Test set.*} $ln]} {
+                set testsetstart 1
+            }
+
+            if {$testsetstart == 1} {
+                if {[regexp {^S Terms with depth (\d+):\s*(\d+).*} $ln match N M]} {
+                    set terms($N) $M
+                } elseif {[regexp {^S Final matched with depth (\d+):\s*(\d+).*} $ln match N M]} {
+                    set matched($N) $M
+                }
+            }
+        }
+
+        set nominator 0
+        set denominator 0
+
+        foreach {dpth num} [array get terms] {
+            if {$dpth > $params(cutoff)} {
+                if {[llength [array names matched $dpth]] == 0} {
+                    set matched($dpth) 0
+                }
+                set ratio [expr {double($matched($dpth)) / $num}]
+                #set ratio [expr {(tanh(log10($dpth)) * $matched($dpth)) / $num}]
+                if {$ratio > 1.0} {
+                    puts "Accepted $matched($num) out of $num total terms at depth $dpth ?"
+                    exit 1
+                }
+                set nominator [expr {$nominator + $ratio * $dpth}]
+                set denominator [expr {$denominator + $dpth}]
+            }
+        }
+        
+       
+        if {$nominator > $denominator} {
+            puts "Invalid nominator ($nominator) and denominator ($denominator) computed"
+            exit 1
+        }
+
+        set score 0.0
+        if {$denominator != 0} {
+            set score [format "%0.3f" [expr {$nominator / $denominator}]]
+        }
+
+        if {$score == 0.0} {
+            incr undetected
+        }
+
+        incr runs
+        set sum [expr {$sum + $score}]
+
+        set expresults($flek) "$expresults($flek) & $score"
+        lappend detailedresults "$flek : $score"
+        array unset terms
+        array unset matched
+        #puts "Finished with test file [format "%20s" $flek]"
+    }
+
+    puts "Average detection rate for k=$i is $sum / $runs = [expr {$sum / $runs}]"
+    puts "Undetected: $undetected"
+    puts "---- Detailed Stats for k=$i ----"
+    puts [join $detailedresults \n]
+    set detailedresults { }
+    set undetected 0
+}
+
+puts "\n\n--- Statistics ---"
+
+foreach {flek ln} [array get expresults] {
+    puts $ln
+}

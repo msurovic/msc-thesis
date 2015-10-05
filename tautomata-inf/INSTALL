@@ -1,0 +1,25 @@
+$Id: INSTALL 330 2010-12-24 22:02:14Z babic $
+
+If you don't see configure, run: autoreconf -f -i -Wall,no-obsolete
+
+Otherwise, run:
+
+./configure [CONFIG-OPTIONS]
+make [MAKE-OPTIONS]
+make install
+
+That will install rumba* binaries to /usr/local/bin . Of course, you
+need to have write access to that directory. You can use --prefix=...
+with configure to define an alternative install directory.
+
+CONFIG-OPTIONS:
+--disable-assertions    : disables assertion checking (quite expensive),
+                          enabled by default
+--enable-optimization   : enables optimizations, disabled by default
+--help                  : for a list of all options
+
+MAKE-OPTIONS:
+-jX                     : for parallel build, set X to 2 * number of
+                          processors you have, for the fastest 
+                          compilation
+-help                   : for a list of all options

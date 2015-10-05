@@ -1,0 +1,29 @@
+#!/usr/bin/gnuplot
+reset
+set term postscript eps
+unset border
+set xrange [0.0:1.0]
+set yrange [0:100]
+set xlabel "Score"
+set ylabel "% of samples with scores above (below)"
+
+set style line 1 lt 1 lc rgb "red" lw 3
+set style line 2 lt 2 lc rgb "blue" lw 2
+set style line 3 lt 2 lc rgb "black" lw 3
+set style line 4 lt 3 lc rgb "green" lw 2
+
+set output 'cummulative.eps'
+plot 'malware-cummulative-2.dat' using 1:(100*$2) with lines title 'k=2' ls 1, \
+     'malware-cummulative-3.dat' using 1:(100*$2) with lines title 'k=3' ls 2, \
+     'malware-cummulative-4.dat' using 1:(100*$2) with lines title 'k=4' ls 3, \
+     'malware-cummulative-5.dat' using 1:(100*$2) with lines title 'k=5' ls 4, \
+     'goodware800-cummulative-2.dat' using 1:(100*$2) with lines notitle ls 1, \
+     'goodware800-cummulative-3.dat' using 1:(100*$2) with lines notitle ls 2, \
+     'goodware800-cummulative-4.dat' using 1:(100*$2) with lines notitle ls 3, \
+     'goodware800-cummulative-5.dat' using 1:(100*$2) with lines notitle ls 4
+
+
+#     'malware-cummulative-7.dat' using 1:2 with lines title 'k=7', \
+#     'malware-cummulative-8.dat' using 1:2 with lines title 'k=8', \
+#     'goodware120-cummulative-7.dat' using 1:2 with lines notitle, \
+#     'goodware120-cummulative-8.dat' using 1:2 with lines notitle

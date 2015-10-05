@@ -1,0 +1,201 @@
+#!/usr/bin/tclsh
+
+# $Id: sdgrun 493 2011-01-20 07:35:59Z babic $
+#
+# Parameters:
+#
+# src       -- source directory
+# dst       -- destination directory
+# num       -- number of benchmarks to take (total) from dst
+# k         -- k reversibility
+# cutoff    -- min depth used for detection
+# prc       -- percentage of benchmarks used for training
+# clean     -- quietly clean dst directory before starting
+# infer     -- path to sdginfer executable
+# chk       -- path to sdgchecker executable for collecting stats for sorting benchmarks
+
+array set params {
+    src     ""
+    dst     ""
+    num     -1
+    k       3
+    cutoff  3
+    prc     0.5
+    clean   0
+    infer   ""
+    chk     ""
+}
+
+# Parameter processing loop
+foreach arg $argv {
+    if {[regexp -- {^-src=(.*)} $arg dummy match]} {
+        set params(src) $match
+    } elseif {[regexp -- {^-dst=(.*)} $arg dummy match]} {
+        set params(dst) $match
+    } elseif {[regexp -- {^-k=(\d*)} $arg dummy match]} {
+        set params(k) $match
+    } elseif {[regexp -- {^-cutoff=(\d*)} $arg dummy match]} {
+        set params(cutoff) $match
+    } elseif {[regexp -- {^-prc=(.*)} $arg dummy match]} {
+        set params(prc) $match
+    } elseif {[regexp -- {^-clean$} $arg dummy]} {
+        set params(clean) 1
+    } elseif {[regexp -- {^-infer=(.*)} $arg dummy match]} {
+        set params(infer) $match
+    } elseif {[regexp -- {^-num=(.*)} $arg dummy match]} {
+        set params(num) $match
+    } elseif {[regexp -- {^-chk=(.*)} $arg dummy match]} {
+        set params(chk) $match
+    }
+}
+
+# Check whether the needed files/directories exist
+if {![file exists $params(src)]} {
+    puts stderr "Src directory \"$params(src)\" does not exist."
+    exit 1
+}
+
+if {![file exists $params(dst)]} {
+    puts stderr "Dst directory \"$params(dst)\" does not exist."
+    exit 1
+}
+
+if {![file exists $params(infer)]} {
+    puts stderr "Couldn't find the \"$params(infer)\" executable."
+    exit 1
+}
+
+set basedstdir [string trimright [file join [file normalize $params(dst)] { }]]
+
+# Cleanup the destination directory, if there's something
+foreach dir [glob -nocomplain -type {d r} -path $basedstdir *] {
+    if {$params(clean) == 0} {
+        puts "Delete $dir? \[Y/N\] "
+    }
+    if {$params(clean) == 1 || [regexp -- {^Y$} [gets stdin] dummy]} {
+        puts "Deleting $dir ...."
+        file delete -force $dir
+    }
+}
+
+set dividecmd [file join . divide]
+
+if {![file exists $dividecmd]} {
+    puts stderr "Divide script $dividecmd does not exist."
+    exit 1
+}
+
+set basesrcdir [string trimright [file join [file normalize $params(src)] { }]]
+set targetdirs { }
+set bmarkidx 1
+array set bmarklist { }
+
+# Partition the benchmarks into train/test sets. Thanks to the seeding
+# of random number generator in the divide script, partition should
+# always be the same for the same chosen percentage.
+foreach dir [lsort -dictionary [glob -nocomplain -type {d r} -path $basesrcdir *]] {
+    set dirshort [file tail $dir]
+    if {[regexp {^([^,]*),([^,]*).*} [file tail $dir] match part1 part2]} {
+        set dirshort "$part1.$part2"
+    }
+    set target [file join $basedstdir $dirshort]
+    lappend targetdirs $target
+    set bmarklist($dirshort) $bmarkidx
+
+    if {![file exists $target]} {
+        file mkdir $target
+    }
+
+    catch {
+        if {[string length $params(chk)] != 0} {
+            eval [list exec $dividecmd -src=$dir -dst=$target -num=$params(num) -chk=$params(chk) -prc=$params(prc)]
+        } else {
+            eval [list exec $dividecmd -src=$dir -dst=$target -num=$params(num) -prc=$params(prc)]
+        }
+    } dummy
+
+    incr bmarkidx
+}
+
+unset basedstdir
+unset basesrcdir
+unset dividecmd
+
+set matchresults { }
+set targetdirs [lsort -dictionary $targetdirs]
+
+# Now run the sdginfer tool and collect stats
+foreach train $targetdirs {
+    foreach test $targetdirs {
+        catch {
+            eval [list exec $params(infer) --train [file join $train train] --test [file join $test test] --stats --k $params(k)]
+        } result
+
+        if {[regexp $params(infer).*failed $result]} {
+            puts "Assertion failure:"
+            puts $result
+            exit 1
+        }
+
+        set testsetstart 0
+        array set terms     { }
+        array set matched   { }
+
+        # Parse result
+        foreach ln [split $result \n] {
+            if {[regexp {^S ---- Test set.*} $ln]} {
+                set testsetstart 1
+            }
+
+            if {$testsetstart == 1} {
+                if {[regexp {^S Terms with depth (\d+):\s*(\d+).*} $ln match N M]} {
+                    set terms($N) $M
+                } elseif {[regexp {^S Final matched with depth (\d+):\s*(\d+).*} $ln match N M]} {
+                    set matched($N) $M
+                }
+            }
+        }
+
+        set nominator 0
+        set denominator 0
+        foreach {dpth num} [array get terms] {
+            if {$dpth > $params(cutoff) && $num > 0} {
+                if {[llength [array names matched $dpth]] == 0} {
+                    set matched($dpth) 0
+                }
+                set ratio [expr {double($matched($dpth)) / $num}]
+                if {$ratio > 1.0} {
+                    puts "Accepted $matched($num) out of $num total terms at depth $dpth ?"
+                    exit 1
+                }
+                set nominator [expr {$nominator + $ratio * $dpth}]
+                set denominator [expr {$denominator + $dpth}]
+            }
+        }
+        set idx1 $bmarklist([file tail $train])
+        set idx2 $bmarklist([file tail $test])
+        if {$nominator > $denominator} {
+            puts "Invalid nominator ($nominator) and denominator ($denominator) computed"
+            exit 1
+        }
+
+        set score 0.0
+        if {$denominator != 0} {
+            set score [format "%0.3f" [expr $nominator / (2 * $denominator)]]
+        }
+        lappend matchresults "$idx1 $idx2 $score"
+        #lappend matchresults "[file tail $train] [file tail $test] [format "%2.2f" [expr $nominator / $denominator]]"
+        array unset terms
+        array unset matched
+    }
+    puts "Finished with train directory [format "%2u" $bmarklist([file tail $train])]: [file tail $train]"
+}
+
+puts " ---- Results of matching ---- "
+set outflekname "matrix-$params(k)-$params(cutoff).dat"
+if {[catch {open $outflekname w} mfp]} {
+    puts stderr "Could not create $outflekname"
+} else {
+    puts $mfp [join $matchresults \n]
+    close $mfp
+}

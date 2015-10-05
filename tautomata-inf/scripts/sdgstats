@@ -1,0 +1,181 @@
+#!/usr/bin/tclsh
+
+# $Id: sdgstats 487 2011-01-20 06:21:52Z babic $
+#
+# Parameters:
+#
+# dir -- root directory
+# exe -- executable
+# min -- min cutoff
+# max -- max cutoff
+
+array set params {
+    dir ""
+    exe ""
+    min 2
+    max 2
+}
+
+# Parameter processing loop
+foreach arg $argv {
+    if {[regexp -- {^-dir=(.*)} $arg dummy match]} {
+        set params(dir) $match
+    } elseif {[regexp -- {^-exe=(.*)} $arg dummy match]} {
+        set params(exe) $match
+    } elseif {[regexp -- {^-min=(\d+)} $arg dummy match]} {
+        set params(min) $match
+    } elseif {[regexp -- {^-max=(\d+)} $arg dummy match]} {
+        set params(max) $match
+    }
+}
+
+if {![file exists $params(dir)]} {
+    puts stderr "Directory \"$params(dir)\" does not exist."
+    exit 1
+}
+
+if {![file exists $params(exe)]} {
+    puts stderr "Executable \"$params(exe)\" does not exist."
+    exit 1
+}
+
+set basedir [string trimright [file join [file normalize $params(dir)] { }]]
+set bmarklist {}
+set maxdepth 0
+set maxcount 0
+
+foreach dir [glob -nocomplain -type {d r} -path $basedir *] {
+    set flek [file join $basedir $dir]
+    set dirshort [file tail $dir]
+
+    if {[regexp {^([^,]*),([^,]*).*} [file tail $dir] match part1 part2]} {
+        set dirshort "$part1.$part2"
+    }
+
+    lappend bmarklist $dirshort
+    array set ${dirshort} {}
+    set ${dirshort}(maxdepth) 1
+
+    for {set i $params(min)} {$i <= $params(max)} {incr i} {
+        #puts [list exec $params(exe) --train $flek --stats --k $i]
+        catch {
+            eval [list exec $params(exe) --train $flek --stats --k $i]
+        } result
+
+        foreach ln [split $result \n] {
+            if {[regexp {^S Total nodes:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(nodes) $N
+            } elseif {[regexp {^S Total edges:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(edges) $N
+            } elseif {[regexp {^S Roots before CSE:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(roots) $N
+            } elseif {[regexp {^S Nodes after CSE:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(csenodes) $N
+            } elseif {[regexp {^S Roots after CSE:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(cseroots) $N
+            } elseif {[regexp {^S Incomplete terms:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(incomplete) $N
+            } elseif {[regexp {^S Merged eq classes:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(merged,$i) $N
+            } elseif {[regexp {^S Congruences:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(congruences,$i) $N
+            } elseif {[regexp {^S Eq classes:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(eqclasses,$i) $N
+            } elseif {[regexp {^S Eq root classes:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(eqroots,$i) $N
+            } elseif {[regexp {^S States created:\s*(\d+).*} $ln match N]} {
+                set ${dirshort}(states,$i) $N
+            } elseif {[regexp {^S Terms with depth (\d+):\s*(\d+).*} $ln match N M]} {
+                if {$N > [set ${dirshort}(maxdepth)]} {
+                    set ${dirshort}(maxdepth) $N
+                }
+                if {$N > $maxdepth} {
+                    set maxdepth $N
+                }
+                if {$M > $maxcount} {
+                    set maxcount $M
+                }
+                set ${dirshort}($N) $M
+            }
+        }
+    }
+}
+
+set bmarkidx 1
+set basestats {}
+set congruences {}
+set statescreated {}
+set averages {}
+set heatmap {}
+set header ""
+
+
+foreach bmark [lsort -dictionary $bmarklist] {
+    # ---- Heatmap ----
+    set ln "$bmarkidx & $bmark & "
+    set depthsum 0.0
+    set idxsum 1
+    for {set i 0} {$i <= $maxdepth} {incr i} {
+        if {[llength [array names ${bmark} $i]] == 1} {
+            set N [set ${bmark}($i)]
+            set depthsum [expr {$depthsum + $N * $i}]
+            set idxsum [expr $idxsum + $N]
+            lappend heatmap "$bmarkidx $i $N"
+        } else {
+            lappend heatmap "$bmarkidx $i 0"
+        }
+    }
+
+    append ln "[format "%3.2f" [expr {$depthsum / $idxsum}]] & "
+    if {$bmarkidx == 1} {
+        set header "avgdepth "
+    }
+
+    # ---- Basic statistics ----
+    foreach {stat val} [array get ${bmark}] {
+        if {![regexp {^\d+$} $stat] && ![regexp {^[^,]*,\d+$} $stat]} {
+            if {$bmarkidx == 1} {
+                set header "$header $stat"
+            }
+            append ln "$val & "
+        }
+    }
+    lappend basestats $ln
+
+    # ---- Congruences as a function of k ----
+    set ln "[format "%2u" $bmarkidx] & "
+    for {set i $params(min)} {$i <= $params(max)} {incr i} {
+        if {[llength [array names ${bmark} "congruences,$i"]] != 0} {
+            append ln "[format "%6u" [set ${bmark}(congruences,$i)]] & "
+        }
+    }
+    lappend congruences $ln
+    
+    # ---- States created as a function of k ----
+    set ln "[format "%2u" $bmarkidx] & "
+    for {set i $params(min)} {$i <= $params(max)} {incr i} {
+        if {[llength [array names ${bmark} "states,$i"]] != 0} {
+            append ln "[format "%6u" [set ${bmark}(states,$i)]] & "
+        }
+    }
+    lappend statescreated $ln
+
+
+    incr bmarkidx
+}
+incr bmarkidx -1
+
+puts " ---- Basic statistics ---- "
+puts $header
+puts [join $basestats \n]
+puts " ---- Congruences as a function of k ---- "
+puts [join $congruences \n]
+puts " ---- States created as a function of k ---- "
+puts [join $statescreated \n]
+puts " ---- Heatmap (bmarks=$bmarkidx , maxdepth=$maxdepth, maxcount=$maxcount) ---- "
+if {[catch {open heatmap.dat w} hfp]} {
+    puts stderr "Could not create heatmap.dat"
+} else {
+    puts $hfp [join $heatmap \n]
+    close $hfp
+}

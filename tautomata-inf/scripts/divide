@@ -1,0 +1,192 @@
+#!/usr/bin/tclsh
+
+# $Id: divide 426 2011-01-15 02:54:55Z babic $
+#
+# Parameters:
+#
+# src -- source directory containing the sdg files
+# dst -- destination directory to put the files
+# prc -- percentage of files used for training
+# num -- number of benchmarks to take (total) from dst
+# chk -- path to binary used for collecting stats (sdgchecker)
+
+array set params {
+    src     ""
+    dst     ""
+    prc     0.5
+    num     -1
+    chk     ""
+}
+
+# Parameter processing loop
+foreach arg $argv {
+    if {[regexp -- {^-src=(.*)} $arg dummy match]} {
+        set params(src) $match
+    } elseif {[regexp -- {^-dst=(.*)} $arg dummy match]} {
+        set params(dst) $match
+    } elseif {[regexp -- {^-prc=(.*)} $arg dummy match]} {
+        set params(prc) $match
+    } elseif {[regexp -- {^-num=(.*)} $arg dummy match]} {
+        set params(num) $match
+    } elseif {[regexp -- {^-chk=(.*)} $arg dummy match]} {
+        set params(chk) $match
+    }
+}
+
+if {![file exists $params(src)]} {
+    puts stderr "Src directory \"$params(src)\" does not exist."
+    exit 1
+}
+
+if {![file exists $params(dst)]} {
+    puts stderr "Dst directory \"$params(dst)\" does not exist."
+    exit 1
+}
+
+# findFiles
+# basedir - the directory to start looking in
+# pattern - A pattern, as defined by the glob command, that the files must match
+proc findFiles { basedir pattern } {
+    # Fix the directory name, this ensures the directory name is in the
+    # native format for the platform and contains a final directory seperator
+    set basedir [string trimright [file join [file normalize $basedir] { }]]
+    set fileList {}
+
+    # Look in the current directory for matching files, -type {f r}
+    # means ony readable normal files are looked at, -nocomplain stops
+    # an error being thrown if the returned list is empty
+    foreach fileName [glob -nocomplain -type {f r} -path $basedir $pattern] {
+        lappend fileList $fileName
+    }
+
+    # Now look for any sub direcories in the current directory
+    foreach dirName [glob -nocomplain -type {d  r} -path $basedir *] {
+        # Recusively call the routine on the sub directory and append any
+        # new files to the results
+        set subDirList [findFiles $dirName $pattern]
+        if { [llength $subDirList] > 0 } {
+            foreach subDirFile $subDirList {
+                lappend fileList $subDirFile
+            }
+        }
+    }
+    return $fileList
+}
+
+proc sizecmp { a b } {
+    global array params
+
+    array set size { }
+    set size($a) [file size $a]
+    set size($b) [file size $b]
+
+    if {[string length $params(chk)] != 0} {
+        # Compare according to the graph size after CSE
+        if {![file exists $params(chk)]} {
+            puts stderr "Couldn't find the $params(chk) executable."
+            exit 1
+        }
+
+        foreach flek [list $a $b] {
+            if {[file exists $flek.stats]} {
+                if {[catch {open $flek.stats r} fp]} {
+                    puts stderr "Could not open $flek.stats file"
+                    exit 1
+                } else {
+                    set contents [split [read $fp] \n]
+                    set size($flek) [lindex $contents 0]
+                    close $fp
+                }
+            } else {
+                catch {
+                    eval [list exec $params(chk) --sdg $flek --stats]
+                } results
+                regexp {S Nodes after CSE:\s*(\d+).*} $results match size($flek)
+                #regexp {S Roots after CSE:\s*(\d+).*} $results match size($flek)
+                #regexp {S Total edges:\s*(\d+).*} $results match size($flek)
+                #set size($flek) [expr {int(rand())}]
+
+                #regexp {S Nodes after CSE:\s*(\d+).*} $results match nom
+                #regexp {S Roots after CSE:\s*(\d+).*} $results match den
+                #set size($flek) [expr {$nom / $den}]
+
+                if {[catch {open $flek.stats w} fp]} {
+                    puts stderr "Could not create $flek.stats file"
+                    exit 1
+                } else {
+                    puts $fp $size($flek)
+                    close $fp
+                }
+            }
+        }
+    }
+
+    # Size comparison
+    if {$size($a) < $size($b)} {
+        return -1;
+    } elseif {$size($a) > $size($b)} {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+# Donald Fellow's K combinator
+proc Kcomb { x y } { set x }
+
+proc shuffle { lst } {
+    set n [llength $lst]
+    while { $n > 0 } {
+        set j [expr {int( rand() * $n )}]
+        lappend slist [lindex $lst $j]
+        incr n -1
+        set temp [lindex $lst $n]
+        set lst [lreplace [Kcomb $lst [set lst {}]] $j $j $temp]
+    }
+    return $slist
+}
+
+set dstbasedir [string trimright [file join [file normalize $params(dst)] { }]]
+set train [file join $dstbasedir train]
+set test  [file join $dstbasedir test ]
+unset dstbasedir
+
+if {![file exists $train]} {
+    file mkdir $train
+}
+if {![file exists $test]} {
+    file mkdir $test
+}
+
+# Seed the random number generator
+#expr srand(23273480119)
+#expr srand(4892018945)
+expr srand(13203480172)
+
+set files [findFiles $params(src) *.sdg]
+
+if {$params(num) != -1} {
+    set files [lsort -command sizecmp $files]
+
+    if {[llength $files] < $params(num)} {
+        puts "Directory $params(src) has only $files *.sdg files"
+        exit 1
+    }
+
+    set cnt [expr $params(num) - 1]
+    set files [shuffle [lrange $files end-$cnt end]]
+    unset cnt
+    set trainnum [expr {int( $params(num) * $params(prc) )}]
+} else {
+    set files [shuffle $files]
+    set trainnum [expr {int($params(prc) * [llength $files])}]
+}
+
+
+for {set i 0} {$i < [llength $files]} {incr i} {
+    if {$i < $trainnum} {
+        file link -symbolic [file join $train $i.sdg] [lindex $files $i]
+    } else {
+        file link -symbolic [file join $test $i.sdg] [lindex $files $i]
+    }
+}

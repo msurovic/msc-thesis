@@ -1,0 +1,177 @@
+#!/usr/bin/tclsh
+
+# $Id: virustotal 385 2011-01-10 05:46:15Z babic $
+#
+# Parameters
+#
+# lst       -- list of executables to submit
+# min       -- minimal number of required reports
+# verbose   -- verbose
+# interact  -- interactive, ask after every report
+# skip      -- skip first N files
+
+array set params {
+    lst         ""
+    min         25
+    verbose     0
+    interactive 0
+    skip        0
+}
+
+# Parameter processing loop
+foreach arg $argv {
+    if {[regexp -- {^-lst=(.*)} $arg dummy match]} {
+        set params(lst) $match
+    } elseif {[regexp -- {^-min=(\d+)} $arg dummy match]} {
+        set params(min) $match
+    } elseif {[regexp -- {^-verbose$} $arg]} {
+        set params(verbose) 1
+    } elseif {[regexp -- {^-interact$} $arg]} {
+        set params(interactive) 1
+    } elseif {[regexp -- {^-skip=(\d+)$} $arg dummy match]} {
+        set params(skip) $match
+    }
+}
+
+# Check whether the needed files/directories exist
+if {![file exists $params(lst)]} {
+    puts stderr "File with list of executables \"$params(lst)\" does not exist."
+    exit 1
+}
+
+set processed 0
+set resubmitted 0
+
+if {[catch {open $params(lst) r} fp]} {
+    puts stderr "Could not open $params(lst)"
+    exit 1
+} else {
+    set files [split [read $fp] \n]
+    close $fp
+    foreach flek $files {
+        if {[string length $flek] == 0} {
+            # Skip empty lines quietly
+        } elseif {![file exists $flek]} {
+            puts stderr "Could not find file \"$flek\""
+        } elseif {![file exists $flek.info]} {
+            if {$processed <= $params(skip)} {
+                incr processed
+                continue
+            }
+
+            # 1 -- First iteration or resubmit (quota exceeded)
+            # 2 -- Submitted
+            # 3 -- Report found
+            set status 1
+            set result ""
+
+            while {$status == 1} {
+                catch {
+                    eval [list exec [file join . virustotal_report.py] $flek]
+                } result
+
+                if {[regexp {Submit successful\.} $result]} {
+                    # File hash not found in the database, so the file was
+                    # resubmitted
+                    incr resubmitted
+                    set status 3
+                } elseif {[regexp {Submit failed\.} $result]} {
+                    # Most likely quota exceeded
+                    puts "Processed: $processed , resubmitted: $resubmitted . Waiting 5min..."
+                    after [expr {5 * 60 * 1000}]
+                } elseif {[regexp {Printing found report\.} $result]} {
+                    # Report found, it might be incomplete, but at least
+                    # it's found
+                    set status 2
+                } else {
+                    puts "Unknown response processing $flek : $result"
+                    exit 1
+                }
+            }
+
+            if {$status == 3} {
+                incr processed
+                continue
+            }
+
+            set report [split $result \n]
+            set processedreport { }
+            set recognized 0;
+
+            foreach ln $report {
+                if {[regexp {'([^']*)'[^']*'([^']*)'.*} $ln match av class]} {
+                    if {[string length $class] != 0} {
+                        incr recognized
+                    }
+                    lappend processedreport "'$av' : '$class'"
+                }
+            }
+
+            # Resubmit the file for scan
+            if {$recognized < $params(min)} {
+                if {$params(verbose) == 1} {
+                    puts "-----------------------------------------"
+                    puts "Partial report for: $flek :"
+                    puts $result
+                    puts "-----------------------------------------"
+                }
+
+                # 1 -- First iteration or resubmit (quota exceeded)
+                # 2 -- Resubmitted
+                set success 1
+                while {$success == 1} {
+                    if {$params(verbose) == 1} {
+                        puts "Resubmitting $flek..."
+                    }
+
+                    catch {
+                        eval [list exec [file join . virustotal_report.py] $flek dummy]
+                    } result
+
+                    if {[regexp {Submit failed\.} $result]} {
+                        # Most likely quota exceeded
+                        puts "Processed: $processed , resubmitted: $resubmitted . Waiting 5min..."
+                        after [expr {5 * 60 * 1000}]
+                    } elseif {[regexp {Submit successful\.} $result]} {
+                        incr resubmitted
+                        set success 2
+                    } else {
+                        puts "Unknown response resubmitting $flek : $result"
+                        exit 1
+                    }
+                }
+            } else {
+                if {[catch {open $flek.info w} ifp]} {
+                    puts stderr "Could not create $flek.info file"
+                    exit 1
+                } else {
+                    puts $ifp [join $processedreport \n]
+                    close $ifp
+                }
+                if {$params(verbose) == 1} {
+                    puts "-----------------------------------------"
+                    puts "Final report for: $flek :"
+                    puts [join $processedreport \n]
+                    puts "-----------------------------------------"
+                }
+            }
+
+            incr processed
+
+            if {$params(verbose) == 1} {
+                puts "Processed: $processed , resubmitted: $resubmitted"
+            }
+
+            if {$params(interactive) == 1} {
+                puts "Continue? \[Y/N\] "
+                while {[regexp -- {^([[:upper:]])$} [gets stdin] response]} {
+                    if {$response == "Y"} {
+                        break
+                    } else {
+                        exit 1
+                    }
+                }
+            }
+        }
+    }
+}

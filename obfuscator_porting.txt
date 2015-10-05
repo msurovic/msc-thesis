@@ -1,0 +1,27 @@
+Copy  /include/Transforms/Obfuscation
+Copy  /include/CryptoUtils.h
+Copy  /lib/Transforms/Obfuscation
+
+Add the following to /lib/Transforms/IPO/PassManagerBuilder.cpp
+      
+      #include "llvm/Transforms/Obfuscation/BogusControlFlow.h"
+      #include "llvm/Transforms/Obfuscation/Flattening.h"
+      #include "llvm/Transforms/Obfuscation/Split.h"
+      #include "llvm/Transforms/Obfuscation/Substitution.h"
+      #include "llvm/CryptoUtils.h"
+
+      // Flags for obfuscation
+      static cl::opt<bool> Flattening("fla", cl::init(false),
+                                      cl::desc("Enable the flattening pass"));
+
+      static cl::opt<bool> BogusControlFlow("bcf", cl::init(false),
+                                            cl::desc("Enable bogus control flow"));
+
+      static cl::opt<bool> Substitution("sub", cl::init(false),
+                                        cl::desc("Enable instruction substitutions"));
+
+      static cl::opt<std::string> AesSeed("aesSeed", cl::init(""),
+                                          cl::desc("seed for the AES-CTR PRNG"));
+
+      static cl::opt<bool> Split("spli", cl::init(false),
+                                 cl::desc("Enable basic block splitting"));

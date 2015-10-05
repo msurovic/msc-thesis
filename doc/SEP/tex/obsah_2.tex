@@ -1,0 +1,67 @@
+%=========================================================================
+% (c) Michal Bidlo, Bohuslav Køena, 2008
+
+%Cohen86 -- PhD Thesis Viruses
+%Filiol12 -- Malicious cryptology and mathematics
+%Moser07 -- Limits of Static Analysis for Malware Detection
+%Durfina11 -- Design of a Retargetable Decompiler for a Static Platform-Independent Malware Analysis
+
+\chapter{Úvod}
+Informaèní technologie jsou dnes souèástí vìt¹iny odvìtví lidské èinnosti. Od mezilidské komunikace a interaktivní zábavy, a¾ po prùmyslnou výrobu a poskytování slu¾eb. S tímto výrazným prùnikem do ka¾dodenního ¾ivota v¹ak stále èastìji vyvstává otázka bezpeènosti a dùvìryhodnosti informaèních technologií. Díky své slo¾itosti je vývoj a provoz tìchto technologií náchylný na chyby a tyto chyby mohou být zneu¾ity k cílùm, které nemusí být v souladu s pøáními legitimního u¾ivatele. Odpovìï na tento problém je dvojí. Zlep¹ením procesù, které jsou uplatòovány ve vývoji je mo¾né pøedejít vytvoøení nìkterých chyb. Monitorováním provozu a u¾ívání informaèních technologií je mo¾né pøedejít zneu¾ití chyb, které jsou v systému ji¾ pøítomny, pøípadnì minimalizovat ¹kodu, která vznikla úspì¹ným zneu¾itím chyby. Softvéru, který je vytvoøen primárnì za úèelem nelegitimního u¾ití nebo po¹kození informaèních technologií øíkáme souhrnnì \emph{malware}. 
+
+Za úèelem ochrany informaèních technologií a u¾ivatelských dat byli vytvoøeny systémy, které odhalují a identifikují malware. Tyto systémy souhrnnì oznaèujeme jako bezpeènostní, av¹ak v kontextu softvérových systémù je bì¾nìj¹ím oznaèením antivirový systém neboli \emph{antivir}. Po pøedstavení antivirù na trh nastává ve svìtì informaèních technologií stav konfliktu, kde na jedné stranì stojí autoøi malwaru a na druhé stranì spoleènosti, které vyvíjejí antiviry. Nové techniky na jedné stranì stimulují vývoj nových technik na stranì druhé. Asi nejvýznamìj¹ím katalyzátorem tohoto konfliktu je \emph{obfuskace} malwaru.
+
+Pro to aby mohl malware efektivnì plnit svùj úèel je vhodné aby jeho pøítomnost v hostitelském systému zùstala v tajnosti. Obfuskace je jedním z prostøedkù jakými tohoto cíle dosáhnout. Malware, který vyu¾ívá obfuskaci je cílenì upravován tak aby bylo jeho rozeznání od bì¾ného a legitimního softvéru co nejtì¾¹í a aby jeho pøípadné nalezení v jednom systému nepomohlo identifikaci v jiných systémech. Zkoumání malwaru v kontextu teorie slo¾itosti a vyèíslitelnosti nám ukazuje, ¾e absolutnì spolehlivá detekce malwaru není mo¾ná\cite{Cohen86} nebo mù¾e být velice výpoèetnì nároèná\cite{Filiol12}. Vysoké nasazení a úspì¹nost antivirù v¹ak nasvìdèuje tomu, ¾e situace je v praxi o nìco pozitivnìj¹í a výzkum v oblasti detekce a klasifikace malwaru je smysluplný.
+
+Historicky byly techniky pro odhalování malware zamìøeny na vyhledávání syntaktických vzorù. Tedy se zamìøovali na to jak malware vypadá. Roz¹íøenost vysoce efektivní obfuskace na stranì malwaru v¹ak v posledních letech èiní syntakticky orientovanou detekci stále ménì efektivní a je nutné stále více vyu¾ívat techniky behaviorální\cite{Moser07}. Tyto techniky se zamìøují na to jak se malware chová v prostøedí hostitelského systému. Zde v¹ak nastává problém se zaji¹tìním bezpeènosti hostitelského systému pøi pozorování chování malwaru. Pomoc s tímto problémem by mohla poskytnout odvìtví formální analýzy a verifikace, které nabízí techniky pro analýzu vlastností softvéru bez jeho explicitního spu¹tìní. Takováto analýza se bì¾nì v kontextu formální analýzy a verifikace nazývá \emph{statická}. Opakem je analýza \emph{dynamická}, která softvér spou¹tí v kontrolovaném prostøedí a pozoruje jeho chování v nìm. Nevýhodou statické analýzy je v¹ak fakt, ¾e mnohokrát není k dispozici k analýze vhodná reprezentace konkretního malwaru. Výpomocí v tomto ohledu by mohl být pokrok v oblasti pøekladaèù programovacích jazykù a zpìtného pøekladu\cite{Durfina11}.
+
+Tato práce se zabývá zkoumáním mo¾ností aplikace metod formální analýzy a verifikace v statické behaviorální detekci a klasifikaci malwaru. Výchozím bodem je zejména implementace detekce a klasifikace malwaru pomocí \emph{inference stromových automatù} pøedstavená v \cite{Babic11}. Vstupem detektoru v \cite{Babic11} je binární soubor, který je spu¹tìn a pozorován v kontrolovaném prostøedí. Pozorované chování je zaznamenáno ve vhodné reprezentaci a z této reprezentace je odvozen nebo obohacen klasifikátor zalo¾ený na stromovém automatu. Cílem této práce je nahradit pøední dynamickou èást zmínìného detektoru vhodnou statickou variantou. Vychozím bodem v tomto pøípadì je mezikód pou¾ívaný v populární pøekladaèové infrastruktuøe LLVM.
+
+Zbytek práce je organizována následovnì. Kapitola \ref{malware_sota} pøedstavuje techniky, kterých vyu¾ívá moderní malware k obfuskaci a skrývání. Kapitola \ref{detection_sota} pøedstavuje techniky, které vyu¾ívají moderní antiviry k detekci a klasifikaci malware. Kapitola \ref{tree_automata} je struèným úvodem do teorie stromových automatù, která je vyu¾ita ke konstrukci jádra detektoru. Kapitola \ref{detector_design} pøibli¾uje strukturu a návrh detektoru z \cite{Babic11} spolu s návrhem zmìn v pøední èásti detektoru. Koneènì kapitola \ref{future} diskutuje dal¹í kroky, které je nutné podniknout k dosa¾ení cíle této práce.
+
+\chapter{Moderní malware a obfuskace}
+Jedním z hlavních cílù ka¾dého malwaru je utajení. Hlavním nástrojem k dosa¾ení tohoto cíle je obfuskace. Principielnì existuje mnoho zpùsobù jakým dosáhnout utajení malwaru v hostitelském systému. Tato kapitola se bude zamìøovat na techniky, které jsou bì¾né pro velkou èást malwaru a dostateènì obecné na to aby byli aplikovatelné ve vìt¹inì pøípadù u¾ití malwaru.
+
+\section{Packing a komprese}
+K tomu aby jsme pochopili co packing je a jakou roli hraje komprese v utajení malwaru je nejprve potøebné aby jsme pochopili v jaké formì se malware ¹íøí a jaké byly první techniky pro detekci malware. Moderní malware se ¹íøí primárnì v podobì binárních souborù a ke svému ¹íøení vyu¾ívá poèítaèových sítí --- zejména internetu. Základem detekèních technik i dnes je databáze vzorù malwaru. Proti syntaktickým a behaviorálním vzorùm v této databázi je mo¾né porovnávat chování procesù a strukturu souborù, které jsou pøítomny v hostitelském systému. 
+
+Packování je technika, která vyu¾íva kompresních algoritmù k zmìnì syntaktických vlastností binárního souboru. Hlavní binární soubor je komprimován a k výsledku je pøidána dekomprimaèní procedura, která v pøípadì spu¹tìní výsledného souboru dekomprimuje hlavní soubor uvnitø a spustí ho. Pùvodnì byla tato technika navr¾ena pro redukci objemu dat na pøenosných mediích, kde kapacita byla omezená. Dnes má tato technika hlavní uplatnìní pøi redukci objemu dat pøená¹ených pøes poèítaèové sítì a právì v obfuskaci malware.
+
+Komprimace efektivnì znemo¾ní nìkteré metody analýzy a detekce malware tím, ¾e zneèitelní statická data uvnitø hlavního binárního souboru. Tyto data jsou vìt¹inou znakové rìtìzce a èíselné konstanty, které mohou prozradit identitu malwaru a poskytnout vhled do jeho fungování. 
+
+Dal¹ím zpùsobem jak vyu¾ít komprese k obfuskaci je zkomprimováním náhodných nadbyteèných dat spolu s hlavním programem. Pokroèilé kompresní algoritmy jsou citlivé na zmìnu vstupních dat a i malá zmìna vstupního souboru vede na dramatické rozdíly ve výstupním souboru. Tohoto jevu je mo¾né s výhodou vyu¾ít k zvý¹ení variability vzhledu malwaru mezi jednotlivými systémy napadenými stejným malwarem.
+
+A v neposledné øadì komprese sni¾uje velikost výsledného malwaru, co vede na men¹í syntaktické vzory a tedy vìt¹í ¹anci, ¾e se podobný vzor vyskytne uvnitø legitimního softvéru, který bude ¹patnì oznaèen jako malware.
+
+\section{©ifrování a oligomorfismus}
+Vysoce efektivním a roz¹íøeným zpùsobem obfuskace je ¹ifrování. Podobnì jako u packingu a komprese je ¹ifrování vyu¾ito k zmìnì syntaktických vlastností binárního souboru, který obsahuje hlavní tìlo malwaru. K ¹ifrovanému hlavnímu tìlu je pøidána procedura, které v pøípadì spu¹tìní de¹ifruje hlavní tìlo a spustí ho. ©ifrovacím klíèem je typicky údaj, který je proceduøe kdykoli dispozici, napøíklad velikost souboru s hlavním tìlem. Pøí napadení dal¹ích systémù je klíè zmìnìn a hlavní tìlo malwaru je ¹ifrováno novým klíèem. Tímto je dosa¾eno toho, ¾e na ka¾dém napadeném systému má malware stejné chování, ale vypadá jinak. Poèítaèový vir Cascade byl prvním malwarem vyu¾ívající ¹ifrování k obfuskaci. Svoje hlavní tìlo ¹ifroval jednoduchou \texttt{xor} ¹ifrou s klíèem odvozeným právì velikostí hlavního tìla. 
+
+Ikdy¾ se hlavní tìlo malwaru mìní mezi jednotlivými instancemi napadení, tìlo ¹ifrovací procedury zùstává stejné. Tohoto mù¾e antivir vyu¾ít k detekci malwaru. Klasifikace je v¹ak stále obtí¾ná proto¾e dva rùzné malwary mohou vyu¾ívat stejnou ¹ifrovací proceduru. Stejnì tak legitimní softvér mù¾e vyu¾ívat ¹ifrování. Nicmnénì je v zájmu autorù malware aby pøítomnost jejich výtvoru v napadeném systému zùstala úplnì v tajnosti. Z tohoto dùvodu byl pøedstaven \emph{oligomorfní}\footnote{z øeckého \emph{oligo} --- málo a \emph{morphe} --- tvar nebo forma} malware. Takovýto malware doká¾e mìnit mezi instancemi napadení i svoji ¹ifrovací proceduru.
+
+Typickou cestou jak implementovat oligomorfismus je mít k dispozici nìkolik nezávislých ¹ifrovacích procedur a ty støídat a mìnit ¹ifrovací klíèe. ©ifrovací procedury, které nejsou vyu¾ity jsou ¹ifrovány spolu s hlavním tìlem. Tímto zpùsobem je v¹ak mo¾né mít \uv{pouze} stovky mo¾ných forem --- nebo \emph{mutací} --- jednoho malwaru. Na této úrovni je je¹tì mo¾né efektivnì vyu¾ívat detekce zalo¾ené na vyhledávání syntaktických vzorù. Pøíkladem oligomorfního malwaru byl souborový infektor Whale z roku 1990.
+
+\section{Polymorfismus}
+Hlavním nedostatkem oligomorfního malwaru byl relativnì malý poèet mo¾ných mutací jednoho malwaru. Øe¹ením tohto \uv{problému} je \emph{polymorfní}\footnote{z øeckého \emph{polys} --- mnoho a \emph{morphe} --- tvar nebo forma} malware. Tento druh malwaru pou¾ívá k obfuskaci ¹ifrovací rutiny transformace kódu, které mìní syntaktické vlastnosti ¹ifrovací rutiny, ale nijak nemìní její chování. Výsledkem je malware, který mutací mìní témìø celou svoji binární podobu a není detekovatelný pomocí èistì syntaktických metod. Typickými transformacemi kódu, které polymorfní malware provádí jsou:
+
+\begin{itemize}
+	\item Vkládání mrtvého kódu --- do pùvodního kódu jsou vlo¾eny zbyteèné instrukce, které nemají ¾ádný vliv na funènost kódu, ale mìní jeho binární podobu. Pøíkladem mù¾e být vkládání \texttt{nop} isntrukcí nebo \texttt{inc} instrukce následovaná \texttt{dec} instrukcí nad stejným registrem.
+
+	\item Pøerazení registrù --- kód provádí stejné instrukce nad stejnými daty, které jsou ale po ka¾dé mutaci umístìny v jiných registrech. Tato transformace samotná je v¹ak detekovatelná pomocí tzv. \emph{wildcard} vyhledávání. Tato technika byla vyu¾ita napøíklad ve viru Win95/Regswap.
+
+	\item Pøeuspoøádání podprogramù --- velmi efektivní transformace, která pøeuspoøádává nezávislé èásti kódu. Pro kód, který lze rozdìlit na $n$ nezávislých èástí je mo¾né tímto zpùsobem vytvoøit $n!$ rùzných mutací. Virus Win32/Ghost se svými $10$ èástmi byl teda schopen vyprodukovat a¾ $10! = 3628800$ mutací.
+
+	\item Substituce instrukcí --- nahrazení jedné nebo více instrukcí jinými instrukcemi se stejnou funkèností. Napøíklad \texttt{xor} za \texttt{sub} nebo \texttt{mov} za \texttt{push} a \texttt{pop} instrukce.
+
+	\item Transpozice kódu --- pøeuspoøádání instrukcí. V pøípadì, ¾e instrukce jsou na sobì závislé, je poøadí vykonávání obnoveno pomocí nepodmínìných skokù. Pokud pøeuspoøádávané instrukce nejsou na sobì závislé, obnova poøadí není nutná. Av¹ak nalezení nezávislých instrukcí je v kontextu malwaru pomìrnì nákladné.
+	
+	\item Integrace kódu --- technika, která vyu¾ívá k obfuskaci jiný binární soubor. Malware nejprve rozlo¾í \uv{hostitelský} binární soubor na nezávislé bloky, pak vlo¾í malwarový kód mezi tyto bloky a nakonec znovu sestaví pùvodní binární soubor. Tato technika byla poprvé pøedstavena v populárním viru Win95/Zmist a je jednou z nejvíce sofistikovaných metod obfuskace vùbec.
+\end{itemize}
+
+\section{Metamorfismus}
+
+\chapter{Metody detekce malware}
+\chapter{Stromové automaty}
+\chapter{Struktura behaviorálního detektoru}
+\chapter{Závìr}
+
+%=========================================================================

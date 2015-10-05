@@ -1,0 +1,16 @@
+#!/usr/bin/gnuplot
+reset
+set term postscript eps font "Times,10"
+set output "matrix-3-5.eps"
+#set xlabel "Train"
+#set ylabel "Test"
+unset key
+
+set tic scale 1
+
+set xrange [0.5:48.5]
+set xtics 1,1,48 out scale 0.1
+set yrange [0.5:48.5]
+set ytics 1,1,48 out scale 0.1
+
+plot 'matrix-3-5.dat' using 1:2:3 with circles lc rgb "blue" fs solid 0.70 noborder

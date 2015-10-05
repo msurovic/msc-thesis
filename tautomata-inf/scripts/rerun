@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# $Id: rerun 485 2011-01-20 06:21:10Z babic $
+
+# Generate statistics and the heatmap
+./sdgstats -dir=/home/babic/projects/tpin/traces/malware -exe=../src/sdginfer -min=2 -max=8 > malware_stats.dat
+mv heatmap.dat malware_heatmap.dat
+./sdgstats -dir=/home/babic/projects/tpin/traces/benign -exe=../src/sdginfer -min=2 -max=8 > goodware_stats.dat
+mv heatmap.dat goodware_heatmap.dat
+./heatmap
+
+echo "Done with statistics generation."
+
+# Generate the family recognition matrix
+./sdgrun -src=/home/babic/projects/tpin/traces/malware -dst=../test/ -infer=../src/sdginfer -prc=0.5 -k=3 -cutoff=5 -clean
+./matrix
+
+# Erase the partition
+rm -fr ../test/*
+
+echo "Done with family recognition experiments."
+
+# Detection experiments
+./divide -src=/home/babic/projects/tpin/traces/malware -dst=../test -prc=0.5
+./detect -train=../test/train -test=/home/babic/projects/tpin/traces/benign -infer=../src/sdginfer -min=2 -max=8 > detect_goodware_stats.dat
+./detect -train=../test/train -test=../test/test -infer=../src/sdginfer -min=2 -max=8 > detect_malware_stats.dat
+
+echo "Done with detection experiments."

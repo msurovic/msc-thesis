@@ -1,0 +1,29 @@
+#!/usr/bin/gnuplot
+reset
+set term postscript eps font "Times,12"
+unset key
+set tic scale 1
+gamma = 2
+color(gray) = gray ** gamma
+set palette model RGB functions color(gray), color(gray), color(gray) negative
+set view map
+set format y "%2.0f"
+set cbrange [1:50]
+set cbtics scale 0
+set format cb "%2.0f"
+#set cblabel "Legend"
+
+
+# Goodware
+set xrange [0.5:100.5]
+set yrange [0.5:35.5]
+set ytics 1,1,35
+set output "goodware_heatmap.eps"
+plot "goodware_heatmap.dat" using 2:1:3 with image
+
+# Malware
+set xrange [0.5:70.5]
+set yrange [0.5:48.5]
+set ytics 1,1,48
+set output "malware_heatmap.eps"
+plot "malware_heatmap.dat" using 2:1:3 with image

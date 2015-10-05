@@ -1,0 +1,254 @@
+%=========================================================================
+% (c) Michal Bidlo, Bohuslav Køena, 2008
+
+%Cohen86 -- PhD Thesis Viruses
+%Filiol12 -- Malicious cryptology and mathematics
+%Moser07 -- Limits of Static Analysis for Malware Detection
+%Durfina11 -- Design of a Retargetable Decompiler for a Static Platform-Independent Malware Analysis
+%Konstantinou08 -- PhD Thesis Metamorphic virus
+%Babic11 -- Malware detection with TA Inference
+%Jacob08 -- Behavioral detection of malware: from a survey towards an established taxonomy
+%You10 -- Malware Obfuscation Techniques: A Brief Survey
+%Shiffman10 -- A Brief History of Malware Obfuscation
+%RevGen -- Enabling sophisticated analyses of ×86 binaries with RevGen
+
+\chapter{Úvod}
+Informaèní technologie jsou dnes souèástí vìt¹iny odvìtví lidské èinnosti. Od mezilidské komunikace a interaktivní zábavy, a¾ po prùmyslnou výrobu a poskytování slu¾eb. S~tímto výrazným prùnikem do ka¾dodenního ¾ivota v¹ak stále èastìji vyvstává otázka bezpeènosti a dùvìryhodnosti informaèních technologií. Díky své slo¾itosti je vývoj a provoz tìchto technologií náchylný na chyby a tyto chyby mohou být zneu¾ity k~cílùm, které nemusí být v~souladu s~pøáními legitimního u¾ivatele. Odpovìï na tento problém je dvojí. Zlep¹ením procesù, které jsou uplatòovány ve vývoji je mo¾né pøedejít vytvoøení nìkterých chyb. Monitorováním provozu a u¾ívání informaèních technologií je mo¾né pøedejít zneu¾ití chyb, které jsou v~systému ji¾ pøítomny, pøípadnì minimalizovat ¹kodu, která vznikla úspì¹ným zneu¾itím chyby. Softvéru, který je vytvoøen primárnì za úèelem nelegitimního u¾ití nebo po¹kození informaèních technologií øíkáme souhrnnì \emph{malware}. 
+
+Za úèelem ochrany informaèních technologií a u¾ivatelských dat byli vytvoøeny systémy, které odhalují a identifikují malware. Tyto systémy souhrnnì oznaèujeme jako bezpeènostní, av¹ak v~kontextu softwarových systémù je bì¾nìj¹ím oznaèením antivirový systém neboli \emph{antivir}. Po pøedstavení antivirù na trh nastává ve svìtì informaèních technologií stav konfliktu, kde na jedné stranì stojí autoøi malware a na druhé stranì spoleènosti, které vyvíjejí antiviry. Nové techniky na jedné stranì stimulují vývoj nových technik na stranì druhé. Asi nejvýznamìj¹ím katalyzátorem tohoto konfliktu je \emph{obfuskace} malware.
+
+Pro to aby mohl malware efektivnì plnit svùj úèel je vhodné aby jeho pøítomnost v~hostitelském systému zùstala v~tajnosti. Obfuskace je jedním z~prostøedkù jakými tohoto cíle dosáhnout. Malware, který vyu¾ívá obfuskaci je cílenì upravován tak aby bylo jeho rozeznání od bì¾ného a legitimního software co nejtì¾¹í a aby jeho pøípadné nalezení v~jednom systému nepomohlo identifikaci v~jiných systémech. Zkoumání malware v~kontextu teorie slo¾itosti a vyèíslitelnosti nám ukazuje, ¾e absolutnì spolehlivá detekce malware není mo¾ná\cite{Cohen86} nebo mù¾e být velice výpoèetnì nároèná\cite{Filiol12}. Vysoké nasazení a úspì¹nost antivirù v¹ak nasvìdèuje tomu, ¾e situace je v~praxi o~nìco pozitivnìj¹í a výzkum v~oblasti detekce a klasifikace malware je smysluplný.
+
+Historicky byly techniky pro odhalování malware zamìøeny na vyhledávání syntaktických vzorù. Tedy se zamìøovali na to jak malware vypadá. Roz¹íøenost vysoce efektivní obfuskace na stranì malware v¹ak v~posledních letech èiní syntakticky orientovanou detekci stále ménì efektivní a je nutné stále více vyu¾ívat techniky behaviorální\cite{Moser07}. Tyto techniky se zamìøují na to jak se malware chová v~prostøedí hostitelského systému. Zde v¹ak nastává problém se zaji¹tìním bezpeènosti hostitelského systému pøi pozorování chování malware. Pomoc s~tímto problémem by mohla poskytnout odvìtví formální analýzy a verifikace, které nabízí techniky pro analýzu vlastností software bez jeho explicitního spu¹tìní. Takováto analýza se bì¾nì v~kontextu formální analýzy a verifikace nazývá \emph{statická}. Opakem je analýza \emph{dynamická}, která software spou¹tí v~kontrolovaném prostøedí a pozoruje jeho chování v~nìm. Nevýhodou statické analýzy je v¹ak fakt, ¾e mnohokrát není k~dispozici k~analýze vhodná reprezentace konkretního malware. Výpomocí v~tomto ohledu by mohl být pokrok v~oblasti pøekladaèù programovacích jazykù a zpìtného pøekladu\cite{Durfina11}.
+
+Tato práce se zabývá zkoumáním mo¾ností aplikace metod formální analýzy a verifikace v~statické behaviorální detekci a klasifikaci malware. Výchozím bodem je zejména implementace detekce a klasifikace malware pomocí \emph{inference stromových automatù} pøedstavená v~\cite{Babic11}. Vstupem detektoru v~\cite{Babic11} je binární soubor, který je spu¹tìn a pozorován v~kontrolovaném prostøedí. Pozorované chování je zaznamenáno ve vhodné reprezentaci a z~této reprezentace je odvozen nebo obohacen klasifikátor zalo¾ený na stromovém automatu. Cílem této práce je nahradit pøední dynamickou èást zmínìného detektoru vhodnou statickou variantou. Vychozím bodem v~tomto pøípadì je mezikód pou¾ívaný v~populární pøekladaèové infrastruktuøe LLVM.
+
+Zbytek práce je organizována následovnì. Kapitola \ref{malware_sota} pøedstavuje techniky, kterých vyu¾ívá moderní malware k~obfuskaci a skrývání. Kapitola \ref{detection_sota} pøedstavuje techniky pro detekci a klasifikaci malware. Kapitola \ref{detector_design} pøibli¾uje strukturu a návrh detektoru z~\cite{Babic11} spolu s~návrhem zmìn v~pøední èásti detektoru. Koneènì kapitola \ref{future} diskutuje dal¹í kroky, které je nutné podniknout k~dosa¾ení cíle této práce.
+
+\chapter{Obfuskace malware}
+\label{malware_sota}
+Jedním z~hlavních cílù ka¾dého malware je utajení. Hlavním nástrojem k~dosa¾ení tohoto cíle je obfuskace. Principielnì existuje mnoho zpùsobù jakým dosáhnout utajení malware v~hostitelském systému. Tato kapitola se bude zamìøovat na techniky, které jsou bì¾né pro velkou èást malware a dostateènì obecné na to aby byli aplikovatelné ve vìt¹inì pøípadù u¾ití malware. Kapitola èerpá zejména z~èlánkù \cite{You10, Schiffman10} a kapitol \cite{Konstantinou08} vìnovaným obfuskaci malware.
+
+\section{Packing a komprese}
+K~tomu aby jsme pochopili co \emph{packing} je a jakou roli hraje komprese v~utajení malware je nejprve potøebné aby jsme pochopili v~jaké formì se malware ¹íøí a jaké byly první techniky pro detekci malware. Moderní malware se ¹íøí primárnì v~podobì binárních souborù a ke svému ¹íøení vyu¾ívá poèítaèových sítí --- zejména internetu. Základem detekèních technik i dnes je databáze vzorù malware. Proti syntaktickým a behaviorálním vzorùm v~této databázi je mo¾né porovnávat chování procesù a strukturu souborù, které jsou pøítomny v~hostitelském systému. 
+
+Packování je technika, která vyu¾íva kompresních algoritmù k~zmìnì syntaktických vlastností binárního souboru. Hlavní binární soubor je komprimován a k~výsledku je pøidána dekomprimaèní procedura, která v~pøípadì spu¹tìní výsledného souboru dekomprimuje hlavní soubor uvnitø a spustí ho. Pùvodnì byla tato technika navr¾ena pro redukci objemu dat na pøenosných mediích, kde kapacita byla omezená. Dnes má tato technika hlavní uplatnìní pøi redukci objemu dat pøená¹ených pøes poèítaèové sítì a právì v~obfuskaci malware.
+
+Komprimace efektivnì znemo¾ní nìkteré metody analýzy a detekce malware tím, ¾e zneèitelní statická data uvnitø hlavního binárního souboru. Tyto data jsou vìt¹inou znakové rìtìzce a èíselné konstanty, které mohou prozradit identitu malware a poskytnout vhled do jeho fungování. 
+
+Dal¹ím zpùsobem jak vyu¾ít komprese k~obfuskaci je zkomprimováním náhodných nadbyteèných dat spolu s~hlavním programem. Pokroèilé kompresní algoritmy jsou citlivé na zmìnu vstupních dat a i malá zmìna vstupního souboru vede na dramatické rozdíly ve výstupním souboru. Tohoto jevu je mo¾né s~výhodou vyu¾ít k~zvý¹ení variability vzhledu malware mezi jednotlivými systémy napadenými stejným malwarem.
+
+A~v~neposledné øadì komprese sni¾uje velikost výsledného malware, co vede na men¹í syntaktické vzory a tedy vìt¹í ¹anci, ¾e se podobný vzor vyskytne uvnitø legitimního software, který bude ¹patnì oznaèen jako malware.
+
+\section{©ifrování a oligomorfismus}
+Vysoce efektivním a roz¹íøeným zpùsobem obfuskace je ¹ifrování. Podobnì jako u~packingu a komprese je ¹ifrování vyu¾ito k~zmìnì syntaktických vlastností binárního souboru, který obsahuje hlavní tìlo malware. K~¹ifrovanému hlavnímu tìlu je pøidána procedura, které v~pøípadì spu¹tìní de¹ifruje hlavní tìlo a spustí ho. ©ifrovacím klíèem je typicky údaj, který je proceduøe kdykoli dispozici, napøíklad velikost souboru s~hlavním tìlem. Pøí napadení dal¹ích systémù je klíè zmìnìn a hlavní tìlo malware je ¹ifrováno novým klíèem. Tímto je dosa¾eno toho, ¾e na ka¾dém napadeném systému má malware stejné chování, ale vypadá jinak. Poèítaèový vir Cascade byl prvním malwarem vyu¾ívající ¹ifrování k~obfuskaci. Svoje hlavní tìlo ¹ifroval jednoduchou \texttt{xor} ¹ifrou s~klíèem odvozeným právì z~velikosti hlavního tìla. 
+
+Ikdy¾ se hlavní tìlo malware mìní mezi jednotlivými instancemi napadení, tìlo ¹ifrovací procedury zùstává stejné. Tohoto mù¾e antivir vyu¾ít k~detekci malware. Klasifikace je v¹ak stále obtí¾ná proto¾e dva rùzné malwary mohou vyu¾ívat stejnou ¹ifrovací proceduru. Stejnì tak legitimní software mù¾e vyu¾ívat ¹ifrování. Nicmnénì je v~zájmu autorù malware aby pøítomnost jejich výtvoru v~napadeném systému zùstala úplnì v~tajnosti. Z~tohoto dùvodu byl pøedstaven \emph{oligomorfní} malware. Takovýto malware doká¾e mìnit mezi instancemi napadení i svoji ¹ifrovací proceduru.
+
+Typickou cestou jak implementovat oligomorfismus je mít k~dispozici nìkolik nezávislých ¹ifrovacích procedur a ty støídat a mìnit ¹ifrovací klíèe. ©ifrovací procedury, které nejsou vyu¾ity jsou ¹ifrovány spolu s~hlavním tìlem. Tímto zpùsobem je v¹ak mo¾né mít \uv{pouze} stovky mo¾ných forem --- nebo \emph{mutací} --- jednoho malware. Na této úrovni je je¹tì mo¾né efektivnì vyu¾ívat detekce zalo¾ené na vyhledávání syntaktických vzorù v~binárním souboru. Pøíkladem oligomorfního malware byl souborový infektor Whale z~roku 1990.
+
+\section{Polymorfismus}
+Hlavním nedostatkem oligomorfního malware byl relativnì malý poèet mo¾ných mutací jednoho malware. Øe¹ením tohoto \uv{problému} je \emph{polymorfní} malware. Tento druh malware pou¾ívá k~obfuskaci ¹ifrovací procedury transformace kódu, které mìní syntaktické vlastnosti ¹ifrovací procedury, ale nijak nemìní její chování. Výsledkem je malware, který mutací mìní témìø celou svoji binární podobu a není detekovatelný pomocí èistì statických syntaktických metod. Typickými transformacemi kódu, které polymorfní malware provádí jsou:
+
+\subsubsection*{Vkládání mrtvého kódu}
+Do pùvodního kódu jsou vlo¾eny zbyteèné instrukce, které nemají ¾ádný vliv na funènost kódu, ale mìní jeho binární podobu. Pøíkladem mù¾e být vkládání \texttt{nop} isntrukcí nebo \texttt{inc} instrukce následovaná \texttt{dec} instrukcí nad stejným registrem.
+
+\subsubsection*{Pøerazení registrù}
+Kód provádí stejné instrukce nad stejnými daty, které jsou ale po ka¾dé mutaci umístìny v~jiných registrech. Tato transformace samotná je v¹ak detekovatelná pomocí tzv. \emph{wildcard} vyhledávání. Tato technika byla vyu¾ita napøíklad ve viru Win95/Regswap.
+
+\subsubsection*{Pøeuspoøádání podprogramù}
+Velmi efektivní transformace, která pøeuspoøádává nezávislé èásti kódu. Pro kód, který lze rozdìlit na $n$ nezávislých èástí je mo¾né tímto zpùsobem vytvoøit $n!$ rùzných mutací. Virus Win32/Ghost se svými $10$ èástmi byl teda schopen vyprodukovat a¾ $10! = 3628800$ mutací.
+
+\subsubsection*{Substituce instrukcí}
+Nahrazení jedné nebo více instrukcí jinými instrukcemi se stejnou funkèností. Napøíklad \texttt{xor} za \texttt{sub} nebo \texttt{mov} za \texttt{push} a \texttt{pop} instrukce.
+
+\subsubsection*{Transpozice kódu}
+Pøeuspoøádání instrukcí. V~pøípadì, ¾e instrukce jsou na sobì závislé, je poøadí vykonávání obnoveno pomocí nepodmínìných skokù. Pokud pøeuspoøádávané instrukce nejsou na sobì závislé, obnova poøadí není nutná. Av¹ak nalezení nezávislých instrukcí je v~kontextu malware pomìrnì nákladné.
+    
+\subsubsection*{Integrace kódu}
+Technika, která vyu¾ívá k~obfuskaci jiný binární soubor. Malware nejprve rozlo¾í \uv{hostitelský} binární soubor na nezávislé bloky, pak vlo¾í malwarový kód mezi tyto bloky a nakonec znovu sestaví pùvodní binární soubor. Tato technika byla poprvé pøedstavena v~populárním viru Win95/Zmist a je jednou z~nejvíce sofistikovaných metod obfuskace vùbec.
+
+\section{Metamorfismus}
+S~nástupem polymorfního malware bylo nutné obohatit antiviry o~dynamické detekèní metody. Polymorfní malware mìnil mutací celou svoji binární podobu, ale po tom co provedl de¹ifrování bylo mo¾né v~pamìti poèítaèe objevit neobfuskované hlavní tìlo malware, které vykonávalo ¹kodlivou èinnost a mutaci ¹ifrovací procedury pro novou generaci. Tedy vyhledáváním syntaktických vzorù v~pamìti poèítaèe bylo mo¾né polymorfní malware odhalit. Odpovìdí na tyto metody detekce byl malware \emph{metamorfní}. Takovýto malware ji¾ nevyu¾ívá primárnì ¹ifrování k~obfuskaci, ale aplikuje transformaèní techniky polymorfního malware i na hlavní tìlo. Tímto se mìní syntaxe celého tìla malware a jakýkoli èistì syntaktický pøístup je obecnì málo efektivní.
+
+Implementace efektivního metamorfního malware je netriviální úkol. Na obrázku \ref{meta_malware} je ilustrován obecný ¾ivotní cyklus metamorfního malware. Jedna iterace ¾ivotního cyklu koresponduje právì k~jedné mutaci malware. Následuje popis jednotlivých etap.
+
+\subsubsection*{Lokalizace vlastního kódu}
+Prvním krokem malware pøi mutaci je nalezení specifikace vlastního kódu v~napadeném systému. Takovouto specifikací mù¾e být vlastní binarní soubor, pseudokód nebo pøímo zdrojový kód malware. V~pøípadì malware, který vyu¾ívá hostitelské soubory --- napøíklad Win95/Zmist --- je nutné aby byl malware schopen identifikovat napadadené hostitelské soubory a svùj vlastní kód v~nich.
+
+\subsubsection*{Dekódování}
+Aby metamorfní malware unikl èistì syntaktickým metodám, je nutné aby ¾ádná jeho èást nebyla konstantní, tedy ani jeho specifikace. Pøi dekódování je specifikace zpracována do podoby, z~které je mo¾né sestavit mutací novou generaci malware. U~specifikace vlastním binárním souborem, je dekódování vlastnì zpìtným pøekladem strojového kódu do assembleru, tedy disassembling.
+
+\subsubsection*{Analýza}
+Na to aby byl malware schopen provést mutaci je nutné aby mìl k~dispozici napøíklad informace o~vyu¾ití registrù pro obfuskaci jejich pøeøazením, nebo informace o~toku øízení pro obfuskaci pøeuspoøádáním podprogramù a transpozicí kódu. V~tomto kroku jsou provádìny analýzy dekódované specifikace nutné pro získání tìchto informací.
+
+\subsubsection*{Transformace}
+V~této etapì jsou provádìna obfuskace na základì výsledkù pøedchozích etap. Aplikovány mohou být v¹echny transformace pøedstavené v~polymorfních malwarech a nìkteré dal¹í, jako je napøíklad obfuskace vstupního bodu vykonávání malware, která mù¾e ztí¾it nìkteré druhy dynamické detekce. Souèástí transformací mù¾e být také odstranìní nìkterých pøedchozích obfuskací a jednoduchá optimalizace kódu za úèelem zmen¹ení velikosti výsledného malware.
+
+\subsubsection*{Znovusestavení}
+Posledním krokem pøi mutaci metamorfního malware je znovusestavení binárního souboru malware. Tímto krokem je mutace dokonèena a binární soubor malware je pøipraven k~napadení dal¹ího systému nebo souboru v~systému.
+
+\bigskip
+
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.25}{\includegraphics{meta_malware.pdf}}
+    \caption{®ivotní cyklus metamorfního malware}
+    \label{meta_malware}
+\end{figure}
+
+\chapter{Metody detekce malware}
+\label{detection_sota}
+Na problematiku detekce malware je mo¾né se dívat dvojím zpùsobem. Defenzivním pøístupem k~detekci malware jsou \emph{intrusion detection systémy}, které monitorují vyu¾ívání zdrojù a èinnost procesù v~chránìném systému. Pokud je zaznamenáno potenciálnì ¹kodlivé chování u~nìkterého z~procesù v~systému nebo podezøelé vyu¾ití zdrojù, u¾ivatel je o~tom informován a pøípadnì jsou podniknuty kroky z~potlaèení hrozby.
+
+\emph{Antiviry} pøedstavují ofenzivní pøístup k~detekci malware. Podezøelé soubory nebo procesy jsou aktivnì prohledávány a jejich vzhled nebo chování je porovnáváno vùèi databázi, která obsahuje vzory známého malware. Metody, které se orientují na vzhled podezøelých souborù a procesù nazýváme \emph{vzhledovì--orientované} nebo \emph{syntaktické}. Metody vy¹etøující chování nazýváme \emph{behaviorální}.
+
+Tato kapitola pøibli¾uje historický vývoj antivirových detekèních metod, metody detekce pou¾ívané v~moderních antivirech a nové výzkumní trendy v~oblasti detekce malware. Èást pojednávající o~syntaktických detektorech èerpá primárnì z~kapitol o~antivirových skenerech v~\cite{Konstantinou08}. Èást pøedstavující behaviorální detektory èerpá z~\cite{Jacob08}.
+
+\section{Syntaktická detekce}
+Historicky první pøístup k~detekci malware vyu¾ívaný antivirovým software. Syntaktické detektory se orientují na hledání vzorù malware ve vzhledu --- zejména binárních --- souborù. K~tomuto úèelu bylo vyvinuto mnoho detekèních metod, z~kterých vìt¹ina je zalo¾ena na \emph{vyhledávání vzorù} nebo \emph{emulace kódu} nebo na kombinaci zmínìných.
+
+\subsection{Vyhledávání vzorù}
+První a nejjednodu¹¹í formou detekce malware je vyhledávání posloupností bajtù v~binárních souborech. Detektor je tedy slo¾en z~databáze posloupností bajtù, které jsou specifické pro jednotlivé vzorky malware a metody, která tyto posloupnosti hledá v~binárních souborech. Velikost hledané posloupnosti a struktura kódu malware má velký vliv na úspì¹nsot tìchto metod. Následuje nìkolik variací prostého vyhledávání, které vylep¹ují vlastnosti této metody.
+
+\subsubsection*{Wildcard vyhledávání}
+Modifikace prostého vyhledávání posloupnosti bajtù. Mìjme posloupnosti bajtù na obrázku \ref{wildcards}. Horní posloupnost je vybrána z~binárního souboru napadeného virem W32/Beast. Dolní posloupnost je vzor pro wildcard vyhledávání. Znaèka \texttt{?} znamená, ¾e tato èást posloupnosti mù¾e být vynechána. Znaèka \texttt{\%2} zase znamená, ¾e dal¹í bajt --- \texttt{03} v~uvedeném pøíkladì --- se mù¾e vyskytovat na následujících dvou pozicích za znaèkou. Zajímavostí této metody je fakt, ¾e i navzdory své jednoduchosti byla schopna odhalit virus Win95/Regswap, který vy¾íval obfuskaci pomocí pøeøazení registrù. 
+
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \verb|83EB 0274 1683 EB0E 740A 81EB 0301 0000|\\
+    \verb|   83EB 0274 ??83 EB0? 740A 81EB %2 0301 0000|
+    \caption{Posloupnost bajtù z~W32/Beast a wildcard vzor pro jeho detekci}
+    \label{wildcards}
+\end{figure}
+
+\subsubsection*{Mismatch vyhledávání}
+Metoda, která povoluje pøi vyhledávání vzoru chyby. Pokud nastane pøi vyhledávání chyba, vyhledávací algoritmus to zaznamená a sna¾í se najít stejný bajt na dal¹í pozici v~binárním souboru. Na obrázku \ref{mismatches} je na prvním øádku vyhledávaný vzor. Dal¹í øádky ilustrují posloupnosti, které vzoru vyhovují pro mismatch, který pøipou¹tí tøi chyby.
+
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \verb|vzor: 11 22 33 44 55 66 77 88|\\
+    \verb|pr1:  A3 11 22 33 C9 44 55 66 0A 77 88|\\
+    \verb|pr2:  11 34 22 33 C4 44 55 66 67 77 88|\\
+    \verb|pr3:  11 22 33 44 D4 DD E5 55 66 77 88|
+    \caption{Pøíklad vyhledávání povolující 3--mismatch}
+    \label{mismatches}
+\end{figure}
+
+\subsubsection*{Top--and--Tail optimalizace}
+Jednoduchá optimalizace, která omezuje hledání vzoru na prvních a posledních dvou, ètyøech nebo osmi kilobajtech. Tato technika byla populární v~dobì kdy malware umís»oval svùj kód na zaèátek a konec souborù.
+
+\subsubsection*{Smart Scanning}
+Pokroèilá modifikace prostého vyhledávání, která se doká¾e vypoøádat s~nìkterými druhy obfuskace. Pøi vyhledávání jsou ignorovány zbyteèné instrukce, napøíklad \texttt{nop} a hledání je provádìno v~partiích kódu, které neobsahují skoky nebo volání podprogramù.
+
+\subsubsection*{Algoritmická detekce}
+Nebo také \emph{malwarovì specifická detekce} je rodina metod, které se orientují na specializované vyhledávání vzorù specifických pro jednotlivé malwary. Pro efektivní implementaci tìchto metod jsou èastokrát vytvoøeny specializované jazyky pro popis malware a jeho vyhledávání. Specifikace detekèních algoritmù v~takovýchto jazycích jsou pøelo¾eny do mezikódu, který je interpretován antivirem. Typické pro tyto metody je \emph{filtrování}, tedy vyhledávání vzorù v~specifických souborech, které napadá jenom malware daného druhu. Pokud daný mawalre vyu¾ívá ¹ifrování k~obfuskaci, je mo¾né provést \emph{x-ray vyhledávání}, které provádí útok na ¹ifru malware pomocí znalosti de¹ifrovaného tìla. Proto¾e malware èasto vyu¾ívá slabé ¹ifrovací klíèe a jednoduché ¹ifry, je tato metoda pomìrnì úspì¹ná.
+
+\subsection{Emulace kódu}
+Velice efektivní metoda pro detekci jakéhokoli malware, který vyu¾ívá ¹ifrování k~obfuskaci. Kód malware je spu¹tìn v~kontrolovaném prostøedí virtuálního stroje, který napodobuje podmínky reálného systému. Malware v~tomto prostøedí de¹ifruje svoje konstantní hlavní tìlo a prezentuje tak kód, v~kterém je mo¾né vyhledat syntaktické vzory ji¾ zmínìnými metodami.
+
+Efektivnost této metody je v¹ak závislá od implementace virtuálního prostøedí, v~kterém je malware spu¹tìn. Malware mù¾e pou¾ít zbyteèných výpoètù k~tomu aby uèinil emulaci drahou a neefektivní a tím celou metodu znehodnotil. K~tomuto byly typicky vyu¾ívány smyèky se zbyteèným kódem a operace nad èísly v~plovoucí øádové èárce. Obranou proti tomuto je dynamická detekce zbyteèných smyèek a emulace operací v~plovoucí øádové èárce. Toto v¹ak dává malware mo¾nosti detekce emulátoru a adekvátní odpovìdi.
+
+\subsection{Detekce pomocí koneèných automatù}
+Metoda zalo¾ená na teorii formálních jazykù a koneèných automatù, která byla navr¾ena pro analýzu obfuskovaného, zejména polymorfního a metamorfního malware. Malware je pøelo¾en ze strojového jazyka do assembleru, transformován a výsledný kód je brán jako øetìzec symbolù, kde symboly jsou jednotlivé instrukce assembleru. Na obrázku \ref{dfa_detector} je uveden schematický popis detektoru zalo¾eném na simulaci koneèných automatù.
+
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.5}{\includegraphics{dfa_detector.pdf}}
+    \caption{Schéma detektoru, který vyu¾ívá koneèné automaty}
+    \label{dfa_detector}
+\end{figure}
+
+\bigskip
+
+Depermutace má za úkol pøeskládat kód obfuskovaný pøeuspoøádaním podrogramù a transpozicí kódu. Pùvodní poøadí vykonávání instrukcí je èásteènì obnoveno analýzou instrukcí skokù a voláním podprogramù. Tento proces v¹ak ze svého principu není exaktní. Normalizace je provádìna zároveò se simulací koneèného automatu a slou¾í k~zahazování zbyteèného kódu a reverzi obfuskace provedené substitucí instrukcí. Samotná simulace koneèného automatu mù¾e být obohacena o~zpìtné navracení, nebo pøechody se speciální sémantikou.
+
+Polymorfní malware je  detekován na základì kódu ¹ifrovací procedury, pøípadnì na základì de¹ifrovaného hlavního tìla pokud je metoda kombinována s~emulací kódu. Metamorfní malware je detekován na základì celého tìla, av¹ak pro detekci pokroèilého metamorfního malware jako je Win95/Zmist je zase vhodné pou¾ít i emulaci kódu.
+
+\section{Behaviorální detekce}
+Fundamentálním nedostatkem syntaktických detekorù je jejich závislost na vzorech malware, které jsou odvozeny z~vzhledu malware. Pokroèilý metamorfický malware jako je Win95/Zmist a \{Win32, Linux\}/Simile dokazuje, ¾e èistì syntaktický pøístup u¾ není dostaèující. Prohloubení tohoto problému demonstroval v~roce 2007 malware Storm Worm. Autoøi nevybavili samotný malware polymorfismem, ale místo toho vytváøeli nové generace malware pøedem a v~pravidelných intervalech je vypou¹tìli do veøejného internetu. Tímto zpùsobem tvùrci antivirù nemìli pøístup k~mutaèním procedurám, které malware obfuskovali, nemohli efektivnì vytvoøit syntaktické vzory pro detekci a jejich detektory byly zahlceny velkým mno¾stvím syntakticky rùzných variant stejného malware.
+
+Tyto a dal¹í dùvody motivovali vývoj behaviorálních metod, které se orientují na funkènost a chování malware. Výhodou tohoto pøístupu je jeho generiènost, kdy pomocí jednoho vzoru podezøelého chování je mo¾né detekovat celou rodinu malware a odolnost vùèi mutacím metamorfního a polymorfního malware. Spoleènou nevýhodou behaviorálních detektorù je výpoèetní slo¾itost detekèních metod a nároky, které kladou na informaèní systém a jeho u¾ivatele.
+
+Na obrázku \ref{generic_behav_detector} je ilustrována dekompozice behaviorálního detektoru. Detekèní proces je rozdìlen do tøí podprocesù. Výstupem ka¾dého z~dílèích podprocesù je popis souboru nebo procesu podezøelého z~malwarového chování na vy¹¹í úrovni abstrakce. Proces porovnávání nakonec porovná abstraktní reprezentaci chování vùèi databázi vzorù známych malwarových chování. Proces generování modelù obohacuje databázi známých malwarových chování o~nové vzory, pøípadnì upravuje staré vzory za úèelem zvý¹ení dùvìryhodnosti detekce.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.275}{\includegraphics{gen_behav_det.pdf}}
+    \caption{Koncepèní schéma behaviorálního detektoru}
+    \label{generic_behav_detector}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.35}{\includegraphics{gen_behav_tax.pdf}}
+    \caption{Taxonomie stávajících behaviorálních detektorù}
+    \label{taxonomy_behav_detector}
+\end{figure}
+
+Obrázek \ref{taxonomy_behav_detector} znázoròuje taxonomii behaviorálních detektorù, tak jak je prezentována v~\cite{Jacob08}. Diagram je rozdìlen do dvou èástí dle pøístupu k~detekci: \emph{simulaènì orientovaná detekce} a \emph{detekce formální verifikací}. Uvnitø tìchto èástí jsou do úrovní rozdìleny metody a struktury, které detekory  vyu¾ívají pøi detekci a tvorbì modelu chování. Hlavní inspirací pøi tvorbì této taxonomie byla oblast testování a formální verifikace software. Také mnoho metod, které jsou v~diagramu zahrnuty jsou v~tìchto oblastech hojnì vyu¾ívány.
+
+\subsection{Simulaènì orientovaná detekce}
+Simulaènì orientovaná detekce je paralelou k~black box testování a teda pracuje z~principu dynamicky. Analyzováno je chování podezøelého procesu po spu¹tìní, buï v~realném systému, nebo v~kontrolovaném prostøedí, podobnì jako je tomu u~emulace kódu. Detektory tohoto typu pracují s~událostmi, které podezøelý proces vyvolá v~systému. Posloupnosti takovýchto událostí nazýváme \emph{stopy}. Pøíkladem takovéto stopy je posloupnost systémových volání, které proces vykonal, nebo posloupnost odeslaných sí»ových paketù.
+
+Stopa je následnì interpretována do abstraktní reprezentace. Èasto vyu¾ívanou reprezentací jsou \emph{atomickická chování} a jejich posloupnosti. Pøíkladem takovéhoto chování je napøíklad otevøení souboru, nebo odeslání paketu. Vzorem podezøelého chování jsou pak rùzné posloupnosti atomických chování, které byly pozorovány u~malware. Tyto podezøelé posloupnosti pak mohou být organizovány do grafù, tabulek pravidel s~body nebo stavových automatù. Algoritmy pro porovnávaní mohou pak být heuristické grafové algoritmy, sumy bodù s~definovaným prahem nebo simulace stavových automatù.
+
+Hlavním nedostatkem simulaènì orientované detekce je fakt, ¾e najednou je mo¾né analyzovat pouze jedno z~mnoha mo¾ných chování podezøelého procesu. Velká èást malware pracuje s~jistou mírou nedeterminismu, nebo je jejich chování silnì ovlivnìno prostøedím, ve kterém byl spu¹tìn. Také malware mù¾e své chování upravit v~pøípadì, ¾e detekuje spu¹tìní v~prostøedí, které je monitorováno antivirem.
+
+\subsection{Detekce formální verifikací}
+Behaviorální detekce je tradiènì spojována s~dynamickou analýzou, kdy je podezøelému souboru nebo procesu povoleno vykonávat svoji èinnost a realizovat svoje chování. Tento pøístup se v¹ak zdá krátkozraký kdy¾ vezmeme v~úvahu, ¾e chování malware je plnì specifikováno svým kódem. Formální verifikace se zabývá ovìøováním zda verifikovaný program nebo systém vyhovuje jisté specifikaci. V~kontextu detekce malware je verifikován program podezøelý z~malwarového chování a specifikací je vzor chování známých malwarù.
+
+Vstupem detektoru je tedy kód podezøelý z~malwarového chování. Z~tohoto kódu je  odvozena abstraktní reprezentace pokrývající obecnì v¹echna mo¾ná chování popsána podezøelým kódem. Toto pøedstavuje nespornou výhodu proti jakékoli dynamické analýze. Pøeká¾kou v~tomto procesu je fakt, ¾e pracujeme s~kódem, který lze obfuskovat a tím komplikovat proces získání abstraktní reprezentace kódu. V~pøípadì binárních souborù je navíc nutné øe¹it problém packingu a zpìtného pøekladu.
+
+Volba abstraktní reprezentace podezøelého kódu a specifikace, která bude slou¾it jako vzor malwarového chování je úzce spjata s~volbou algoritmu pro jejich porovanávání. Zavedenou formou abstraktní rezprezentace kódu jsou \emph{sémantické grafy}. Pøíkladem takovýchto grafù jsou grafy tokù dat a øízení. Vzorem malwarového chování je pak graf stejného typu a porovnávacím algoritmem je algoritmus øe¹ící problém izomorfismu podgrafù.
+
+Jiným pøístupem je vyu¾ití algebraické abstraktní reprezentace a specifikace. Podezøelý kód a vzor chování známého malware je popsán pomocí specializované algebry a porovnávací algoritmus zkoumá jejich ekvivalenci. Podezøelý kód je v¹ak nejprve redukován pomocí aplikace ekvivalencí specifikovaných v~pøíslu¹né algebøe. Tímto zpùsobem je mo¾né efektivnì øe¹it problém obfuskace u~metamorfního malware. Rùznì obfuskované èásti kódu, které mají stejnou funkènost vedou redukcí na stejné nebo ekvivaletní výrazy v~pøíslu¹né algebøe.
+
+Posledním pøítupem prezentovaným v~\cite{Jacob08} je porovnávání model checkingem. Podezøelý kód je reprezentován mno¾inou v¹ech stavù, v~kterých se mù¾e program popsaný kódem vyskytnout a pøechody mezi tìmito stavy. Tuto strukturu nazýváme stavovým prostorem podezøelého programu. Vzorem malwarového chování je formule v~temporální logice, která klade podmínku na vlastnosti stavového prostoru podezøelého programu. Porovnávácí algoritmus pak zkoumá platnost této formule na daném stavovém prostoru.
+
+\chapter{Detekce malware inferencí stromových automatù}
+\label{detector_design}
+Nový pøístup k~behaviorální detekci malware byl pøedstaven v~\cite{Babic11}. V~èlánku je prezentován pøístup kombinující dynamické monitorování podezøelého procesu s~metodami formální verifikace, konkrétnì inference stromových automatù, které tvoøí jádro detektoru. Na obrázku \ref{DTA_detector} je uvedeno schéma tohoto detektoru. Koneèným cílem této práce je navrhnout náhradu dynamického monitorování v~tomto detektoru statickou extrakcí a odvozením vhodné abstraktní reprezentace. 
+
+Statická extrakce kódu z~binárních souborù obfuskovaných packingem a ¹ifrováním je v¹ak problematika daleko pøesahující rozsah této práce. Z~tohoto dùvodu jsou v~této práci uva¾ovány pouze podezøelé binární soubory, které tímto zpùsobem obfuskovány nejsou a je mo¾né na nì bez problémù aplikovat zpìtný pøeklad do vy¹¹ího formy reprezentace kódu. 
+
+V~této práci je touto formou interní reprezentace pøekladaèové infrastruktury LLVM. Tato reprezentace byla zvolena díky své schopnosti postihnout strukturální vlastnosti kódu, které lze vyu¾ít pøi formální analýze a odvození abstraktní reprezentace. V~dobì psaní této práce existuje nìkolik výzkumných projektù, které se zabývají zpìtným pøekladem a analýzou binárních souborù pomocí této reprezentace. Pøíkladem nech» jsou \cite{Durfina11, RevGen}.
+
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.3}{\includegraphics{DTA_TA_Inference.pdf}}
+    \caption{Schéma detektoru s~DTA}
+    \label{DTA_detector}
+\end{figure}
+
+\section{Struktura detektoru}
+Detektor prezentovaný v~\cite{Babic11} je slo¾en z~tøí hlavních èástí, které lze vidìt na obrázku \ref{DTA_detector}. Vstupem detektoru jsou podezøelé binární soubory, které spu¹tìny v~kontrolovaném prostøedí, kde je zkoumáno jejich chování pomocí \emph{dynamické taint analýzy} nad systémovými voláními. Dynamická taint analýza je technika vyu¾ívaná k~sledování toku dat v~programech nebo celých systémech. Data, kterých tok sledujeme nazýváme \emph{tainty} a tok sledujeme od \emph{zdroje taintu} do \emph{cíle taintu}. V~na¹em kontextu jsou tainty výsledky jednotlivých systémových volání, zdroje taintù jsou systémová volání, která výsledky vyprodukovala a cíle taintù jsou systémová volání, která tyto výsledky vyu¾ívají. Vykonávání programu je øízeno pomocí \emph{propagaèních pravidel} na úrovni assemblerových instrukcí. Výstupem DTA je orientovaný graf, kde uzly jsou jednotlivá systémová volání a hrany vedou ze zdrojù taintù k~cílùm. Na takto definovaný graf lze pohlí¾et jako na jistou formu grafu toku dat.
+
+\emph{Inferencí} budujeme jádro detektoru --- stromový automat. Stromové automaty jsou stavové automaty, které zpracovávájí grafové struktury, konkrétnì stromy. Vstupem inferenèního algoritmu je mno¾ina grafù tokù dat, které jsou získány aplikací DTA na binární soubory známých malwarù. Vybudovaný stromový automat pak definuje jazyk grafù tokù dat malware --- jinými slovy definuje chování specifické pro malware. Posledním krokem v~detekèním procesu je samotná simulace odvozeného stromového automatu nad grafem tokù dat podezøelého binárního souboru.
+
+\section{Plánované zmìny detektoru}
+\label{TA_detector_changes}
+Dle samotných autorù detektoru je dynamická taint analýza jedním z~nejslab¹ích míst detektoru. Grafy tokù dat, které analýza poskytuje pøímo ovlivòují úspì¹nost detekce a v~rámci detektoru je to èást, která je nejvíce výpoèetnì nároèná. Na obrázku \ref{LLVM_detector} jsou znázornìny plánované zmìny pùvodního detektoru. Hlavním cílem budoucí práce je návrh analýzy LLVM interní reprezentace za úèelem vytvoøení sémantického grafu, který bude vstupem algoritmu pro inferenci stromového automatu. Jedním z~mo¾ných øe¹ení je vybudování stejného grafu tokù dat jaký buduje dynamická taint analýza v~pùvodním návrhu detektoru. Jiným øe¹ením mù¾e být vybudování grafu tokù dat mezi základními bloky podezøelého kódu.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.3}{\includegraphics{LLVM_TA_Inference.pdf}}
+    \caption{Schéma detektoru s~analýzou LLVM IR}
+    \label{LLVM_detector}
+\end{figure}
+
+\chapter{Závìr}
+\label{future}
+Práce prezentuje úvodní èást diplomové práce autora, která pojednává o~metodách behaviorální detekce malware pomocí metod formální analýzy a verifikace. Prezentován je úvod do problematiky konfliktu mezi autory malware a vývojáøi antivirového software. Ze strany autorù malware jsou prezentovány metody obfuskace malware za úèelem utajení v~napadeném systému. Ze strany druhé jsou prezentovány metody detekce obfuskovaného malware. V~rámci detekèních metod jsou struènì popsány metody syntaktické, které se orientují na to jak kód \uv{vypadá}. Hlavním zájmem jsou v¹ak metody behaviorální, které zkoumají funkènost kódu a chování malware. Nakonec je prezentován behaviorální detektor zalo¾ený na inferenci stromových automatù. Cílem diplomové práce autora je implementace úprav detektoru prezentované v~\ref{TA_detector_changes}.
+
+%=========================================================================
