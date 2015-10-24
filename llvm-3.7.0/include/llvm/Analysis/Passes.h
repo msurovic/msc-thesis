@@ -173,6 +173,12 @@ namespace llvm {
   //
   FunctionPass *createMemDerefPrinter();
 
+  //===--------------------------------------------------------------------===//
+  //
+  // createWinAPITaintAnalysis - This pass traces the possible execution paths
+  // in a function and builds a WinAPI call dependency graph.
+  //
+  FunctionPass *createWinAPITaintAnalysis();
 }
 
 #endif

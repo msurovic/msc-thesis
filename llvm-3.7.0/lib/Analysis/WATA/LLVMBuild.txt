@@ -1,4 +1,4 @@
-;===- ./lib/Analysis/LLVMBuild.txt -----------------------------*- Conf -*--===;
+;===- ./lib/Analysis/IPA/LLVMBuild.txt -------------------------*- Conf -*--===;
 ;
 ;                     The LLVM Compiler Infrastructure
 ;
@@ -15,11 +15,8 @@
 ;
 ;===------------------------------------------------------------------------===;
 
-[common]
-subdirectories = IPA WATA
-
 [component_0]
 type = Library
-name = Analysis
+name = WATA
 parent = Libraries
-required_libraries = Core Support
+required_libraries = Analysis Core Support
