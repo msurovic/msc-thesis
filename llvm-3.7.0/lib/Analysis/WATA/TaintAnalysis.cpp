@@ -11,18 +11,18 @@ namespace {
     WinAPITaintAnalysis() : FunctionPass(ID) {}
 
     bool runOnFunction(Function &F) override {
-      if(F.HasDLLImportStorageClass()){
+      //if(F.hasDLLImportStorageClass()){
       	errs() << "WATA: ";
       	errs().write_escaped(F.getName()) << '\n';	
-      }
+      //}
       return false;
     }
   };
 }
 
-char WinAPITaintAnalysis::ID = 0;
-static RegisterPass<WinAPITaintAnalysis> X("WATA", "WinAPI Taint Analysis Pass", false, false);
-
 FunctionPass *llvm::createWinAPITaintAnalysis() {
   return new WinAPITaintAnalysis();
 }
+
+char WinAPITaintAnalysis::ID = 0;
+static RegisterPass<WinAPITaintAnalysis> X("winapi-taint-analysis", "WinAPI Taint Analysis Pass", false, false);

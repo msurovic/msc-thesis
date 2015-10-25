@@ -1,5 +1,5 @@
-add_llvm_library(WATA
+add_llvm_library(LLVMWATA
   TaintAnalysis.cpp
   )
 
-add_dependencies(WATA intrinsics_gen)
+add_dependencies(LLVMWATA intrinsics_gen)
