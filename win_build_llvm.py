@@ -6,7 +6,7 @@ import subprocess
 def main():
     ConfGen = "Visual Studio 14 2015 Win64"
     ConfFlags = "-DLLVM_TARGETS_TO_BUILD:STRING=X86"
-    ConfSrcDir = "..\llvm-3.7.0"
+    ConfSrcDir = "../llvm-3.7.0"
 
     BuildDir = "./tools/"
     BuildType = "Release"
@@ -19,6 +19,7 @@ def main():
         os.mkdir(BuildDir)
     
     os.chdir(BuildDir)
+
     subprocess.call(["cmake", "-G", ConfGen, ConfFlags, ConfSrcDir])
     subprocess.call(["cmake", "--build", '.', "--config", BuildType, "--", BuildJobs])
     
