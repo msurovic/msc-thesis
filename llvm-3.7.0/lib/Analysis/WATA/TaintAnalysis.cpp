@@ -3,6 +3,9 @@
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
 
+#define PASSNAME "winapi-taint-analysis"
+#define HELPTEXT "WinAPI Taint Analysis Pass"
+
 using namespace llvm;
 
 namespace {
@@ -25,4 +28,4 @@ FunctionPass *llvm::createWinAPITaintAnalysis() {
 }
 
 char WinAPITaintAnalysis::ID = 0;
-static RegisterPass<WinAPITaintAnalysis> X("winapi-taint-analysis", "WinAPI Taint Analysis Pass", false, false);
+static RegisterPass<WinAPITaintAnalysis> X(PASSNAME, HELPTEXT, false, false);

@@ -112,8 +112,8 @@ static cl::opt<bool> Split("spli", cl::init(false),
                            cl::desc("Enable basic block splitting"));
 
 // Flags for WATA
-static cl::opt<bool> EnableWATA("wata", cl::init(false),
-                           cl::desc("Run the WinAPI Taint Analysis pass"));
+static cl::opt<bool> EnableWATA("winapi-ta", cl::init(false),
+                           cl::desc("Enable the WinAPI Taint Analysis Pass"));
 
 PassManagerBuilder::PassManagerBuilder() {
     OptLevel = 2;
@@ -228,6 +228,9 @@ void PassManagerBuilder::populateModulePassManager(
       MPM.add(createBarrierNoopPass());
 
     MPM.add(createSubstitution(Substitution));
+
+    if (EnableWATA)
+      MPM.add(createWinAPITaintAnalysis());
 
     addExtensionsToPM(EP_EnabledOnOptLevel0, MPM);
     return;
