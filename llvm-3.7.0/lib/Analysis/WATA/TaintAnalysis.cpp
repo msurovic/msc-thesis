@@ -31,30 +31,46 @@ namespace {
 bool WinAPITaintAnalysis::runOnFunction(Function &F){
   TaintMap FunctionTaints;
 
-  while(runTaints(F, FunctionTaints));
+  errs() << "Function: ";
+  errs().write_escaped(F.getName());
+
+  unsigned runs = 1;
+  while(runTaints(F, FunctionTaints)) runs++;
   
+  errs() << "\t\t" << runs << "\n\n";
+
+  for(TaintMap::iterator i = FunctionTaints.begin(); i != FunctionTaints.end(); ++i){
+    if(i->second.size() > 0)
+      errs() << *i->first << '\t' << i->second.size() << '\n';
+  }
+
   return false;
 }
 
-bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FuncTaints){
-  
-  // errs() << "Function: ";
-  // errs().write_escaped(F.getName()) << '\n';
-
+bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT){
   bool Changed = false;
 
   for(inst_iterator I = inst_begin(F), IE = inst_end(F); I != IE; ++I){
     // Add entry into Taints for I.
-    TaintSet InstrTaints = FuncTaints[&*I];
+    TaintMap::iterator IT = FT.find(&*I);
+    if(IT == FT.end()){
+      IT = FT.insert(std::make_pair(&*I, TaintSet())).first;
+    }
+
     // Add taints of I's operands to I's taints.
-    for(User::op_iterator O = I->op_begin(), OE = I->op_end(); O != OE; ++O){
-      Changed = set_union(InstrTaints, FuncTaints[*O]);
+    for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+      TaintMap::iterator UT = FT.find(U->get());
+      if(UT != FT.end()){
+        Changed = set_union(IT->second, UT->second) || Changed;
+      }
     }
 
     if(isTaintSource(*I)){
       // Add I itself to I's taints.
-      Changed = std::get<1>(FuncTaints[&*I].insert(cast<CallInst>(&*I)));
+      CallInst *CI = cast<CallInst>(&*I);
+      Changed = (IT->second.insert(CI)).second || Changed;
       // Add node to dependency graph.
+      
       // CallInst *CI = &cast<CallInst>(*I);
       // errs() << "\t Source: ";
       // errs().write_escaped(CI->getCalledFunction()->getName()) << '\n';
@@ -68,9 +84,7 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FuncTaints){
       // errs().write_escaped(CI->getCalledFunction()->getName()) << "\n\n";
     }
   }
-
-  // if(Changed) errs() << "There was a change." << '\n';
-
+  
   return Changed;
 }
 
