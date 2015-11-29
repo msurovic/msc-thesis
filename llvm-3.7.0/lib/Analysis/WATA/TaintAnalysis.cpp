@@ -57,14 +57,6 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT){
       IT = FT.insert(std::make_pair(&*I, TaintSet())).first;
     }
 
-    // Add taints of I's operands to I's taints.
-    for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-      TaintMap::iterator UT = FT.find(U->get());
-      if(UT != FT.end()){
-        Changed = set_union(IT->second, UT->second) || Changed;
-      }
-    }
-
     if(isTaintSource(*I)){
       // Add I itself to I's taints.
       CallInst *CI = cast<CallInst>(&*I);
@@ -76,12 +68,21 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT){
       // errs().write_escaped(CI->getCalledFunction()->getName()) << '\n';
     }
 
+    // Add taints of I's operands to I's taints.
     if(isTaintSink(*I)){
-      // Add edges to the dependency graph based on I's taints.
-
-      // CallInst *CI = &cast<CallInst>(*I);
-      // errs() << "\t Sink: ";
-      // errs().write_escaped(CI->getCalledFunction()->getName()) << "\n\n";
+      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+        TaintMap::iterator UT = FT.find(U->get());
+        if(UT != FT.end()){
+          // Add edges to the dependency graph based on I's taints.
+        }
+      }
+    }else{
+      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+        TaintMap::iterator UT = FT.find(U->get());
+        if(UT != FT.end()){
+          Changed = set_union(IT->second, UT->second) || Changed;
+        }
+      }
     }
   }
   
