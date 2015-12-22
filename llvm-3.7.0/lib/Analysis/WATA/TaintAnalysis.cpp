@@ -4,23 +4,19 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/InstIterator.h"
 #include "llvm/IR/ValueMap.h"
-#include "llvm/ADT/SetOperations.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/raw_ostream.h"
+#include <sstream>
 
 #define PASSNAME "winapi-taint-analysis"
 #define HELPTEXT "WinAPI Taint Analysis Pass"
 
 using namespace llvm;
 
-typedef SmallPtrSet<CallInst*, 10> TaintSet;
+typedef std::pair<Value*, int>     Taint;
+typedef SmallSetVector<Taint, 10>  TaintSet;
 typedef ValueMap<Value*, TaintSet> TaintMap;
-
-
-typedef std::pair<CallInst*, unsigned>    TaintEdge;
-typedef SmallSetVector<TaintEdge, 10>     TaintEdgeSet;
-typedef ValueMap<CallInst*, TaintEdgeSet> TaintGraph;
 
 namespace {
   struct WinAPITaintAnalysis : public FunctionPass {
@@ -28,7 +24,7 @@ namespace {
     WinAPITaintAnalysis() : FunctionPass(ID) {}
 
     bool runOnFunction(Function&) override;
-    bool runTaints(Function&, TaintMap&, TaintGraph&);
+    bool runTaints(Function&, TaintMap&, TaintMap&);
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
     void printTaintGraph(TaintMap&);
@@ -36,27 +32,24 @@ namespace {
 }
 
 bool WinAPITaintAnalysis::runOnFunction(Function &F){
-  TaintMap   FTaints;
-  TaintGraph FGraph; 
+  TaintMap FunctionTaints;
+  TaintMap DepGraph; 
 
   errs() << "Function: ";
   errs().write_escaped(F.getName());
 
   unsigned runs = 1;
-  while(runTaints(F, FTaints, FGraph)) runs++;
+  while(runTaints(F, FunctionTaints, DepGraph)) runs++;
   
   errs() << "\t" << runs << "\n";
 
-  // for(TaintMap::iterator i = FunctionTaints.begin(); i != FunctionTaints.end(); ++i){
-  //   if(i->second.size() > 0)
-  //     errs() << *i->first << '\t' << i->second.size() << '\n';
-  // }
-
-  for(TaintGraph::iterator i = FGraph.begin(); i != FGraph.end(); ++i){
-    const CallInst *CI = cast<CallInst>(&(*i->first));
-    errs() << CI->getCalledFunction()->getName() << '\n';
-    for(TaintEdgeSet::iterator j = i->second.begin(); j != i->second.end(); ++j)
-      errs() << '\t' << ((*j).first)->getCalledFunction()->getName() << ((*j).second) << '\n';
+  for(TaintMap::iterator i = DepGraph.begin(); i != DepGraph.end(); ++i){
+    CallInst *To = cast<CallInst>(&(*i->first));
+    errs() << To->getCalledFunction()->getName() << '\n';
+    for(TaintSet::iterator j = i->second.begin(); j != i->second.end(); ++j){
+      CallInst *From = cast<CallInst>(j->first);
+      errs() << '\t' << From->getCalledFunction()->getName() << j->second << '\n';
+    }
   }
 
   errs() << '\n';
@@ -64,7 +57,7 @@ bool WinAPITaintAnalysis::runOnFunction(Function &F){
   return false;
 }
 
-bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintGraph& TG){
+bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
   bool Changed = false;
 
   for(inst_iterator I = inst_begin(F), IE = inst_end(F); I != IE; ++I){
@@ -77,33 +70,36 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintGraph& TG){
 
     if(isTaintSource(*I)){
       // Add I itself to I's taints.
-      CallInst *CI = cast<CallInst>(&*I);
-      Changed = (IT->second.insert(CI)).second || Changed;
+      Changed = IT->second.insert(Taint(&*I, -1)) || Changed;
       // Add node to dependency graph.
-      if(TG.find(CI) == TG.end()){
-        Changed = TG.insert(std::make_pair(CI, TaintEdgeSet())).second || Changed;
+      if(TG.find(&*I) == TG.end()){
+        Changed = TG.insert(std::make_pair(&*I, TaintSet())).second || Changed;
       }
     }
     
     if(isTaintSink(*I)){
       // Add edges to the dependency graph based on I's taints.
-      CallInst *CI = cast<CallInst>(&*I);
-      TaintGraph::iterator GN = TG.find(CI);
-      assert(GN != TG.end() && "Taint sink node not present in taint graph.");
+      TaintMap::iterator NT = TG.find(&*I);
+      assert(NT != TG.end() && "Taint sink node not present in taint graph.");
       for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        if(FT.find(U->get()) != FT.end()){ 
-          TaintSet UT = FT.find(U->get())->second;
-          for(TaintSet::iterator UTI = UT.begin(), UTE = UT.end(); UTI != UTE; ++UTI){
-            Changed = GN->second.insert(std::make_pair(*UTI, U - I->op_begin())) || Changed;
+        TaintMap::iterator OT = FT.find(U->get());
+        if(OT != FT.end()){
+          TaintSet T = OT->second;
+          for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
+            Taint N(TI->first, U - I->op_begin());
+            Changed = NT->second.insert(N) || Changed;
           }
         }
       }
     }else{
       // Add taints of I's operands to I's taints.
       for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        TaintMap::iterator UT = FT.find(U->get());
-        if(UT != FT.end()){
-          Changed = set_union(IT->second, UT->second) || Changed;
+        TaintMap::iterator OT = FT.find(U->get());
+        if(OT != FT.end()){
+          TaintSet T = OT->second;
+          for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
+            Changed = IT->second.insert(*TI) || Changed;
+          }
         }
       }
     }
@@ -124,29 +120,30 @@ bool WinAPITaintAnalysis::isTaintSink(Instruction& I){
 }
 
 void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
-  // errs() << "# node count" << '\n';
-  // errs() << "N " << TG.size() << "\n\n";
+  std::stringstream Nodes;
+  std::stringstream Edges;
+
+  Nodes << "# node count" << '\n';
+  Nodes << "N " << TG.size() << "\n\n";
+  Nodes << "# nodes declarations: V number label in_arity out_arity" << '\n';
+
+  Edges << "# edge declarations: ";
+  Edges << "E node_from:out_param_from,node_to:in_param_to" << '\n';
   
-  // // Print node declarations
-  // errs() << "# nodes declarations: V number label in_arity out_arity" << '\n';
+  //Print node declarations
   // unsigned NodeID = 0;
-  // for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
-  //   CallInst* Node = cast<CallInst>(&*NI->first);
-  //   errs() << "V " << NodeID << ' ';
-  //   errs() << Node->getCalledFunction()->getName() << ' ';
-  //   errs() << Node->getNumArgOperands() << ' ';
-  //   errs() << Node->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1;
-  //   errs() << '\n';
-  // }
-  
-  // // Print edge declarations
-  // errs() << "# edge declarations: ";
-  // errs() << "E node_from:out_param_from,node_to:in_param_to" << '\n';
-  // for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
-  //   CallInst* To  = cast<CallInst>(&*NI->first);
-  //   TaintSet  Frm = NI->second;
-  //   for(TainSet::iterator FI = Frm.begin(), FIE = Frm.end(); FI != FIE; ++FI){
-      
+  // for(TaintGraph::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
+  //   CallInst* NodeTo = NI->first;
+  //   TaintEdgeSet NodesFrom = NI->second;
+
+  //   Nodes << "V " << NodeID << ' ';
+  //   Nodes << Node->getCalledFunction()->getName() << ' ';
+  //   Nodes << Node->getNumArgOperands() << ' ';
+  //   Nodes << Node->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1;
+  //   Nodes << '\n';
+
+  //   for(TaintEdgeSet::iterator FI = Frm.begin(), FIE = Frm.end(); FI != FIE; ++FI){
+  //     Edges <<  "E " << NodeID << ":0,"
   //   }
   // }
 }
