@@ -3,7 +3,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/InstIterator.h"
-#include "llvm/IR/ValueMap.h"
+#include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/raw_ostream.h"
@@ -16,7 +16,7 @@ using namespace llvm;
 
 typedef std::pair<Value*, int>     Taint;
 typedef SmallSetVector<Taint, 10>  TaintSet;
-typedef ValueMap<Value*, TaintSet> TaintMap;
+typedef MapVector<Value*, TaintSet> TaintMap;
 
 namespace {
   struct WinAPITaintAnalysis : public FunctionPass {
@@ -40,19 +40,8 @@ bool WinAPITaintAnalysis::runOnFunction(Function &F){
 
   unsigned runs = 1;
   while(runTaints(F, FunctionTaints, DepGraph)) runs++;
-  
-  errs() << "\t" << runs << "\n";
 
-  for(TaintMap::iterator i = DepGraph.begin(); i != DepGraph.end(); ++i){
-    CallInst *To = cast<CallInst>(&(*i->first));
-    errs() << To->getCalledFunction()->getName() << '\n';
-    for(TaintSet::iterator j = i->second.begin(); j != i->second.end(); ++j){
-      CallInst *From = cast<CallInst>(j->first);
-      errs() << '\t' << From->getCalledFunction()->getName() << j->second << '\n';
-    }
-  }
-
-  errs() << '\n';
+  printTaintGraph(DepGraph);
 
   return false;
 }
@@ -130,22 +119,24 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
   Edges << "# edge declarations: ";
   Edges << "E node_from:out_param_from,node_to:in_param_to" << '\n';
   
-  //Print node declarations
-  // unsigned NodeID = 0;
-  // for(TaintGraph::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
-  //   CallInst* NodeTo = NI->first;
-  //   TaintEdgeSet NodesFrom = NI->second;
+  for(TaintMap::iterator DI = TG.begin(), DIE = TG.end(); DI != DIE; ++DI){
+    CallInst* Dst = cast<CallInst>(DI->first);
+    TaintSet  Src = DI->second;
 
-  //   Nodes << "V " << NodeID << ' ';
-  //   Nodes << Node->getCalledFunction()->getName() << ' ';
-  //   Nodes << Node->getNumArgOperands() << ' ';
-  //   Nodes << Node->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1;
-  //   Nodes << '\n';
+    unsigned DstID = DI - TG.begin();
 
-  //   for(TaintEdgeSet::iterator FI = Frm.begin(), FIE = Frm.end(); FI != FIE; ++FI){
-  //     Edges <<  "E " << NodeID << ":0,"
-  //   }
-  // }
+    Nodes << "V " << DstID << ' ';
+    Nodes << Dst->getCalledFunction()->getName().str() << ' ';
+    Nodes << Src.size() << ' ';
+    Nodes << Dst->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1;
+    Nodes << "\n";
+
+    for(TaintSet::iterator SI = Src.begin(), SIE = Src.end(); SI != SIE; ++SI){
+      unsigned SrcID = TG.find(SI->first) - TG.begin();
+      Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
+    }
+  }
+  errs() << Nodes.str() << '\n' << Edges.str() << '\n';
 }
 
 FunctionPass *llvm::createWinAPITaintAnalysis() {
