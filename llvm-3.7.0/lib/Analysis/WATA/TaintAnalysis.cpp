@@ -127,7 +127,7 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
 
     Nodes << "V " << DstID << ' ';
     Nodes << Dst->getCalledFunction()->getName().str() << ' ';
-    Nodes << Src.size() << ' ';
+    Nodes << Dst->getNumArgOperands() << ' ';
     Nodes << Dst->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1;
     Nodes << "\n";
 
