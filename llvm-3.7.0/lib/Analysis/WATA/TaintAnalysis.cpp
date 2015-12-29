@@ -3,6 +3,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/InstIterator.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
@@ -14,8 +15,8 @@
 
 using namespace llvm;
 
-typedef std::pair<Value*, int>     Taint;
-typedef SmallSetVector<Taint, 10>  TaintSet;
+typedef std::pair<Value*, int>      Taint;
+typedef SmallSetVector<Taint, 10>   TaintSet;
 typedef MapVector<Value*, TaintSet> TaintMap;
 
 namespace {
@@ -38,10 +39,10 @@ bool WinAPITaintAnalysis::runOnFunction(Function &F){
   errs() << "Function: ";
   errs().write_escaped(F.getName());
 
-  unsigned runs = 1;
-  while(runTaints(F, FunctionTaints, DepGraph)) runs++;
+  while(runTaints(F, FunctionTaints, DepGraph));
 
-  printTaintGraph(DepGraph);
+  errs() << '\n';
+  //printTaintGraph(DepGraph);
 
   return false;
 }
@@ -71,19 +72,33 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
       TaintMap::iterator NT = TG.find(&*I);
       assert(NT != TG.end() && "Taint sink node not present in taint graph.");
       for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        TaintMap::iterator OT = FT.find(U->get());
+        // Iterate through I's operands, fetch the taints from FT and create
+        // dependency graph edges based on the taints.
+        Value* V = U->get();
+        TaintMap::iterator OT = FT.find(V);
+        unsigned OpIndex = U - I->op_begin();
         if(OT != FT.end()){
+          // Operand is a Value* that has an entry in FT. Use taints in the entry.
           TaintSet T = OT->second;
           for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
-            Taint N(TI->first, U - I->op_begin());
-            Changed = NT->second.insert(N) || Changed;
+            Changed = NT->second.insert(Taint(TI->first, OpIndex)) || Changed;
           }
+        }else if(isa<Constant>(V) && !isa<Function>(V) && !isa<BlockAddress>(V)){
+          // Operand does not have an entry in FT, thus is probably a constant
+          // directly used in the sink intruction. Create a new TG node and a
+          // corresponding edge for NT.
+          if(TG.find(V) == TG.end()){
+            Changed = TG.insert(std::make_pair(V, TaintSet())).second || Changed;
+            NT = TG.find(&*I);
+          }
+          Changed = NT->second.insert(Taint(V, OpIndex)) || Changed;
         }
       }
     }else{
       // Add taints of I's operands to I's taints.
       for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        TaintMap::iterator OT = FT.find(U->get());
+        Value* V = U->get();
+        TaintMap::iterator OT = FT.find(V);
         if(OT != FT.end()){
           TaintSet T = OT->second;
           for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
