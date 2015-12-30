@@ -42,7 +42,7 @@ bool WinAPITaintAnalysis::runOnFunction(Function &F){
   while(runTaints(F, FunctionTaints, DepGraph));
 
   errs() << '\n';
-  //printTaintGraph(DepGraph);
+  printTaintGraph(DepGraph);
 
   return false;
 }
@@ -135,20 +135,26 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
   Edges << "E node_from:out_param_from,node_to:in_param_to" << '\n';
   
   for(TaintMap::iterator DI = TG.begin(), DIE = TG.end(); DI != DIE; ++DI){
-    CallInst* Dst = cast<CallInst>(DI->first);
-    TaintSet  Src = DI->second;
-
+    TaintSet Src = DI->second;
     unsigned DstID = DI - TG.begin();
 
     Nodes << "V " << DstID << ' ';
-    Nodes << Dst->getCalledFunction()->getName().str() << ' ';
-    Nodes << Dst->getNumArgOperands() << ' ';
-    Nodes << Dst->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1;
-    Nodes << "\n";
 
-    for(TaintSet::iterator SI = Src.begin(), SIE = Src.end(); SI != SIE; ++SI){
-      unsigned SrcID = TG.find(SI->first) - TG.begin();
-      Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
+    if(CallInst* Dst = dyn_cast<CallInst>(DI->first)){
+      Nodes << Dst->getCalledFunction()->getName().str() << ' ';
+      Nodes << Dst->getNumArgOperands() << ' ';
+      Nodes << (Dst->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1);
+      Nodes << "\n";
+
+      for(TaintSet::iterator SI = Src.begin(), SIE = Src.end(); SI != SIE; ++SI){
+        unsigned SrcID = TG.find(SI->first) - TG.begin();
+        Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
+      }
+    }else if(Constant* Dst = dyn_cast<Constant>(DI->first)){
+      std::string ConstType;
+      raw_string_ostream rso(ConstType);
+      Dst->getType()->print(rso);
+      Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
   errs() << Nodes.str() << '\n' << Edges.str() << '\n';
