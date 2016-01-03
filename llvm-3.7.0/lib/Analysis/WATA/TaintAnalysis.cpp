@@ -51,7 +51,7 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
   bool Changed = false;
 
   for(inst_iterator I = inst_begin(F), IE = inst_end(F); I != IE; ++I){
-    // Add entry into Taints for I.
+    // Add entry into FT for I.
     TaintMap::iterator IT = FT.find(&*I);
     if(IT == FT.end()){
       IT = FT.insert(std::make_pair(&*I, TaintSet())).first;
@@ -61,6 +61,20 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
     if(isTaintSource(*I)){
       // Add I itself to I's taints.
       Changed = IT->second.insert(Taint(&*I, -1)) || Changed;
+      // Any pointer type variable operand of I is tainted by I.
+      // Note: This behaves weirdly. Fix it sometime.
+      // for(Value* V : I->operand_values()){
+      //   if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
+      //     // Add entry into FT for V.
+      //     TaintMap::iterator VT = FT.find(V);
+      //     if(VT == FT.end()){
+      //       VT = FT.insert(std::make_pair(V, TaintSet())).first;
+      //       Changed = true;
+      //     }
+      //     // Add I into V's taints.
+      //     Changed = VT->second.insert(Taint(&*I, -1)) || Changed;
+      //   }
+      // }
       // Add node to dependency graph.
       if(TG.find(&*I) == TG.end()){
         Changed = TG.insert(std::make_pair(&*I, TaintSet())).second || Changed;
@@ -77,16 +91,15 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
         Value* V = U->get();
         TaintMap::iterator OT = FT.find(V);
         unsigned OpIndex = U - I->op_begin();
-        if(OT != FT.end()){
+        if(OT != FT.end() && !OT->second.empty()){
           // Operand is a Value* that has an entry in FT. Use taints in the entry.
           TaintSet T = OT->second;
           for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
             Changed = NT->second.insert(Taint(TI->first, OpIndex)) || Changed;
           }
-        }else if(isa<Constant>(V) && !isa<Function>(V) && !isa<BlockAddress>(V)){
-          // Operand does not have an entry in FT, thus is probably a constant
-          // directly used in the sink intruction. Create a new TG node and a
-          // corresponding edge for NT.
+        }else if(!isa<Function>(V)){
+          // Operand does not have an entry in FT, so a terminal node needs to be
+          // created. The node will be labeled by the type of the operand.
           if(TG.find(V) == TG.end()){
             Changed = TG.insert(std::make_pair(V, TaintSet())).second || Changed;
             NT = TG.find(&*I);
@@ -150,10 +163,10 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
         unsigned SrcID = TG.find(SI->first) - TG.begin();
         Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
       }
-    }else if(Constant* Dst = dyn_cast<Constant>(DI->first)){
+    }else{
       std::string ConstType;
       raw_string_ostream rso(ConstType);
-      Dst->getType()->print(rso);
+      DI->first->getType()->print(rso);
       Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
