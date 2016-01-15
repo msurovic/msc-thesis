@@ -178,7 +178,7 @@ namespace llvm {
   // createWinAPITaintAnalysis - This pass traces the possible execution paths
   // in a function and builds a WinAPI call dependency graph.
   //
-  FunctionPass *createWinAPITaintAnalysis();
+  ModulePass *createWinAPITaintAnalysis();
 }
 
 #endif

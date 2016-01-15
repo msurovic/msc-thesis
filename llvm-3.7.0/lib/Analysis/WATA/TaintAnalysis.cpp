@@ -1,5 +1,6 @@
 #include "llvm/Pass.h"
 #include "llvm/Analysis/Passes.h"
+#include "llvm/IR/Module.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/InstIterator.h"
@@ -20,11 +21,11 @@ typedef SmallSetVector<Taint, 10>   TaintSet;
 typedef MapVector<Value*, TaintSet> TaintMap;
 
 namespace {
-  struct WinAPITaintAnalysis : public FunctionPass {
+  struct WinAPITaintAnalysis : public ModulePass {
     static char ID;
-    WinAPITaintAnalysis() : FunctionPass(ID) {}
+    WinAPITaintAnalysis() : ModulePass(ID) {}
 
-    bool runOnFunction(Function&) override;
+    bool runOnModule(Module&) override;
     bool runTaints(Function&, TaintMap&, TaintMap&);
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
@@ -32,16 +33,20 @@ namespace {
   };
 }
 
-bool WinAPITaintAnalysis::runOnFunction(Function &F){
-  TaintMap FunctionTaints;
-  TaintMap DepGraph; 
+bool WinAPITaintAnalysis::runOnModule(Module &M){
+  TaintMap DepGraph;
 
-  errs() << "Function: ";
-  errs().write_escaped(F.getName());
+  for(Module::iterator MI = M.begin(), ME = M.end(); MI != ME; ++MI){
+    if(!MI->empty()){
+      TaintMap FunctionTaints;
+      
+      errs() << "Function: ";
+      errs().write_escaped(MI->getName());
+      while(runTaints(*MI, FunctionTaints, DepGraph));
+      errs() << '\n';
+    }
+  }
 
-  while(runTaints(F, FunctionTaints, DepGraph));
-
-  errs() << '\n';
   printTaintGraph(DepGraph);
 
   return false;
@@ -173,7 +178,7 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
   errs() << Nodes.str() << '\n' << Edges.str() << '\n';
 }
 
-FunctionPass *llvm::createWinAPITaintAnalysis() {
+ModulePass *llvm::createWinAPITaintAnalysis() {
   return new WinAPITaintAnalysis();
 }
 
