@@ -17,7 +17,7 @@
 using namespace llvm;
 
 typedef std::pair<Value*, int>      Taint;
-typedef SmallSetVector<Taint, 10>   TaintSet;
+typedef SmallSetVector<Taint, 20>   TaintSet;
 typedef MapVector<Value*, TaintSet> TaintMap;
 
 namespace {
@@ -27,6 +27,7 @@ namespace {
 
     bool runOnModule(Module&) override;
     bool runTaints(Function&, TaintMap&, TaintMap&);
+    bool taintSetUnion(TaintSet&, TaintSet&);
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
     void printTaintGraph(TaintMap&);
@@ -35,31 +36,34 @@ namespace {
 
 bool WinAPITaintAnalysis::runOnModule(Module &M){
   TaintMap DepGraph;
+  TaintMap ModuleTaints;
 
-  for(Module::iterator MI = M.begin(), ME = M.end(); MI != ME; ++MI){
-    if(!MI->empty()){
-      TaintMap FunctionTaints;
-      
-      errs() << "Function: ";
-      errs().write_escaped(MI->getName());
-      while(runTaints(*MI, FunctionTaints, DepGraph));
-      errs() << '\n';
+  bool Changed = true;
+
+  while(Changed){
+    Changed = false;
+    for(Module::iterator MI = M.begin(), ME = M.end(); MI != ME; ++MI){
+      if(!MI->empty()){
+        while(runTaints(*MI, ModuleTaints, DepGraph)){
+          Changed = true;
+        }
+      }
     }
   }
 
-  printTaintGraph(DepGraph);
-
+  //printTaintGraph(DepGraph);
   return false;
 }
 
-bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
+bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
   bool Changed = false;
 
+  // Run the taints
   for(inst_iterator I = inst_begin(F), IE = inst_end(F); I != IE; ++I){
-    // Add entry into FT for I.
-    TaintMap::iterator IT = FT.find(&*I);
-    if(IT == FT.end()){
-      IT = FT.insert(std::make_pair(&*I, TaintSet())).first;
+    // Add entry into MT for I.
+    TaintMap::iterator IT = MT.find(&*I);
+    if(IT == MT.end()){
+      IT = MT.insert(std::make_pair(&*I, TaintSet())).first;
       Changed = true;
     }
 
@@ -70,10 +74,10 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
       // Note: This behaves weirdly. Fix it sometime.
       // for(Value* V : I->operand_values()){
       //   if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
-      //     // Add entry into FT for V.
-      //     TaintMap::iterator VT = FT.find(V);
-      //     if(VT == FT.end()){
-      //       VT = FT.insert(std::make_pair(V, TaintSet())).first;
+      //     // Add entry into MT for V.
+      //     TaintMap::iterator VT = MT.find(V);
+      //     if(VT == MT.end()){
+      //       VT = MT.insert(std::make_pair(V, TaintSet())).first;
       //       Changed = true;
       //     }
       //     // Add I into V's taints.
@@ -85,46 +89,77 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& FT, TaintMap& TG){
         Changed = TG.insert(std::make_pair(&*I, TaintSet())).second || Changed;
       }
     }
-    
-    if(isTaintSink(*I)){
-      // Add edges to the dependency graph based on I's taints.
-      TaintMap::iterator NT = TG.find(&*I);
-      assert(NT != TG.end() && "Taint sink node not present in taint graph.");
-      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        // Iterate through I's operands, fetch the taints from FT and create
-        // dependency graph edges based on the taints.
-        Value* V = U->get();
-        TaintMap::iterator OT = FT.find(V);
-        unsigned OpIndex = U - I->op_begin();
-        if(OT != FT.end() && !OT->second.empty()){
-          // Operand is a Value* that has an entry in FT. Use taints in the entry.
+
+    for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+      Value* V = U->get();
+      TaintMap::iterator OT = MT.find(V);
+      unsigned OpIdx = U - I->op_begin();
+
+      if(isa<Argument>(V)) errs() << "BUZNA" << '\n';
+      
+      if(isTaintSink(*I)){
+        // Add edges to the dependency graph based on operands taints.
+        TaintMap::iterator NT = TG.find(&*I);
+        assert(NT != TG.end() && "Taint sink node not present in taint graph.");
+        if(OT != MT.end() && !OT->second.empty()){
+          // Operand is a Value* that has an entry in MT. Use taints in the entry.
           TaintSet T = OT->second;
           for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
-            Changed = NT->second.insert(Taint(TI->first, OpIndex)) || Changed;
+            Changed = NT->second.insert(Taint(TI->first, OpIdx)) || Changed;
           }
         }else if(!isa<Function>(V)){
-          // Operand does not have an entry in FT, so a terminal node needs to be
+          // Operand does not have an entry in MT, so a terminal node needs to be
           // created. The node will be labeled by the type of the operand.
           if(TG.find(V) == TG.end()){
             Changed = TG.insert(std::make_pair(V, TaintSet())).second || Changed;
             NT = TG.find(&*I);
           }
-          Changed = NT->second.insert(Taint(V, OpIndex)) || Changed;
+          Changed = NT->second.insert(Taint(V, OpIdx)) || Changed;
         }
-      }
-    }else{
-      // Add taints of I's operands to I's taints.
-      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        Value* V = U->get();
-        TaintMap::iterator OT = FT.find(V);
-        if(OT != FT.end()){
-          TaintSet T = OT->second;
-          for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
-            Changed = IT->second.insert(*TI) || Changed;
+      }else{
+        if(OT != MT.end()){
+          if(CallInst *CI = dyn_cast<CallInst>(&*I)){
+            // If I is a CallInst to a function CF with a definition in
+            // module M, taint CF's arguments.
+            Function* CF = CI->getCalledFunction();
+            if(!CF->empty()){
+              assert(OpIdx < CF->arg_size() && "arg_iterator out of bounds.");
+              Function::arg_iterator AI = CF->arg_begin();
+              for(unsigned i = 0; i < OpIdx; i++) AI++;
+              TaintMap::iterator AT = MT.find(&*AI);
+              if(AT == MT.end()){
+                AT = MT.insert(std::make_pair(&*AI, TaintSet())).first;
+                Changed = true;
+              }
+              Changed = taintSetUnion(AT->second, OT->second) || Changed;
+            }
+          }else if(ReturnInst *RI = dyn_cast<ReturnInst>(&*I)){
+            // If I is a ReturnInst we need to taint all the CallInsts that use
+            // Function F.
+            for(User* FU : F.users()){
+              if(isa<Instruction>(FU)){
+                TaintMap::iterator FUT = MT.find(FU);
+                if(FUT == MT.end()){
+                  FUT = MT.insert(std::make_pair(FU, TaintSet())).first;
+                  Changed = true;
+                }
+                Changed = taintSetUnion(FUT->second, OT->second) || Changed;
+              }
+            }
           }
+          // Add taints of I's operands to I's taints.
+          Changed = taintSetUnion(IT->second, OT->second) || Changed;
         }
       }
     }
+  }
+  return Changed;
+}
+
+bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
+  bool Changed = false;
+  for(TaintSet::iterator TI = B.begin(), TE = B.end(); TI != TE; ++TI){
+    Changed = A.insert(*TI) || Changed;
   }
   return Changed;
 }
