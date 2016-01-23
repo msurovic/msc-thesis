@@ -51,7 +51,15 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
     }
   }
 
-  //printTaintGraph(DepGraph);
+  printTaintGraph(DepGraph);
+
+  // for(TaintMap::iterator i = ModuleTaints.begin(), e = ModuleTaints.end(); i != e; ++i){
+  //   if(isa<Argument>(i->first)){
+  //     i->first->dump();
+  //     errs() << i->second.size() << '\n';
+  //   }
+  // }
+
   return false;
 }
 
@@ -95,8 +103,6 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
       TaintMap::iterator OT = MT.find(V);
       unsigned OpIdx = U - I->op_begin();
 
-      if(isa<Argument>(V)) errs() << "BUZNA" << '\n';
-      
       if(isTaintSink(*I)){
         // Add edges to the dependency graph based on operands taints.
         TaintMap::iterator NT = TG.find(&*I);
@@ -119,19 +125,19 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
       }else{
         if(OT != MT.end()){
           if(CallInst *CI = dyn_cast<CallInst>(&*I)){
-            // If I is a CallInst to a function CF with a definition in
-            // module M, taint CF's arguments.
-            Function* CF = CI->getCalledFunction();
-            if(!CF->empty()){
-              assert(OpIdx < CF->arg_size() && "arg_iterator out of bounds.");
-              Function::arg_iterator AI = CF->arg_begin();
-              for(unsigned i = 0; i < OpIdx; i++) AI++;
-              TaintMap::iterator AT = MT.find(&*AI);
-              if(AT == MT.end()){
-                AT = MT.insert(std::make_pair(&*AI, TaintSet())).first;
-                Changed = true;
+            if(Function* CF = dyn_cast<Function>(CI->getCalledValue())){
+              // If I is a CallInst to a function CF with a definition in
+              // module M, taint CF's arguments.
+              if(!CF->empty()){
+                Function::arg_iterator AI = CF->arg_begin();
+                for(unsigned i = 0; i < OpIdx; i++) AI++;
+                TaintMap::iterator AT = MT.find(&*AI);
+                if(AT == MT.end()){
+                  AT = MT.insert(std::make_pair(&*AI, TaintSet())).first;
+                  Changed = true;
+                }
+                Changed = taintSetUnion(AT->second, OT->second) || Changed;
               }
-              Changed = taintSetUnion(AT->second, OT->second) || Changed;
             }
           }else if(ReturnInst *RI = dyn_cast<ReturnInst>(&*I)){
             // If I is a ReturnInst we need to taint all the CallInsts that use
@@ -165,11 +171,12 @@ bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
 }
 
 bool WinAPITaintAnalysis::isTaintSource(Instruction& I){
-  if(CallInst *CI = dyn_cast<CallInst>(&I)){
-    return CI->getCalledFunction()->hasDLLImportStorageClass();
-  }else{
-    return false;
+  if(CallInst* CI = dyn_cast<CallInst>(&I)){
+    if(Function* F = dyn_cast<Function>(CI->getCalledValue())){
+      return F->hasDLLImportStorageClass();
+    }
   }
+  return false;
 }
 
 bool WinAPITaintAnalysis::isTaintSink(Instruction& I){
@@ -186,6 +193,8 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
 
   Edges << "# edge declarations: ";
   Edges << "E node_from:out_param_from,node_to:in_param_to" << '\n';
+
+  unsigned EdgeCount = 0;
   
   for(TaintMap::iterator DI = TG.begin(), DIE = TG.end(); DI != DIE; ++DI){
     TaintSet Src = DI->second;
@@ -202,6 +211,7 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
       for(TaintSet::iterator SI = Src.begin(), SIE = Src.end(); SI != SIE; ++SI){
         unsigned SrcID = TG.find(SI->first) - TG.begin();
         Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
+        EdgeCount++;
       }
     }else{
       std::string ConstType;
@@ -210,7 +220,8 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
       Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
-  errs() << Nodes.str() << '\n' << Edges.str() << '\n';
+  errs() << "Nodes: " << TG.size() << '\n' << "Edges: " << EdgeCount << '\n';
+  //errs() << Nodes.str() << '\n' << Edges.str() << '\n';
 }
 
 ModulePass *llvm::createWinAPITaintAnalysis() {
