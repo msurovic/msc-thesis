@@ -20,8 +20,8 @@ AC_PROG_LIBTOOL
 ## Section 2: Set program options
 ## --------------------------------------------------------------------
 
-MYCXXFLAGS="-Wall -Wextra -pipe -ffloat-store"
-MYCCFLAGS="-Wall -Wextra -pipe -ffloat-store -m32"
+MYCXXFLAGS="-Wall -Wextra -pipe -ffloat-store -lboost_system"
+MYCCFLAGS="-Wall -Wextra -pipe -ffloat-store -m32 -lboost_system"
 OPTFLAGS=""
 DBGFLAGS=""
 
