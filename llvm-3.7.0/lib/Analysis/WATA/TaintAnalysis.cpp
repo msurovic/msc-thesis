@@ -220,8 +220,8 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
       Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
-  errs() << "Nodes: " << TG.size() << '\n' << "Edges: " << EdgeCount << '\n';
-  //errs() << Nodes.str() << '\n' << Edges.str() << '\n';
+  //errs() << "Nodes: " << TG.size() << '\n' << "Edges: " << EdgeCount << '\n';
+  errs() << Nodes.str() << '\n' << Edges.str() << '\n';
 }
 
 ModulePass *llvm::createWinAPITaintAnalysis() {
