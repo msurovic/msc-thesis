@@ -9,7 +9,9 @@
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/FileSystem.h"
 #include <sstream>
+#include <system_error>
 
 #define PASSNAME "winapi-taint-analysis"
 #define HELPTEXT "WinAPI Taint Analysis Pass"
@@ -30,7 +32,7 @@ namespace {
     bool taintSetUnion(TaintSet&, TaintSet&);
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
-    void printTaintGraph(TaintMap&);
+    void printTaintGraph(TaintMap&, Module&);
   };
 }
 
@@ -51,14 +53,7 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
     }
   }
 
-  printTaintGraph(DepGraph);
-
-  // for(TaintMap::iterator i = ModuleTaints.begin(), e = ModuleTaints.end(); i != e; ++i){
-  //   if(isa<Argument>(i->first)){
-  //     i->first->dump();
-  //     errs() << i->second.size() << '\n';
-  //   }
-  // }
+  printTaintGraph(DepGraph, M);
 
   return false;
 }
@@ -183,7 +178,7 @@ bool WinAPITaintAnalysis::isTaintSink(Instruction& I){
   return isTaintSource(I);
 }
 
-void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
+void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
   std::stringstream Nodes;
   std::stringstream Edges;
 
@@ -220,8 +215,18 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG){
       Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
-  //errs() << "Nodes: " << TG.size() << '\n' << "Edges: " << EdgeCount << '\n';
-  errs() << Nodes.str() << '\n' << Edges.str() << '\n';
+
+  std::error_code EC;
+  std::string OutputFileName = M.getName().str() + ".sdg";
+  raw_fd_ostream OutputFile(OutputFileName, EC, sys::fs::F_Text);
+
+  if(EC){
+    errs() << M.getName() << ": error opening " << OutputFileName << ":"
+           << EC.message() << "\n";
+  }else{
+    OutputFile << Nodes.str() << '\n' << Edges.str() << '\n';
+    OutputFile.close();
+  }
 }
 
 ModulePass *llvm::createWinAPITaintAnalysis() {
