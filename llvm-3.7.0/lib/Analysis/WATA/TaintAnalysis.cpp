@@ -108,9 +108,17 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
           for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
             Changed = NT->second.insert(Taint(TI->first, OpIdx)) || Changed;
           }
-        }else if(!isa<Function>(V)){
+        }else{
           // Operand does not have an entry in MT, so a terminal node needs to be
           // created. The node will be labeled by the type of the operand.
+          
+          // If I is a CallInst we should skip handling the called Value.
+          if(CallInst *CI = dyn_cast<CallInst>(&*I)){
+            if(V == CI->getCalledValue()){
+              continue;
+            }
+          }
+
           if(TG.find(V) == TG.end()){
             Changed = TG.insert(std::make_pair(V, TaintSet())).second || Changed;
             NT = TG.find(&*I);
@@ -154,6 +162,7 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
       }
     }
   }
+
   return Changed;
 }
 
@@ -188,8 +197,6 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
 
   Edges << "# edge declarations: ";
   Edges << "E node_from:out_param_from,node_to:in_param_to" << '\n';
-
-  unsigned EdgeCount = 0;
   
   for(TaintMap::iterator DI = TG.begin(), DIE = TG.end(); DI != DIE; ++DI){
     TaintSet Src = DI->second;
@@ -206,7 +213,6 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
       for(TaintSet::iterator SI = Src.begin(), SIE = Src.end(); SI != SIE; ++SI){
         unsigned SrcID = TG.find(SI->first) - TG.begin();
         Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
-        EdgeCount++;
       }
     }else{
       std::string ConstType;
