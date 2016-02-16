@@ -29,6 +29,7 @@ namespace {
 
     bool runOnModule(Module&) override;
     bool runTaints(Function&, TaintMap&, TaintMap&);
+    void finalizeTaintGraph(TaintMap&, TaintMap&);
     bool taintSetUnion(TaintSet&, TaintSet&);
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
@@ -53,6 +54,7 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
     }
   }
 
+  finalizeTaintGraph(DepGraph, ModuleTaints);
   printTaintGraph(DepGraph, M);
 
   return false;
@@ -106,24 +108,12 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
           // Operand is a Value* that has an entry in MT. Use taints in the entry.
           TaintSet T = OT->second;
           for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
-            Changed = NT->second.insert(Taint(TI->first, OpIdx)) || Changed;
-          }
-        }else{
-          // Operand does not have an entry in MT, so a terminal node needs to be
-          // created. The node will be labeled by the type of the operand.
-          
-          // If I is a CallInst we should skip handling the called Value.
-          if(CallInst *CI = dyn_cast<CallInst>(&*I)){
-            if(V == CI->getCalledValue()){
-              continue;
+            // If *TI is the same as *NT we do not sink it. Taint sinks cannot
+            // sink their own taints.
+            if(NT->first != TI->first){
+              Changed = NT->second.insert(Taint(TI->first, OpIdx)) || Changed;
             }
           }
-
-          if(TG.find(V) == TG.end()){
-            Changed = TG.insert(std::make_pair(V, TaintSet())).second || Changed;
-            NT = TG.find(&*I);
-          }
-          Changed = NT->second.insert(Taint(V, OpIdx)) || Changed;
         }
       }else{
         if(OT != MT.end()){
@@ -162,8 +152,37 @@ bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
       }
     }
   }
-
   return Changed;
+}
+
+void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
+  // Operands that do not have an entry in MT, so a terminal node needs to be
+  // created. The node will be labeled by the type of the operand. If I is
+  // a CallInst we should skip handling the called Value.
+  for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
+    if(Instruction* I = dyn_cast<Instruction>(NI->first)){
+      TaintMap::iterator NT = TG.find(I);
+      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+        Value* V = U->get();
+        unsigned OpIdx = U - I->op_begin();
+        TaintMap::iterator OT = MT.find(V);
+        if(OT == MT.end() || OT->second.empty()){
+          if(CallInst *CI = dyn_cast<CallInst>(I)){
+            if(V == CI->getCalledValue()){
+              continue;
+            }
+          }
+          if(TG.find(V) == TG.end()){
+            TG.insert(std::make_pair(V, TaintSet()));
+            NT = TG.find(I);
+          }
+          NT->second.insert(Taint(V, OpIdx));
+        }
+      }
+    }else{
+      assert(false && "Taint graph node is not an Instruction.");
+    }
+  }
 }
 
 bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
@@ -217,7 +236,11 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
     }else{
       std::string ConstType;
       raw_string_ostream rso(ConstType);
-      DI->first->getType()->print(rso);
+      if(Function* F = dyn_cast<Function>(DI->first)){
+        F->getReturnType()->print(rso);
+      }else{
+        DI->first->getType()->print(rso);
+      }
       Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
