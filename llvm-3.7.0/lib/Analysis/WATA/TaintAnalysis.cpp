@@ -29,10 +29,13 @@ namespace {
 
     bool runOnModule(Module&) override;
     bool runTaints(Function&, TaintMap&, TaintMap&);
-    void finalizeTaintGraph(TaintMap&, TaintMap&);
-    bool taintSetUnion(TaintSet&, TaintSet&);
+    bool makeTaints(Instruction&, TaintMap&);
+    bool propTaints(Instruction&, TaintMap&);
+    bool sinkTaints(Instruction&, TaintMap&, TaintMap&);
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
+    bool taintSetUnion(TaintSet&, TaintSet&);
+    void finalizeTaintGraph(TaintMap&, TaintMap&);
     void printTaintGraph(TaintMap&, Module&);
   };
 }
@@ -41,17 +44,8 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
   TaintMap DepGraph;
   TaintMap ModuleTaints;
 
-  bool Changed = true;
-
-  while(Changed){
-    Changed = false;
-    for(Module::iterator MI = M.begin(), ME = M.end(); MI != ME; ++MI){
-      if(!MI->empty()){
-        while(runTaints(*MI, ModuleTaints, DepGraph)){
-          Changed = true;
-        }
-      }
-    }
+  for(Module::iterator MI = M.begin(), ME = M.end(); MI != ME; ++MI){
+    runTaints(*MI, ModuleTaints, DepGraph);
   }
 
   finalizeTaintGraph(DepGraph, ModuleTaints);
@@ -62,134 +56,6 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
 
 bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
   bool Changed = false;
-
-  // Run the taints
-  for(inst_iterator I = inst_begin(F), IE = inst_end(F); I != IE; ++I){
-    // Add entry into MT for I.
-    TaintMap::iterator IT = MT.find(&*I);
-    if(IT == MT.end()){
-      IT = MT.insert(std::make_pair(&*I, TaintSet())).first;
-      Changed = true;
-    }
-
-    if(isTaintSource(*I)){
-      // Add I itself to I's taints.
-      Changed = IT->second.insert(Taint(&*I, -1)) || Changed;
-      // Any pointer type variable operand of I is tainted by I.
-      // Note: This behaves weirdly. Fix it sometime.
-      // for(Value* V : I->operand_values()){
-      //   if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
-      //     // Add entry into MT for V.
-      //     TaintMap::iterator VT = MT.find(V);
-      //     if(VT == MT.end()){
-      //       VT = MT.insert(std::make_pair(V, TaintSet())).first;
-      //       Changed = true;
-      //     }
-      //     // Add I into V's taints.
-      //     Changed = VT->second.insert(Taint(&*I, -1)) || Changed;
-      //   }
-      // }
-      // Add node to dependency graph.
-      if(TG.find(&*I) == TG.end()){
-        Changed = TG.insert(std::make_pair(&*I, TaintSet())).second || Changed;
-      }
-    }
-
-    for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-      Value* V = U->get();
-      TaintMap::iterator OT = MT.find(V);
-      unsigned OpIdx = U - I->op_begin();
-
-      if(isTaintSink(*I)){
-        // Add edges to the dependency graph based on operands taints.
-        TaintMap::iterator NT = TG.find(&*I);
-        assert(NT != TG.end() && "Taint sink node not present in taint graph.");
-        if(OT != MT.end() && !OT->second.empty()){
-          // Operand is a Value* that has an entry in MT. Use taints in the entry.
-          TaintSet T = OT->second;
-          for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
-            // If *TI is the same as *NT we do not sink it. Taint sinks cannot
-            // sink their own taints.
-            if(NT->first != TI->first){
-              Changed = NT->second.insert(Taint(TI->first, OpIdx)) || Changed;
-            }
-          }
-        }
-      }else{
-        if(OT != MT.end()){
-          if(CallInst *CI = dyn_cast<CallInst>(&*I)){
-            if(Function* CF = dyn_cast<Function>(CI->getCalledValue())){
-              // If I is a CallInst to a function CF with a definition in
-              // module M, taint CF's arguments.
-              if(!CF->empty()){
-                Function::arg_iterator AI = CF->arg_begin();
-                for(unsigned i = 0; i < OpIdx; i++) AI++;
-                TaintMap::iterator AT = MT.find(&*AI);
-                if(AT == MT.end()){
-                  AT = MT.insert(std::make_pair(&*AI, TaintSet())).first;
-                  Changed = true;
-                }
-                Changed = taintSetUnion(AT->second, OT->second) || Changed;
-              }
-            }
-          }else if(ReturnInst *RI = dyn_cast<ReturnInst>(&*I)){
-            // If I is a ReturnInst we need to taint all the CallInsts that use
-            // Function F.
-            for(User* FU : F.users()){
-              if(isa<Instruction>(FU)){
-                TaintMap::iterator FUT = MT.find(FU);
-                if(FUT == MT.end()){
-                  FUT = MT.insert(std::make_pair(FU, TaintSet())).first;
-                  Changed = true;
-                }
-                Changed = taintSetUnion(FUT->second, OT->second) || Changed;
-              }
-            }
-          }
-          // Add taints of I's operands to I's taints.
-          Changed = taintSetUnion(IT->second, OT->second) || Changed;
-        }
-      }
-    }
-  }
-  return Changed;
-}
-
-void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
-  // Operands that do not have an entry in MT, so a terminal node needs to be
-  // created. The node will be labeled by the type of the operand. If I is
-  // a CallInst we should skip handling the called Value.
-  for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
-    if(Instruction* I = dyn_cast<Instruction>(NI->first)){
-      TaintMap::iterator NT = TG.find(I);
-      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
-        Value* V = U->get();
-        unsigned OpIdx = U - I->op_begin();
-        TaintMap::iterator OT = MT.find(V);
-        if(OT == MT.end() || OT->second.empty()){
-          if(CallInst *CI = dyn_cast<CallInst>(I)){
-            if(V == CI->getCalledValue()){
-              continue;
-            }
-          }
-          if(TG.find(V) == TG.end()){
-            TG.insert(std::make_pair(V, TaintSet()));
-            NT = TG.find(I);
-          }
-          NT->second.insert(Taint(V, OpIdx));
-        }
-      }
-    }else{
-      assert(false && "Taint graph node is not an Instruction.");
-    }
-  }
-}
-
-bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
-  bool Changed = false;
-  for(TaintSet::iterator TI = B.begin(), TE = B.end(); TI != TE; ++TI){
-    Changed = A.insert(*TI) || Changed;
-  }
   return Changed;
 }
 
@@ -204,6 +70,127 @@ bool WinAPITaintAnalysis::isTaintSource(Instruction& I){
 
 bool WinAPITaintAnalysis::isTaintSink(Instruction& I){
   return isTaintSource(I);
+}
+
+bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
+  bool Changed = false;
+  for(TaintSet::iterator TI = B.begin(), TE = B.end(); TI != TE; ++TI){
+    Changed = A.insert(*TI) || Changed;
+  }
+  return Changed;
+}
+
+bool WinAPITaintAnalysis::makeTaints(Instruction& I, TaintMap& MT){
+  bool Changed = false;
+  // Find I's taints in MT. If I does not have a record in MT, create it.
+  TaintMap::iterator IT = MT.find(&I);
+  if(IT == MT.end()){
+    IT = MT.insert(std::make_pair(&I, TaintSet())).first;
+    Changed = true;
+  }
+  // Add I itself to I's taints.
+  Changed = IT->second.insert(Taint(&I, -1)) || Changed;
+  // Any pointer type variable operand of I is tainted by I.
+  for(Value* V : I.operand_values()){
+    if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
+      TaintMap::iterator OT = MT.find(V);
+      if(OT == MT.end()){
+        OT = MT.insert(std::make_pair(&I, TaintSet())).first;
+        Changed = true;
+      }
+      Changed = OT->second.insert(Taint(&I, -1)) || Changed;
+    }
+  }
+  return Changed;
+}
+
+bool WinAPITaintAnalysis::propTaints(Instruction& I, TaintMap& MT){
+  bool Changed = false;
+  // Find I's taints in MT. If I does not have a record in MT, create it.
+  TaintMap::iterator IT = MT.find(&I);
+  if(IT == MT.end()){
+    IT = MT.insert(std::make_pair(&I, TaintSet())).first;
+    Changed = true;
+  }
+  // Add taints of I's operands into I's taints. Constants do not have
+  // taints.
+  for(Value* V : I.operand_values()){
+    if(!isa<Constant>(V)){
+      TaintMap::iterator OT = MT.find(V);
+      if(OT != MT.end() && !OT->second.empty()){
+        Changed = taintSetUnion(IT->second, OT->second) || Changed;
+      }
+    }
+  }
+  return Changed;
+}
+
+bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& MT, TaintMap& TG){
+  bool Changed = false;
+  // Add taint sink node into the dependency graph.
+  TaintMap::iterator DN = TG.find(&I);
+  if(DN == TG.end()){
+    DN = TG.insert(std::make_pair(&I, TaintSet())).first;
+    Changed = true;
+  }
+  // Iterate through the sink's operands and sink their taint if they have any.
+  for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+    Value* V = U->get();
+    unsigned OpIdx = U - I->op_begin();
+    TaintMap::iterator OT = MT.find(V);
+    if(OT != MT.end() && !OT->second.empty()){
+      TaintSet T = OT->second;
+      for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
+        // Create taint source node if there isn't one.
+        if(TG.find(TI->first) == TG.end()){
+          TG.insert(std::make_pair(TI->first, TaintSet()));
+          Changed = true;
+        }
+        // Create the edge from taint source TI->first into DN taint sink's
+        // operand on index OpIdx.
+        Changed = DN->second.insert(Taint(TI->first, OpIdx)) || Changed;
+      }
+      // If V is a pointer type variable I sinks all it's current taints.
+      // Note: sinkTaints should probably only report changes of TG. The
+      // clearing of T is done due to the stateful nature of pointer
+      // variables.
+      if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
+        T.clear(); 
+        //Changed = true;
+      }
+    }
+  }
+  return Changed;
+}
+
+void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
+  // Operands that do not have an entry in MT, so a terminal node needs to be
+  // created. The node will be labeled by the type of the operand. If I is
+  // a CallInst we should skip handling the called Value.
+  for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
+    if(Instruction* I = dyn_cast<Instruction>(NI->first)){
+      TaintMap::iterator DN = TG.find(I);
+      for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+        Value* V = U->get();
+        unsigned OpIdx = U - I->op_begin();
+        TaintMap::iterator OT = MT.find(V);
+        if(OT == MT.end() || OT->second.empty()){
+          if(CallInst *CI = dyn_cast<CallInst>(I)){
+            if(V == CI->getCalledValue()){
+              continue;
+            }
+          }
+          if(TG.find(V) == TG.end()){
+            TG.insert(std::make_pair(V, TaintSet()));
+            DN = TG.find(I);
+          }
+          DN->second.insert(Taint(V, OpIdx));
+        }
+      }
+    }else{
+      assert(false && "Taint graph node is not an Instruction.");
+    }
+  }
 }
 
 void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
