@@ -7,7 +7,6 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SetVector.h"
-#include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FileSystem.h"
 #include <sstream>
@@ -35,6 +34,8 @@ namespace {
     bool isTaintSource(Instruction&);
     bool isTaintSink(Instruction&);
     bool taintSetUnion(TaintSet&, TaintSet&);
+    bool taintMapUnion(TaintMap&, TaintMap&);
+    bool taintMapEquiv(TaintMap&, TaintMap&);
     void finalizeTaintGraph(TaintMap&, TaintMap&);
     void printTaintGraph(TaintMap&, Module&);
   };
@@ -78,6 +79,35 @@ bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
     Changed = A.insert(*TI) || Changed;
   }
   return Changed;
+}
+
+bool WinAPITaintAnalysis::taintMapUnion(TaintMap& A, TaintMap& B){
+  bool Changed = false;
+  for(TaintMap::iterator BI = B.begin(), BE = B.end(); BI != BE; ++BI){
+    TaintMap::iterator AI = A.find(BI->first);
+    if(AI != A.end()){
+      Changed = taintSetUnion(AI->second, BI->second) || Changed;
+    }
+  }
+  return Changed;
+}
+
+bool WinAPITaintAnalysis::taintMapEquiv(TaintMap& A, TaintMap& B){
+  if(A.size() == B.size()){
+    for(TaintMap::iterator BI = B.begin(), BE = B.end(); BI != BE; ++BI){
+      TaintMap::iterator AI = A.find(BI->first);
+      if(AI != A.end()){
+        if(AI->second != BI->second){
+          return false;
+        }
+      }else{
+        return false; 
+      }
+    }
+  }else{
+    return false;
+  }
+  return true;
 }
 
 bool WinAPITaintAnalysis::makeTaints(Instruction& I, TaintMap& MT){
@@ -134,9 +164,9 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& MT, TaintMap& TG)
     Changed = true;
   }
   // Iterate through the sink's operands and sink their taint if they have any.
-  for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
+  for(User::op_iterator U = I.op_begin(), UE = I.op_end(); U != UE; ++U){
     Value* V = U->get();
-    unsigned OpIdx = U - I->op_begin();
+    unsigned OpIdx = U - I.op_begin();
     TaintMap::iterator OT = MT.find(V);
     if(OT != MT.end() && !OT->second.empty()){
       TaintSet T = OT->second;
