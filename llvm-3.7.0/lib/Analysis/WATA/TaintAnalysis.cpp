@@ -1,14 +1,11 @@
-#include "llvm/Pass.h"
 #include "llvm/Analysis/Passes.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
-#include "llvm/IR/InstIterator.h"
-#include "llvm/IR/Constants.h"
-#include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/MapVector.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FileSystem.h"
+#include <iterator>
 #include <sstream>
 #include <system_error>
 
@@ -84,10 +81,12 @@ bool WinAPITaintAnalysis::taintSetUnion(TaintSet& A, TaintSet& B){
 bool WinAPITaintAnalysis::taintMapUnion(TaintMap& A, TaintMap& B){
   bool Changed = false;
   for(TaintMap::iterator BI = B.begin(), BE = B.end(); BI != BE; ++BI){
-    TaintMap::iterator AI = A.find(BI->first);
-    if(AI != A.end()){
-      Changed = taintSetUnion(AI->second, BI->second) || Changed;
+    TaintMap::iterator AI = A.find(BI->first);    
+    if(AI == A.end()){
+      AI = A.insert(std::make_pair(BI->first, TaintSet())).first;
+      Changed = true;
     }
+    Changed = taintSetUnion(AI->second, BI->second) || Changed;
   }
   return Changed;
 }
@@ -166,19 +165,20 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& MT, TaintMap& TG)
   // Iterate through the sink's operands and sink their taint if they have any.
   for(User::op_iterator U = I.op_begin(), UE = I.op_end(); U != UE; ++U){
     Value* V = U->get();
-    unsigned OpIdx = U - I.op_begin();
+    unsigned OpIdx = std::distance(I.op_begin(), U);
     TaintMap::iterator OT = MT.find(V);
     if(OT != MT.end() && !OT->second.empty()){
       TaintSet T = OT->second;
       for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
         // Create taint source node if there isn't one.
-        if(TG.find(TI->first) == TG.end()){
-          TG.insert(std::make_pair(TI->first, TaintSet()));
+        TaintMap::iterator SN = TG.find(TI->first);
+        if(SN == TG.end()){
+          SN = TG.insert(std::make_pair(TI->first, TaintSet())).first;
           Changed = true;
         }
         // Create the edge from taint source TI->first into DN taint sink's
         // operand on index OpIdx.
-        Changed = DN->second.insert(Taint(TI->first, OpIdx)) || Changed;
+        Changed = SN->second.insert(Taint(DN->first, OpIdx)) || Changed;
       }
       // If V is a pointer type variable I sinks all it's current taints.
       // Note: sinkTaints should probably only report changes of TG. The
@@ -199,10 +199,9 @@ void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
   // a CallInst we should skip handling the called Value.
   for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
     if(Instruction* I = dyn_cast<Instruction>(NI->first)){
-      TaintMap::iterator DN = TG.find(I);
       for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
         Value* V = U->get();
-        unsigned OpIdx = U - I->op_begin();
+        unsigned OpIdx = std::distance(I->op_begin(), U);
         TaintMap::iterator OT = MT.find(V);
         if(OT == MT.end() || OT->second.empty()){
           if(CallInst *CI = dyn_cast<CallInst>(I)){
@@ -210,11 +209,14 @@ void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
               continue;
             }
           }
-          if(TG.find(V) == TG.end()){
+          TaintMap::iterator DN = TG.find(V);
+          if(DN == TG.end()){
             TG.insert(std::make_pair(V, TaintSet()));
-            DN = TG.find(I);
+            // Insertion into a MapVector invalidates active iterators.
+            // Hence the restart from beginning.
+            NI = TG.begin();
           }
-          DN->second.insert(Taint(V, OpIdx));
+          DN->second.insert(Taint(I, OpIdx));
         }
       }
     }else{
@@ -226,46 +228,50 @@ void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
 void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
   std::stringstream Nodes;
   std::stringstream Edges;
-
+  // Node headers
   Nodes << "# node count" << '\n';
   Nodes << "N " << TG.size() << "\n\n";
   Nodes << "# nodes declarations: V number label in_arity out_arity" << '\n';
-
+  // Edge headers
   Edges << "# edge declarations: ";
   Edges << "E node_from:out_param_from,node_to:in_param_to" << '\n';
-  
-  for(TaintMap::iterator DI = TG.begin(), DIE = TG.end(); DI != DIE; ++DI){
-    TaintSet Src = DI->second;
-    unsigned DstID = DI - TG.begin();
-
-    Nodes << "V " << DstID << ' ';
-
-    if(CallInst* Dst = dyn_cast<CallInst>(DI->first)){
-      Nodes << Dst->getCalledFunction()->getName().str() << ' ';
-      Nodes << Dst->getNumArgOperands() << ' ';
-      Nodes << (Dst->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1);
+  // Iterate through nodes and fill the stringstreams
+  for(TaintMap::iterator SI = TG.begin(), SIE = TG.end(); SI != SIE; ++SI){
+    // We use the distance of SI from the beginning of the map as an ID.
+    unsigned SrcID = std::distance(TG.begin(), SI);
+    Nodes << "V " << SrcID << ' ';
+    // Fill out the needed name and arities of the node if it's a CallInst,
+    // thus a non-terminal node.
+    if(CallInst* Src = dyn_cast<CallInst>(SI->first)){
+      Nodes << Src->getCalledFunction()->getName().str() << ' ';
+      Nodes << Src->getNumArgOperands() << ' ';
+      Nodes << (Src->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1);
       Nodes << "\n";
-
-      for(TaintSet::iterator SI = Src.begin(), SIE = Src.end(); SI != SIE; ++SI){
-        unsigned SrcID = TG.find(SI->first) - TG.begin();
-        Edges <<  "E " << SrcID << ":0," << DstID << ':' << SI->second << '\n';
+      // Fill out the edge information
+      TaintSet Dst = SI->second;
+      for(TaintSet::iterator DI = Dst.begin(), DIE = Dst.end(); DI != DIE; ++DI){
+        unsigned DstID = std::distance(TG.begin(), TG.find(DI->first));
+        Edges <<  "E " << SrcID << ":0," << DstID << ':' << DI->second << '\n';
       }
     }else{
+      // Terminal nodes are treated separately, since they're general Values.
+      // If the terminal node is a Function, the return type of the function
+      // is used.
       std::string ConstType;
       raw_string_ostream rso(ConstType);
-      if(Function* F = dyn_cast<Function>(DI->first)){
+      if(Function* F = dyn_cast<Function>(SI->first)){
         F->getReturnType()->print(rso);
       }else{
-        DI->first->getType()->print(rso);
+        SI->first->getType()->print(rso);
       }
       Nodes << rso.str() << ' ' << "0 1" << '\n';
     }
   }
-
+  // Final SDG file printing.
   std::error_code EC;
   std::string OutputFileName = M.getName().str() + ".sdg";
   raw_fd_ostream OutputFile(OutputFileName, EC, sys::fs::F_Text);
-
+  
   if(EC){
     errs() << M.getName() << ": error opening " << OutputFileName << ":"
            << EC.message() << "\n";
