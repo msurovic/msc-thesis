@@ -24,7 +24,7 @@ namespace {
     WinAPITaintAnalysis() : ModulePass(ID) {}
 
     bool runOnModule(Module&) override;
-    bool runTaints(Function&, TaintMap&, TaintMap&);
+    void runTaints(Function&, TaintMap&, TaintMap&);
     bool makeTaints(Instruction&, TaintMap&);
     bool propTaints(Instruction&, TaintMap&);
     bool sinkTaints(Instruction&, TaintMap&, TaintMap&);
@@ -39,11 +39,11 @@ namespace {
 }
 
 bool WinAPITaintAnalysis::runOnModule(Module &M){
-  TaintMap DepGraph;
   TaintMap ModuleTaints;
+  TaintMap DepGraph;
 
-  for(Module::iterator MI = M.begin(), ME = M.end(); MI != ME; ++MI){
-    runTaints(*MI, ModuleTaints, DepGraph);
+  for(Function& F : M){
+    runTaints(F, ModuleTaints, DepGraph);
   }
 
   finalizeTaintGraph(DepGraph, ModuleTaints);
@@ -52,9 +52,25 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
   return false;
 }
 
-bool WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
-  bool Changed = false;
-  return Changed;
+void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
+  MapVector<BasicBlock*, TaintMap> AbsContexts;
+  bool Changed = true;
+  // Iteratively compute abstract contexts until a fixpoint is reached
+  while(Changed){
+    Changed = false;
+    for(BasicBlock& BB : F){
+      for(Instruction& I : BB){
+        // iterate over BB's, joining all predecessor contexts and running taints
+        // determine if there was a change in the BB taintmap
+        // fixpoint is reached when no change occurs among any BB in F
+        // the assumption here is that we have all of the functions inlined already
+      }
+    }
+  }
+  // Add TaintMaps of F to the module-wide TaintMap MT
+  for(std::pair<BasicBlock*, TaintMap>& CI : AbsContexts){
+    taintMapUnion(MT, CI.second);
+  }
 }
 
 bool WinAPITaintAnalysis::isTaintSource(Instruction& I){
