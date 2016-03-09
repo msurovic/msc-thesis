@@ -26,7 +26,6 @@ namespace {
 
     bool runOnModule(Module&) override;
     void runTaints(Function&, TaintMap&, TaintMap&);
-    bool runTaints(BasicBlock&, TaintMap&, TaintMap&);
     bool makeTaints(Instruction&, TaintMap&);
     bool propTaints(Instruction&, TaintMap&);
     bool sinkTaints(Instruction&, TaintMap&, TaintMap&);
@@ -44,12 +43,18 @@ bool WinAPITaintAnalysis::runOnModule(Module& M){
   TaintMap ModuleTaints;
   TaintMap DepGraph;
 
+  errs() << "Checkpoint 1" << '\n';
+
   for(Function& F : M){
     runTaints(F, ModuleTaints, DepGraph);
   }
 
+  errs() << "Checkpoint 2" << '\n';
+
   finalizeTaintGraph(DepGraph, ModuleTaints);
+  errs() << "Checkpoint 3" << '\n';
   printTaintGraph(DepGraph, M);
+  errs() << "Checkpoint 4" << '\n';
 
   return false;
 }
@@ -62,45 +67,44 @@ void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
   while(Changed){
     Changed = false;
     for(BasicBlock& BB : F){
-      // Get the abstract context for BB or create one.
-      MapVector<BasicBlock*, TaintMap>::iterator BBT = AbsContexts.find(&BB);
-      if(BBT == AbsContexts.end()){
-        BBT = AbsContexts.insert(std::make_pair(&BB, TaintMap())).first;
-        Changed = true;
-      }
-      // Join all predecessor contexts.
+      // Create tha abstract context for BB.
+      TaintMap BBT;
+      // Join with all predecessor contexts.
       for(BasicBlock* P : predecessors(&BB)){
         MapVector<BasicBlock*, TaintMap>::iterator PT = AbsContexts.find(P);
         if(PT == AbsContexts.end()){
           PT = AbsContexts.insert(std::make_pair(P, TaintMap())).first;
           Changed = true;
         }
-        Changed = taintMapUnion(BBT->second, PT->second) || Changed;
+        taintMapUnion(BBT, PT->second);
       }
       // Analyze BB
-      Changed = runTaints(BB, BBT->second, TG) || Changed;
+      for(Instruction& I : BB){
+        if(isTaintSink(I)){
+          Changed = sinkTaints(I, BBT, TG) || Changed;
+        }
+        if(isTaintSource(I)){
+          makeTaints(I, BBT);
+        }else{
+          propTaints(I, BBT);
+        }
+      }
+      // Determine if there was a change in the abstract context and update
+      // the abstract context if there was.
+      MapVector<BasicBlock*, TaintMap>::iterator CI = AbsContexts.find(&BB);
+      if(CI == AbsContexts.end()){
+        AbsContexts.insert(std::make_pair(&BB, BBT));
+        Changed = true;
+      }else if(!taintMapEquiv(CI->second, BBT)){
+        CI->second = BBT;
+        Changed = true;
+      }
     }
   }
   // Add TaintMaps of F to the module-wide TaintMap MT
   for(std::pair<BasicBlock*, TaintMap>& CI : AbsContexts){
     taintMapUnion(MT, CI.second);
   }
-}
-
-bool WinAPITaintAnalysis::runTaints(BasicBlock& BB, TaintMap& TM, TaintMap& TG){
-  bool Changed = false;
-  TaintMap OldTM = TM;
-  for(Instruction& I : BB){
-    if(isTaintSink(I)){
-      Changed = sinkTaints(I, TM, TG) || Changed;
-    }
-    if(isTaintSource(I)){
-      makeTaints(I, TM);
-    }else{
-      propTaints(I, TM);
-    }
-  }
-  return Changed || taintMapEquiv(OldTM, TM);
 }
 
 bool WinAPITaintAnalysis::isTaintSource(Instruction& I){
@@ -179,20 +183,20 @@ bool WinAPITaintAnalysis::makeTaints(Instruction& I, TaintMap& MT){
   return Changed;
 }
 
-bool WinAPITaintAnalysis::propTaints(Instruction& I, TaintMap& MT){
+bool WinAPITaintAnalysis::propTaints(Instruction& I, TaintMap& TM){
   bool Changed = false;
-  // Find I's taints in MT. If I does not have a record in MT, create it.
-  TaintMap::iterator IT = MT.find(&I);
-  if(IT == MT.end()){
-    IT = MT.insert(std::make_pair(&I, TaintSet())).first;
+  // Find I's taints in TM. If I does not have a record in TM, create it.
+  TaintMap::iterator IT = TM.find(&I);
+  if(IT == TM.end()){
+    IT = TM.insert(std::make_pair(&I, TaintSet())).first;
     Changed = true;
   }
   // Add taints of I's operands into I's taints. Constants do not have
   // taints.
   for(Value* V : I.operand_values()){
     if(!isa<Constant>(V)){
-      TaintMap::iterator OT = MT.find(V);
-      if(OT != MT.end() && !OT->second.empty()){
+      TaintMap::iterator OT = TM.find(V);
+      if(OT != TM.end() && !OT->second.empty()){
         Changed = taintSetUnion(IT->second, OT->second) || Changed;
       }
     }
@@ -200,7 +204,7 @@ bool WinAPITaintAnalysis::propTaints(Instruction& I, TaintMap& MT){
   return Changed;
 }
 
-bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& MT, TaintMap& TG){
+bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& TM, TaintMap& TG){
   bool Changed = false;
   // Add taint sink node into the dependency graph.
   TaintMap::iterator DN = TG.find(&I);
@@ -212,8 +216,8 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& MT, TaintMap& TG)
   for(User::op_iterator U = I.op_begin(), UE = I.op_end(); U != UE; ++U){
     Value* V = U->get();
     unsigned OpIdx = std::distance(I.op_begin(), U);
-    TaintMap::iterator OT = MT.find(V);
-    if(OT != MT.end() && !OT->second.empty()){
+    TaintMap::iterator OT = TM.find(V);
+    if(OT != TM.end() && !OT->second.empty()){
       TaintSet T = OT->second;
       for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
         // Create taint source node if there isn't one.
@@ -231,7 +235,7 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& MT, TaintMap& TG)
       // clearing of T is done due to the stateful nature of pointer
       // variables.
       if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
-        T.clear(); 
+        OT->second.clear();
         //Changed = true;
       }
     }
@@ -257,16 +261,14 @@ void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
           }
           TaintMap::iterator DN = TG.find(V);
           if(DN == TG.end()){
-            TG.insert(std::make_pair(V, TaintSet()));
+            DN = TG.insert(std::make_pair(V, TaintSet())).first;
             // Insertion into a MapVector invalidates active iterators.
             // Hence the restart from beginning. Maybe use std::map?
-            NI = TG.begin();
+            // NI = TG.begin();
           }
           DN->second.insert(Taint(I, OpIdx));
         }
       }
-    }else{
-      assert(false && "Taint graph node is not an Instruction.");
     }
   }
 }
