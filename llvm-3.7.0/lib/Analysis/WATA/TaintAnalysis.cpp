@@ -1,4 +1,5 @@
 #include "llvm/Analysis/Passes.h"
+#include "llvm/Analysis/CFG.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/ADT/SetVector.h"
@@ -25,6 +26,7 @@ namespace {
 
     bool runOnModule(Module&) override;
     void runTaints(Function&, TaintMap&, TaintMap&);
+    bool runTaints(BasicBlock&, TaintMap&, TaintMap&);
     bool makeTaints(Instruction&, TaintMap&);
     bool propTaints(Instruction&, TaintMap&);
     bool sinkTaints(Instruction&, TaintMap&, TaintMap&);
@@ -38,7 +40,7 @@ namespace {
   };
 }
 
-bool WinAPITaintAnalysis::runOnModule(Module &M){
+bool WinAPITaintAnalysis::runOnModule(Module& M){
   TaintMap ModuleTaints;
   TaintMap DepGraph;
 
@@ -55,22 +57,50 @@ bool WinAPITaintAnalysis::runOnModule(Module &M){
 void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
   MapVector<BasicBlock*, TaintMap> AbsContexts;
   bool Changed = true;
-  // Iteratively compute abstract contexts until a fixpoint is reached
+  // Iteratively compute abstract contexts until a fixpoint is reached.
+  // The assumption here is that we have all of the functions inlined already.
   while(Changed){
     Changed = false;
     for(BasicBlock& BB : F){
-      for(Instruction& I : BB){
-        // iterate over BB's, joining all predecessor contexts and running taints
-        // determine if there was a change in the BB taintmap
-        // fixpoint is reached when no change occurs among any BB in F
-        // the assumption here is that we have all of the functions inlined already
+      // Get the abstract context for BB or create one.
+      MapVector<BasicBlock*, TaintMap>::iterator BBT = AbsContexts.find(&BB);
+      if(BBT == AbsContexts.end()){
+        BBT = AbsContexts.insert(std::make_pair(&BB, TaintMap())).first;
+        Changed = true;
       }
+      // Join all predecessor contexts.
+      for(BasicBlock* P : predecessors(&BB)){
+        MapVector<BasicBlock*, TaintMap>::iterator PT = AbsContexts.find(P);
+        if(PT == AbsContexts.end()){
+          PT = AbsContexts.insert(std::make_pair(P, TaintMap())).first;
+          Changed = true;
+        }
+        Changed = taintMapUnion(BBT->second, PT->second) || Changed;
+      }
+      // Analyze BB
+      Changed = runTaints(BB, BBT->second, TG) || Changed;
     }
   }
   // Add TaintMaps of F to the module-wide TaintMap MT
   for(std::pair<BasicBlock*, TaintMap>& CI : AbsContexts){
     taintMapUnion(MT, CI.second);
   }
+}
+
+bool WinAPITaintAnalysis::runTaints(BasicBlock& BB, TaintMap& TM, TaintMap& TG){
+  bool Changed = false;
+  TaintMap OldTM = TM;
+  for(Instruction& I : BB){
+    if(isTaintSink(I)){
+      Changed = sinkTaints(I, TM, TG) || Changed;
+    }
+    if(isTaintSource(I)){
+      makeTaints(I, TM);
+    }else{
+      propTaints(I, TM);
+    }
+  }
+  return Changed || taintMapEquiv(OldTM, TM);
 }
 
 bool WinAPITaintAnalysis::isTaintSource(Instruction& I){
@@ -229,7 +259,7 @@ void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
           if(DN == TG.end()){
             TG.insert(std::make_pair(V, TaintSet()));
             // Insertion into a MapVector invalidates active iterators.
-            // Hence the restart from beginning.
+            // Hence the restart from beginning. Maybe use std::map?
             NI = TG.begin();
           }
           DN->second.insert(Taint(I, OpIdx));
