@@ -16,7 +16,7 @@
 using namespace llvm;
 
 typedef std::pair<Value*, int>      Taint;
-typedef SmallSetVector<Taint, 20>   TaintSet;
+typedef SmallSetVector<Taint, 5>    TaintSet;
 typedef MapVector<Value*, TaintSet> TaintMap;
 
 namespace {
@@ -25,7 +25,7 @@ namespace {
     WinAPITaintAnalysis() : ModulePass(ID) {}
 
     bool runOnModule(Module&) override;
-    void runTaints(Function&, TaintMap&, TaintMap&);
+    void runTaints(Function&, TaintMap&);
     bool makeTaints(Instruction&, TaintMap&);
     bool propTaints(Instruction&, TaintMap&);
     bool sinkTaints(Instruction&, TaintMap&, TaintMap&);
@@ -34,32 +34,30 @@ namespace {
     bool taintSetUnion(TaintSet&, TaintSet&);
     bool taintMapUnion(TaintMap&, TaintMap&);
     bool taintMapEquiv(TaintMap&, TaintMap&);
-    void finalizeTaintGraph(TaintMap&, TaintMap&);
+    void finalizeTaintGraph(TaintMap&);
     void printTaintGraph(TaintMap&, Module&);
   };
 }
 
 bool WinAPITaintAnalysis::runOnModule(Module& M){
-  TaintMap ModuleTaints;
   TaintMap DepGraph;
 
-  errs() << "Checkpoint 1" << '\n';
+  //errs() << "Checkpoint 1" << '\n';
 
   for(Function& F : M){
-    runTaints(F, ModuleTaints, DepGraph);
+    runTaints(F, DepGraph);
   }
 
-  errs() << "Checkpoint 2" << '\n';
-
-  finalizeTaintGraph(DepGraph, ModuleTaints);
-  errs() << "Checkpoint 3" << '\n';
+  //errs() << "Checkpoint 2" << '\n';
+  finalizeTaintGraph(DepGraph);
+  //errs() << "Checkpoint 3" << '\n';
   printTaintGraph(DepGraph, M);
-  errs() << "Checkpoint 4" << '\n';
+  //errs() << "Checkpoint 4" << '\n';
 
   return false;
 }
 
-void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
+void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& TG){
   MapVector<BasicBlock*, TaintMap> AbsContexts;
   bool Changed = true;
   // Iteratively compute abstract contexts until a fixpoint is reached.
@@ -100,10 +98,6 @@ void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& MT, TaintMap& TG){
         Changed = true;
       }
     }
-  }
-  // Add TaintMaps of F to the module-wide TaintMap MT
-  for(std::pair<BasicBlock*, TaintMap>& CI : AbsContexts){
-    taintMapUnion(MT, CI.second);
   }
 }
 
@@ -218,12 +212,11 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& TM, TaintMap& TG)
     unsigned OpIdx = std::distance(I.op_begin(), U);
     TaintMap::iterator OT = TM.find(V);
     if(OT != TM.end() && !OT->second.empty()){
-      TaintSet T = OT->second;
-      for(TaintSet::iterator TI = T.begin(), TE = T.end(); TI != TE; ++TI){
+      for(Taint T : OT->second){
         // Create taint source node if there isn't one.
-        TaintMap::iterator SN = TG.find(TI->first);
+        TaintMap::iterator SN = TG.find(T.first);
         if(SN == TG.end()){
-          SN = TG.insert(std::make_pair(TI->first, TaintSet())).first;
+          SN = TG.insert(std::make_pair(T.first, TaintSet())).first;
           Changed = true;
         }
         // Create the edge from taint source TI->first into DN taint sink's
@@ -236,37 +229,44 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& TM, TaintMap& TG)
       // variables.
       if(!isa<Constant>(V) && V->getType()->isPtrOrPtrVectorTy()){
         OT->second.clear();
-        //Changed = true;
       }
     }
   }
   return Changed;
 }
 
-void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG, TaintMap& MT){
-  // Operands that do not have an entry in MT, so a terminal node needs to be
-  // created. The node will be labeled by the type of the operand. If I is
-  // a CallInst we should skip handling the called Value.
-  for(TaintMap::iterator NI = TG.begin(), NIE = TG.end(); NI != NIE; ++NI){
+void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG){
+  // If a node doesn't have all of it's operands tainted, a terminal node
+  // needs to be created. The node will be labeled by the type of the operand.
+  // If I is a CallInst we should skip handling the called Value.
+  MapVector<Value*, SmallSet<int, 10>> RTG;
+  for(TaintMap::iterator NI = TG.begin(), NE = TG.end(); NI != NE; ++NI){
+    RTG.insert(std::make_pair(NI->first, SmallSet<int, 10>()));
+    for(Taint T : NI->second){
+      auto RNI = RTG.find(T.first);
+      if(RNI == RTG.end()){
+        RNI = RTG.insert(std::make_pair(T.first, SmallSet<int, 10>())).first;
+      }
+      RNI->second.insert(T.second);
+    }
+  }
+
+  for(auto NI = RTG.begin(), NE = RTG.end(); NI != NE; ++NI){
     if(Instruction* I = dyn_cast<Instruction>(NI->first)){
       for(User::op_iterator U = I->op_begin(), UE = I->op_end(); U != UE; ++U){
         Value* V = U->get();
         unsigned OpIdx = std::distance(I->op_begin(), U);
-        TaintMap::iterator OT = MT.find(V);
-        if(OT == MT.end() || OT->second.empty()){
-          if(CallInst *CI = dyn_cast<CallInst>(I)){
+        if(!NI->second.count(OpIdx)){
+          if(CallInst* CI = dyn_cast<CallInst>(I)){
             if(V == CI->getCalledValue()){
               continue;
             }
           }
-          TaintMap::iterator DN = TG.find(V);
-          if(DN == TG.end()){
-            DN = TG.insert(std::make_pair(V, TaintSet())).first;
-            // Insertion into a MapVector invalidates active iterators.
-            // Hence the restart from beginning. Maybe use std::map?
-            // NI = TG.begin();
+          TaintMap::iterator SN = TG.find(V);
+          if(SN == TG.end()){
+            SN = TG.insert(std::make_pair(V, TaintSet())).first;
           }
-          DN->second.insert(Taint(I, OpIdx));
+          SN->second.insert(Taint(I, OpIdx));
         }
       }
     }
@@ -295,12 +295,6 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
       Nodes << Src->getNumArgOperands() << ' ';
       Nodes << (Src->getCalledFunction()->getReturnType()->isVoidTy() ? 0 : 1);
       Nodes << "\n";
-      // Fill out the edge information
-      TaintSet Dst = SI->second;
-      for(TaintSet::iterator DI = Dst.begin(), DIE = Dst.end(); DI != DIE; ++DI){
-        unsigned DstID = std::distance(TG.begin(), TG.find(DI->first));
-        Edges <<  "E " << SrcID << ":0," << DstID << ':' << DI->second << '\n';
-      }
     }else{
       // Terminal nodes are treated separately, since they're general Values.
       // If the terminal node is a Function, the return type of the function
@@ -313,6 +307,12 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
         SI->first->getType()->print(rso);
       }
       Nodes << rso.str() << ' ' << "0 1" << '\n';
+    }
+    // Fill out the edge information
+    TaintSet Dst = SI->second;
+    for(TaintSet::iterator DI = Dst.begin(), DIE = Dst.end(); DI != DIE; ++DI){
+      unsigned DstID = std::distance(TG.begin(), TG.find(DI->first));
+      Edges <<  "E " << SrcID << ":0," << DstID << ':' << DI->second << '\n';
     }
   }
   // Final SDG file printing.
