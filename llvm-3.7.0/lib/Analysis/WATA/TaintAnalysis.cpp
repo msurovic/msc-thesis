@@ -34,6 +34,7 @@ namespace {
     bool taintSetUnion(TaintSet&, TaintSet&);
     bool taintMapUnion(TaintMap&, TaintMap&);
     bool taintMapEquiv(TaintMap&, TaintMap&);
+    void unfoldTaintGraph(TaintMap&);
     void finalizeTaintGraph(TaintMap&);
     void printTaintGraph(TaintMap&, Module&);
   };
@@ -49,10 +50,12 @@ bool WinAPITaintAnalysis::runOnModule(Module& M){
   }
 
   //errs() << "Checkpoint 2" << '\n';
-  finalizeTaintGraph(DepGraph);
+  unfoldTaintGraph(DepGraph);
   //errs() << "Checkpoint 3" << '\n';
-  printTaintGraph(DepGraph, M);
+  //finalizeTaintGraph(DepGraph);
   //errs() << "Checkpoint 4" << '\n';
+  //printTaintGraph(DepGraph, M);
+  //errs() << "Checkpoint 5" << '\n';
 
   return false;
 }
@@ -233,6 +236,40 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& TM, TaintMap& TG)
     }
   }
   return Changed;
+}
+
+void WinAPITaintAnalysis::unfoldTaintGraph(TaintMap& TG){
+  enum Color{W, G, B};
+  MapVector<Value*, Color> C;
+  SmallVector<Value*, 20> S;
+  // Initialize all node colors to white.
+  for(TaintMap::iterator N = TG.begin(), NE = TG.end(); N != NE; ++N){
+    C.insert(std::make_pair(N->first, W));
+  }
+  // Find all back edges using a simple DFS 
+  for(TaintMap::iterator N = TG.begin(), NE = TG.end(); N != NE; ++N){
+    if(C.find(N->first)->second == W){
+      S.push_back(N->first);
+    }
+    while(!S.empty()){
+      Value* U = S.back();
+      auto UC = C.find(U);
+      if(UC->second == W){
+        UC->second = G;
+        for(Taint T : TG.find(U)->second){
+          auto VC = C.find(T.first);
+          if(VC->second == W){
+            S.push_back(T.first);
+          }else if(VC->second == G){
+            errs() << "Found back-edge." << '\n';
+          }
+        }
+      }else if(UC->second == G){
+        UC->second = B;
+        S.pop_back();
+      }
+    }
+  }
 }
 
 void WinAPITaintAnalysis::finalizeTaintGraph(TaintMap& TG){
