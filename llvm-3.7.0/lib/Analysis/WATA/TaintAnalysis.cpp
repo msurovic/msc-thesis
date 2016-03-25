@@ -52,7 +52,9 @@ bool WinAPITaintAnalysis::runOnModule(Module& M){
   }
   //errs() << "Checkpoint 2" << '\n';
   while(findCycle(DepGraph, BackEdge)){
-    unfoldCycle(DepGraph, BackEdge, 3);
+    //errs() << "Checkpoint 2.1" << '\n';
+    unfoldCycle(DepGraph, BackEdge, 1);
+    //errs() << "Checkpoint 2.2" << '\n';
   }
   //errs() << "Checkpoint 3" << '\n';
   finalizeTaintGraph(DepGraph);
@@ -291,23 +293,25 @@ void WinAPITaintAnalysis::unfoldCycle(TaintMap& I, TaintEdge& E, int N){
 
     Q.push_back(E.second);
     C.insert(E.second);
-
+    
     while(!Q.empty()){
       Taint U = Q.front(); Q.pop_front();
-      TaintMap::iterator AN;
+      TaintSet AN;
+      Value* AI = nullptr;
       auto UC = M.find(U.first);
       if(UC == M.end()){
         Instruction* UI = cast<Instruction>(U.first);
-        Instruction* AI = UI->clone();
+        AI = UI->clone();
         // TODO: Create a temporary BB into which we stash cloned instrs.
         //AI->insertAfter(UI);
         M.insert(std::make_pair(UI, AI));
-        AN = I.insert(std::make_pair(AI, TaintSet())).first;
+        AN = I.insert(std::make_pair(AI, TaintSet())).first->second;
       }else{
-        AN = I.find(UC->second);
-        assert(AN != I.end() && "Node is not in TaintGraph!");
+        AI = I.find(UC->second)->first;
+        AN = I.find(UC->second)->second;
       }
-      for(Taint V : I.find(U.first)->second){
+      TaintSet UN = I.find(U.first)->second;
+      for(Taint V : UN){
         Taint B;
         auto VC = M.find(V.first);
         if(VC == M.end()){
@@ -321,10 +325,10 @@ void WinAPITaintAnalysis::unfoldCycle(TaintMap& I, TaintEdge& E, int N){
         }else{
           B = Taint(VC->second, V.second);
         }
-        AN->second.insert(B);
+        AN.insert(B);
         if(U.first == E.first && V == E.second){
           BR = std::make_pair(U.first, B);
-          NE = std::make_pair(AN->first, B);
+          NE = std::make_pair(AI, B);
         }
         if(!C.count(V)){
           C.insert(V);
