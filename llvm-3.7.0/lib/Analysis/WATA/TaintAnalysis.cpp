@@ -6,6 +6,7 @@
 #include "llvm/ADT/MapVector.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FileSystem.h"
+#include <deque>
 #include <iterator>
 #include <sstream>
 #include <system_error>
@@ -16,6 +17,7 @@
 using namespace llvm;
 
 typedef std::pair<Value*, int>      Taint;
+typedef std::pair<Value*, Taint>    TaintEdge;
 typedef SmallSetVector<Taint, 5>    TaintSet;
 typedef MapVector<Value*, TaintSet> TaintMap;
 
@@ -34,7 +36,8 @@ namespace {
     bool taintSetUnion(TaintSet&, TaintSet&);
     bool taintMapUnion(TaintMap&, TaintMap&);
     bool taintMapEquiv(TaintMap&, TaintMap&);
-    void unfoldTaintGraph(TaintMap&);
+    bool findCycle(TaintMap&, TaintEdge&);
+    void unfoldCycle(TaintMap&, TaintEdge&, int);
     void finalizeTaintGraph(TaintMap&);
     void printTaintGraph(TaintMap&, Module&);
   };
@@ -42,19 +45,19 @@ namespace {
 
 bool WinAPITaintAnalysis::runOnModule(Module& M){
   TaintMap DepGraph;
-
+  TaintEdge BackEdge;
   //errs() << "Checkpoint 1" << '\n';
-
   for(Function& F : M){
     runTaints(F, DepGraph);
   }
-
   //errs() << "Checkpoint 2" << '\n';
-  unfoldTaintGraph(DepGraph);
+  while(findCycle(DepGraph, BackEdge)){
+    unfoldCycle(DepGraph, BackEdge, 3);
+  }
   //errs() << "Checkpoint 3" << '\n';
-  //finalizeTaintGraph(DepGraph);
+  finalizeTaintGraph(DepGraph);
   //errs() << "Checkpoint 4" << '\n';
-  //printTaintGraph(DepGraph, M);
+  printTaintGraph(DepGraph, M);
   //errs() << "Checkpoint 5" << '\n';
 
   return false;
@@ -238,7 +241,7 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& TM, TaintMap& TG)
   return Changed;
 }
 
-void WinAPITaintAnalysis::unfoldTaintGraph(TaintMap& TG){
+bool WinAPITaintAnalysis::findCycle(TaintMap& TG, TaintEdge& E){
   enum Color{W, G, B};
   MapVector<Value*, Color> C;
   SmallVector<Value*, 20> S;
@@ -248,27 +251,104 @@ void WinAPITaintAnalysis::unfoldTaintGraph(TaintMap& TG){
   }
   // Find all back edges using a simple DFS 
   for(TaintMap::iterator N = TG.begin(), NE = TG.end(); N != NE; ++N){
-    if(C.find(N->first)->second == W){
-      S.push_back(N->first);
+    Value* R = N->first;
+    auto RC = C.find(R);
+    if(RC->second == W){
+      S.push_back(R);
+      RC->second = G;
     }
     while(!S.empty()){
       Value* U = S.back();
-      auto UC = C.find(U);
-      if(UC->second == W){
-        UC->second = G;
-        for(Taint T : TG.find(U)->second){
-          auto VC = C.find(T.first);
-          if(VC->second == W){
-            S.push_back(T.first);
-          }else if(VC->second == G){
-            errs() << "Found back-edge." << '\n';
-          }
+      bool Done = true;
+      for(Taint V : TG.find(U)->second){
+        auto VC = C.find(V.first);
+        if(VC->second == W){
+          Done = false;
+          VC->second = G;
+          S.push_back(V.first);
+        }else if(VC->second == G){
+          E = std::make_pair(U, V);
+          return true;
         }
-      }else if(UC->second == G){
-        UC->second = B;
+      }
+      if(Done){
+        C.find(U)->second = B;
         S.pop_back();
       }
     }
+  }
+  return false;
+}
+
+void WinAPITaintAnalysis::unfoldCycle(TaintMap& I, TaintEdge& E, int N){
+  std::deque<Taint> Q;
+  SmallSet<Taint, 50> C;
+  MapVector<Value*, Value*> M;
+
+  for(int i = 0; i < N; i++){
+    TaintEdge BR(nullptr, Taint());
+    TaintEdge NE(nullptr, Taint());
+
+    Q.push_back(E.second);
+    C.insert(E.second);
+
+    while(!Q.empty()){
+      Taint U = Q.front(); Q.pop_front();
+      TaintMap::iterator AN;
+      auto UC = M.find(U.first);
+      if(UC == M.end()){
+        Instruction* UI = cast<Instruction>(U.first);
+        Instruction* AI = UI->clone();
+        // TODO: Create a temporary BB into which we stash cloned instrs.
+        //AI->insertAfter(UI);
+        M.insert(std::make_pair(UI, AI));
+        AN = I.insert(std::make_pair(AI, TaintSet())).first;
+      }else{
+        AN = I.find(UC->second);
+        assert(AN != I.end() && "Node is not in TaintGraph!");
+      }
+      for(Taint V : I.find(U.first)->second){
+        Taint B;
+        auto VC = M.find(V.first);
+        if(VC == M.end()){
+          Instruction* VI = cast<Instruction>(V.first);
+          Instruction* BI = VI->clone();
+          // TODO: Create a temporary BB into which we stash cloned instrs.
+          //BI->insertAfter(VI);
+          M.insert(std::make_pair(VI, BI));
+          I.insert(std::make_pair(BI, TaintSet()));
+          B = Taint(BI, V.second);
+        }else{
+          B = Taint(VC->second, V.second);
+        }
+        AN->second.insert(B);
+        if(U.first == E.first && V == E.second){
+          BR = std::make_pair(U.first, B);
+          NE = std::make_pair(AN->first, B);
+        }
+        if(!C.count(V)){
+          C.insert(V);
+          Q.push_back(V);
+        }
+      }
+    }
+    if(BR.first == nullptr || NE.first == nullptr){
+      break;
+    }
+    auto IT = I.find(E.first);
+    if(IT != I.end()){
+      IT->second.remove(E.second);
+    }
+    IT = I.find(BR.first);
+    if(IT != I.end()){
+      IT->second.insert(BR.second);
+    }
+    E = NE;
+    C.clear();
+  }
+  auto IT = I.find(E.first);
+  if(IT != I.end()){
+    IT->second.remove(E.second);
   }
 }
 
