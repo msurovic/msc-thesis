@@ -111,10 +111,6 @@ static cl::opt<std::string> AesSeed("aesSeed", cl::init(""),
 static cl::opt<bool> Split("spli", cl::init(false),
                            cl::desc("Enable basic block splitting"));
 
-// Flags for WATA
-static cl::opt<bool> EnableWATA("winapi-ta", cl::init(false),
-                           cl::desc("Enable the WinAPI Taint Analysis Pass"));
-
 PassManagerBuilder::PassManagerBuilder() {
     OptLevel = 2;
     SizeLevel = 0;
@@ -228,9 +224,6 @@ void PassManagerBuilder::populateModulePassManager(
       MPM.add(createBarrierNoopPass());
 
     MPM.add(createSubstitution(Substitution));
-
-    if (EnableWATA)
-      MPM.add(createWinAPITaintAnalysis());
 
     addExtensionsToPM(EP_EnabledOnOptLevel0, MPM);
     return;
@@ -464,11 +457,6 @@ void PassManagerBuilder::populateModulePassManager(
     MPM.add(createMergeFunctionsPass());
 
   MPM.add(createSubstitution(Substitution));
-
-  // After all is said and done, run the taint analysis.
-  // If it is enabled that is,
-  if (EnableWATA)
-    MPM.add(createWinAPITaintAnalysis());
 
   addExtensionsToPM(EP_OptimizerLast, MPM);
 }

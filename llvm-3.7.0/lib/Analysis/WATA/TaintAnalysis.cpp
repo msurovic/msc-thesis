@@ -11,15 +11,19 @@
 #include <sstream>
 #include <system_error>
 
-#define PASSNAME "winapi-taint-analysis"
+#define PASSNAME "winapi-ta"
 #define HELPTEXT "WinAPI Taint Analysis Pass"
+
+#define UNFOLDER_CALLS 1
+#define UNFOLDER_ITERS 3
 
 using namespace llvm;
 
-typedef std::pair<Value*, int>      Taint;
-typedef std::pair<Value*, Taint>    TaintEdge;
-typedef SmallSetVector<Taint, 5>    TaintSet;
-typedef MapVector<Value*, TaintSet> TaintMap;
+typedef std::pair<Value*, int>        Taint;
+typedef std::pair<Value*, Taint>      TaintEdge;
+typedef SmallSetVector<TaintEdge, 10> TaintEdgeSet;
+typedef SmallSetVector<Taint, 5>      TaintSet;
+typedef MapVector<Value*, TaintSet>   TaintMap;
 
 namespace {
   struct WinAPITaintAnalysis : public ModulePass {
@@ -36,7 +40,7 @@ namespace {
     bool taintSetUnion(TaintSet&, TaintSet&);
     bool taintMapUnion(TaintMap&, TaintMap&);
     bool taintMapEquiv(TaintMap&, TaintMap&);
-    bool findCycle(TaintMap&, TaintEdge&);
+    void findCycle(TaintMap&, TaintEdgeSet&);
     void unfoldCycle(TaintMap&, TaintEdge&, int);
     void finalizeTaintGraph(TaintMap&);
     void printTaintGraph(TaintMap&, Module&);
@@ -45,20 +49,36 @@ namespace {
 
 bool WinAPITaintAnalysis::runOnModule(Module& M){
   TaintMap DepGraph;
-  TaintEdge BackEdge;
   //errs() << "Checkpoint 1" << '\n';
   for(Function& F : M){
     runTaints(F, DepGraph);
   }
-  //errs() << "Checkpoint 2" << '\n';
-  while(findCycle(DepGraph, BackEdge)){
-    //errs() << "Checkpoint 2.1" << '\n';
-    unfoldCycle(DepGraph, BackEdge, 1);
-    errs() << DepGraph.size() << '\n';
-    //errs() << "Checkpoint 2.2" << '\n';
+
+  errs() << DepGraph.size() << '\n';
+  
+  for(int i = 0; i < UNFOLDER_CALLS; i++){
+    TaintEdgeSet BackEdges;
+    findCycle(DepGraph, BackEdges);
+    for(TaintEdge E : BackEdges){
+      unfoldCycle(DepGraph, E, UNFOLDER_ITERS);
+    }
   }
+
+  TaintEdgeSet BackEdges;
+  findCycle(DepGraph, BackEdges);
+  for(TaintEdge E : BackEdges){
+    unfoldCycle(DepGraph, E, 0);
+  }
+
+  errs() << DepGraph.size() << '\n';
+
+  BackEdges.clear();
+  findCycle(DepGraph, BackEdges);
+  errs() << BackEdges.size() << '\n';
+
+  //errs() << "Checkpoint 2" << '\n';
   //errs() << "Checkpoint 3" << '\n';
-  finalizeTaintGraph(DepGraph);
+  //finalizeTaintGraph(DepGraph);
   //errs() << "Checkpoint 4" << '\n';
   printTaintGraph(DepGraph, M);
   //errs() << "Checkpoint 5" << '\n';
@@ -244,7 +264,7 @@ bool WinAPITaintAnalysis::sinkTaints(Instruction& I, TaintMap& TM, TaintMap& TG)
   return Changed;
 }
 
-bool WinAPITaintAnalysis::findCycle(TaintMap& TG, TaintEdge& E){
+void WinAPITaintAnalysis::findCycle(TaintMap& TG, TaintEdgeSet& E){
   enum Color{W, G, B};
   MapVector<Value*, Color> C;
   SmallVector<Value*, 20> S;
@@ -270,8 +290,7 @@ bool WinAPITaintAnalysis::findCycle(TaintMap& TG, TaintEdge& E){
           VC->second = G;
           S.push_back(V.first);
         }else if(VC->second == G){
-          E = std::make_pair(U, V);
-          return true;
+          E.insert(std::make_pair(U, V));
         }
       }
       if(Done){
@@ -280,7 +299,6 @@ bool WinAPITaintAnalysis::findCycle(TaintMap& TG, TaintEdge& E){
       }
     }
   }
-  return false;
 }
 
 void WinAPITaintAnalysis::unfoldCycle(TaintMap& I, TaintEdge& E, int N){
