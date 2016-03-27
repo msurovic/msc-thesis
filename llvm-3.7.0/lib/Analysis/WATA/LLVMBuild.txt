@@ -20,4 +20,4 @@ type = Library
 name = WATA
 parent = Libraries
 library_name = wata
-required_libraries = Analysis Core Support
+required_libraries = Core Support

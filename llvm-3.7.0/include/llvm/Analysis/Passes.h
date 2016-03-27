@@ -179,6 +179,12 @@ namespace llvm {
   // in a function and builds a WinAPI call dependency graph.
   //
   ModulePass *createWinAPITaintAnalysis();
+
+  //===--------------------------------------------------------------------===//
+  //
+  // createMarkAlwaysInline - Marks all non-empty functions as always_inline
+  //
+  ModulePass *createPrepAlwaysInline();
 }
 
 #endif

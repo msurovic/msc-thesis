@@ -15,7 +15,7 @@
 #define HELPTEXT "WinAPI Taint Analysis Pass"
 
 #define UNFOLDER_CALLS 1
-#define UNFOLDER_ITERS 3
+#define UNFOLDER_ITERS 1
 
 using namespace llvm;
 
@@ -49,13 +49,14 @@ namespace {
 
 bool WinAPITaintAnalysis::runOnModule(Module& M){
   TaintMap DepGraph;
-  //errs() << "Checkpoint 1" << '\n';
+  errs() << "Checkpoint 1" << '\n';
   for(Function& F : M){
-    runTaints(F, DepGraph);
+    if(!F.hasFnAttribute(Attribute::AlwaysInline) || F.getNumUses() > 0){
+      runTaints(F, DepGraph);
+    }
   }
-
-  errs() << DepGraph.size() << '\n';
-  
+  errs() << "Checkpoint 2" << '\n';
+  // Unfold the dependency graph cycles
   for(int i = 0; i < UNFOLDER_CALLS; i++){
     TaintEdgeSet BackEdges;
     findCycle(DepGraph, BackEdges);
@@ -63,26 +64,18 @@ bool WinAPITaintAnalysis::runOnModule(Module& M){
       unfoldCycle(DepGraph, E, UNFOLDER_ITERS);
     }
   }
-
+  errs() << "Checkpoint 3" << '\n';
+  // Get rid of the remaining cycles
   TaintEdgeSet BackEdges;
   findCycle(DepGraph, BackEdges);
   for(TaintEdge E : BackEdges){
     unfoldCycle(DepGraph, E, 0);
   }
-
-  errs() << DepGraph.size() << '\n';
-
-  BackEdges.clear();
-  findCycle(DepGraph, BackEdges);
-  errs() << BackEdges.size() << '\n';
-
-  //errs() << "Checkpoint 2" << '\n';
-  //errs() << "Checkpoint 3" << '\n';
-  //finalizeTaintGraph(DepGraph);
-  //errs() << "Checkpoint 4" << '\n';
+  errs() << "Checkpoint 4" << '\n';
+  finalizeTaintGraph(DepGraph);
+  errs() << "Checkpoint 5" << '\n';
   printTaintGraph(DepGraph, M);
-  //errs() << "Checkpoint 5" << '\n';
-
+  errs() << "Checkpoint 6" << '\n';
   return false;
 }
 
@@ -467,7 +460,7 @@ void WinAPITaintAnalysis::printTaintGraph(TaintMap& TG, Module& M){
   }
 }
 
-ModulePass *llvm::createWinAPITaintAnalysis() {
+ModulePass* llvm::createWinAPITaintAnalysis() {
   return new WinAPITaintAnalysis();
 }
 

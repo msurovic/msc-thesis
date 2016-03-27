@@ -178,7 +178,8 @@ namespace {
       (void) llvm::createFloat2IntPass();
       (void) llvm::createEliminateAvailableExternallyPass();
 
-      (void) llvm::createWinAPITaintAnalysis();      
+      (void) llvm::createWinAPITaintAnalysis();
+      (void) llvm::createPrepAlwaysInline();   
 
       (void)new llvm::IntervalPartition();
       (void)new llvm::ScalarEvolution();
