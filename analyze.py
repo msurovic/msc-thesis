@@ -31,13 +31,12 @@ def main():
         print 'Analyzing file ' + file
 
         infile  = os.path.join(args.i, file)
-        sdgfile = os.path.join(args.i, file + '.sdg')
+        inlined = os.path.join(args.i, file[:-3] + '-inlined.bc')
+        sdgfile = os.path.join(args.i, inlined + '.sdg')
         outfile = os.path.join(args.o, file.replace('.bc', '.sdg'))
 
-        #print [opt, '-winapi-ta', infile]
-        #print sdgfile
-        #print outfile
-        subprocess.call([opt, '-winapi-ta', infile], stdout=open(os.devnull, "w"))
+        subprocess.call([opt, '-prep-always-inline', '-always-inline', infile, '-o', inlined])
+        subprocess.call([opt, '-winapi-ta', inlined], stdout=open(os.devnull, "w"))
         shutil.move(sdgfile, outfile)
 
 if __name__ == '__main__':

@@ -32,13 +32,13 @@ def main():
     obf = []
 
     if args.sub:
-        obf += ['-mllvm', '-sub']
+        obf.append(['-mllvm', '-sub'])
     if args.fla:
-        obf += ['-mllvm', '-fla']
+        obf.append(['-mllvm', '-fla'])
     if args.bcf:
-        obf += ['-mllvm', '-bcf', '-mllvm', '-boguscf-loop=' + str(args.bcf_loop)]
+        obf.append(['-mllvm', '-bcf', '-mllvm', '-boguscf-loop=' + str(args.bcf_loop)])
     if args.spli:
-        obf += ['-mllvm', '-spli']
+        obf.append(['-mllvm', '-spli'])
     
     clang = os.path.join(args.t, 'clang')
 
@@ -56,13 +56,15 @@ def main():
     for file in filter(lambda x:x.endswith('.bc'), os.listdir(args.i)):
         print 'Generating for file ' + file
         for i in range(args.m):
-            flags = ['-c', '-emit-llvm']
+            flags = [['-c', '-emit-llvm']]
             seed  = os.urandom(16).encode('hex')
             
             if args.r:
                 flags += random.sample(obf, random.randint(0, len(obf)-1))
             else:
                 flags += obf
+
+            flags = [item for sublist in flags for item in sublist]
             
             if len(obf) > 0:
                 flags += ['-mllvm', '-aesSeed=' + '"' + seed + '"']
