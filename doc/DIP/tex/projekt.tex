@@ -9,7 +9,7 @@
 %============================================================================
 % Šablonu upravil: Ing. Jaroslav Dytrych, idytrych@fit.vutbr.cz
 %============================================================================
-\documentclass[]{fitthesis} % bez zadání - pro začátek práce, aby nebyl problém s překladem
+\documentclass[english]{fitthesis} % bez zadání - pro začátek práce, aby nebyl problém s překladem
 %\documentclass[zadani]{fitthesis} % odevzdani do wisu - odkazy jsou barevné
 %\documentclass[zadani,print]{fitthesis} % pro tisk - odkazy jsou černé
 %\documentclass[english,print]{fitthesis} % pro tisk - odkazy jsou černé
@@ -25,6 +25,7 @@
 \DeclareUrlCommand\url{\def\UrlLeft{<}\def\UrlRight{>} \urlstyle{tt}}
 
 %zde muzeme vlozit vlastni balicky
+\usepackage{float}
 \usepackage{listings}
 \usepackage[toc,page,header]{appendix}
 \RequirePackage{titletoc}
@@ -77,8 +78,8 @@
 %---------------------------------------------------------------------------
 \projectinfo{
   %Prace
-  project=BP,            %typ prace BP/SP/DP/DR
-  year=2013,             %rok
+  project=DP,            %typ prace BP/SP/DP/DR
+  year=2016,             %rok
   date=\today,           %datum odevzdani
   %Nazev prace
   title.cs={Název práce},  %nazev prace v cestine
@@ -88,7 +89,7 @@
   %author.title.p=Bc., %titul pred jmenem (nepovinne)
   %author.title.a=PhD, %titul za jmenem (nepovinne)
   %Ustav
-  department=UPGM, % doplnte prislusnou zkratku: UPSY/UIFS/UITS/UPGM
+  department=UITS, % doplnte prislusnou zkratku: UPSY/UIFS/UITS/UPGM
   %Skolitel
   supervisor=Jméno Příjmení, %jmeno prijmeni skolitele
   supervisor.title.p=Doc. RNDr.,   %titul pred jmenem (nepovinne)

@@ -1,0 +1,33 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction}{2}{chapter.1}
+\contentsline {chapter}{\numberline {2}Malware Detection}{4}{chapter.2}
+\contentsline {section}{\numberline {2.1}Obfuscation and Malware Taxonomy}{4}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Packing, encryption and oligomorphism}{5}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Polymorphism}{5}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Metamorphism}{7}{subsection.2.1.3}
+\contentsline {section}{\numberline {2.2}Syntactic Detection}{8}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Algorithmic scanning}{9}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Code emulation}{9}{subsection.2.2.2}
+\contentsline {section}{\numberline {2.3}Behavioral Detection}{9}{section.2.3}
+\contentsline {chapter}{\numberline {3}Static Analysis}{10}{chapter.3}
+\contentsline {section}{\numberline {3.1}Posets and Lattices}{10}{section.3.1}
+\contentsline {section}{\numberline {3.2}Abstract Interpretation}{10}{section.3.2}
+\contentsline {chapter}{\numberline {4}Formal Models}{11}{chapter.4}
+\contentsline {section}{\numberline {4.1}Tree Automata}{11}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Inference}{11}{subsection.4.1.1}
+\contentsline {chapter}{\numberline {5}The LLVM Compiler Framework}{12}{chapter.5}
+\contentsline {section}{\numberline {5.1}Structure and Design}{12}{section.5.1}
+\contentsline {section}{\numberline {5.2}Intermediate Representation}{12}{section.5.2}
+\contentsline {chapter}{\numberline {6}Detector Design and Implementation}{13}{chapter.6}
+\contentsline {section}{\numberline {6.1}Input generation}{13}{section.6.1}
+\contentsline {section}{\numberline {6.2}Taint analysis}{13}{section.6.2}
+\contentsline {section}{\numberline {6.3}Classifier Inference}{13}{section.6.3}
+\contentsline {section}{\numberline {6.4}Testing and Results}{13}{section.6.4}
+\contentsline {chapter}{\numberline {7}Conclusion}{14}{chapter.7}
+\contentsline {section}{\numberline {7.1}Discussion}{14}{section.7.1}
+\contentsline {section}{\numberline {7.2}Future Work}{14}{section.7.2}
+\contentsline {chapter}{Literature}{15}{chapter*.10}
+\contentsline {chapter}{Appendices}{16}{section*.11}
+\contentsline {section}{List of Appendices}{17}{section*.12}
+\ttl@starttoc {chapters@1}
+\contentsfinish 

@@ -13,17 +13,20 @@
 %RevGen -- Enabling sophisticated analyses of ×86 binaries with RevGen
 %Christo07 -- Mining specifications of malicious behavior
 %Symantec08 -- http://www.ecsl.cs.sunysb.edu/tr/TR237.pdf
+%Filiol07 -- Metamoprhism, Formal Grammars and Undecidable Code Mutation
 
 \chapter{Introduction}
 Information technologies and systems have found use in almost all aspects of human life. From personal communication and entertainment to industrial manufacturing, services and commerce. Because of this widespread adoption, safety and security of information systems and the data they hold has become a major concern. Throughout the years, development and administration of information systems has shown to be a complex task and errors are a common occurence. These errors may pose a safety risk to anyone using the system. Some of these errors can be abused by malicious parties to achieve goals that are not in alignment with the wishes of a legitimate user. The answer to this problem is twofold. By advancing the processes and technologies that we use to develop information systems we lower the number of errors and weaknesses that the system has prior to it's use. By carefully monitoring usage of the system after deployment, we lower the risk of abuse of errors that were not corrected during developement.
 
 \emph{Malware} is a term used to describe any software tools primarily designed for malicious use against a host information system. Common uses include causing damage to the host system, denying usage of the host to legitimate users and theft of data and computing resources. Depending on it's purpose and method of transfer, malware can be classified into several families. For example a \emph{trojan} is malware that is introduced into a host, often by a legitimate user, disguising itself as harmless software. On the other hand a \emph{worm} often abuses an error in the host system to gain access. Both of these are examples of malware that function as standalone pieces of software. \emph{Viruses}, in contrast to trojans and worms, need a host file or software to propagate. The term \emph{payload} is often used to describe the code that will carry out the intended use of the malware. A \emph{keylogger} will log keystrokes to gather sensitive information about the systems users, while a \emph{backdoor} will grant access to the host system to an illegitimate user.
 
+%Malware economy + figure
+
 As a means to protect information systems and user data, security systems were developed. Examples include \emph{firewalls}, which come in the form of hardware and software or \emph{intrusion detection} and \emph{intrusion prevention} systems. But probably the most common security system is an \emph{antivirus} software. The former can be described as passive measures, since they mitigate threats that are already being carried out by a human agent or malware. Antiviruses on the other hand were originally designed to protect against malware by actively scanning files present in the host system.
 
 With the introduction of antiviruses, malware authors had to come up with ways to hide the presence of their malware in a host system. One method of achieving this is \emph{obfuscation}. The goal of obfuscation is to make malware hard to distinguish from legitimate software by changing the malware in a way that preserves it's original functionality or purpose. This also makes detection a per system task if the obfuscations are applied in a randomized manner, since the same malware can differ in some way from system to system. Obfuscations can change the malware on several levels. Obfuscations that primarily change how the malware appears as a file, are called \emph{syntactic}, while those which change how the malware functions while preserving it's intended purpose are referred to as \emph{semantic}. On the other end, antivirus software needs to implement methods that can detect malware despite being obfuscated. As with malware, detectors can be classified as syntactic or \emph{signature--based} and semantic or in other words \emph{behavioral}.
 
-The goal of this work is to research applications of formal analysis and verification to behavioral malware detection and present a proof of concept malware detector that applies these methods. The work begins by giving a brief introduction to the challenges of detecting obfuscated malware in chapter \ref{ch_malware}. Static analyses based on formal methods are introduced in chapter \ref{ch_s_analysis}. In order to detect and classify malicious behavior descriptions obtained by static analysis, suitable models and methods are proposed in chapter \ref{ch_s_models}. The LLVM compiler development framework is introduced in chapter \ref{ch_llvm} as a means to implement the mentioned static analyses. The design and implementation of a proof--of--concept detector prototype is described in chapter \ref{ch_detector}. Finally conclusion with a discussion about choices that were made with possible alternatives and potential for future work is given in chapter \ref{ch_conclusion}.
+The goal of this work is to research applications of formal analysis and verification to behavioral malware detection and present a proof of concept malware detector that applies these methods. The work begins by giving a brief introduction to the challenges of detecting obfuscated malware in chapter \ref{ch_malware}. Static analyses based on formal methods are introduced in chapter \ref{ch_s_analysis}. In order to detect and classify malicious behavior descriptions obtained by static analysis, suitable models and methods are proposed in chapter \ref{ch_models}. The LLVM compiler development framework is introduced in chapter \ref{ch_llvm} as a means to implement the mentioned static analyses. The design and implementation of a proof--of--concept detector prototype is described in chapter \ref{ch_detector}. Finally conclusion with a discussion about choices that were made with possible alternatives and potential for future work is given in chapter \ref{ch_conclusion}.
 
 \chapter{Malware Detection}
 \label{ch_malware}
@@ -31,82 +34,174 @@ Early research in the field of computer virology shows that perfectly reliable m
 
 Since any method of malware detection is bound to be imperfect, there are several metrics that are used in order to describe the performance of a malware detection method. The number of \emph{false positive} and \emph{false negative} results over a test set of legitimate software and malware respectively gives insight into the detection capabilities, while simple time and memory consumption metrics give insight into the cost and potential scalability of the detection method. Another useful distinction to make is whether the detection method is capable of detecting malware that it has not seen before, but has seen similar malware in terms of syntax or semantics, depending on the type of detector. This capability is referred to as \emph{forward detection}\cite{Christo07} or \emph{generalization}\cite{Babic11}.
 
-This chapter aims to introduce topics that impact these metrics. From the point of view of the malware itself, various types of obfuscation will be presented and a taxonomy of malware based on obfuscation techniques will be presented. From the detection point of view, the advantages, drawbacks and overall principles behind syntactic and semantic detection will be introduced.
+This chapter aims to introduce topics that impact these metrics. From the point of view of the malware itself, various types of obfuscation will be presented and a taxonomy of malware based on obfuscation techniques will be presented. This part of the chapter is based on \cite{You10}, \cite{Shiffman10} and \cite{Szor05} From the detection point of view, the advantages, drawbacks and overall principles behind syntactic and semantic detection will be introduced, taking from \cite{Jacob08} and again \cite{Szor05}.
 
 \section{Obfuscation and Malware Taxonomy}
-A crucial part of any malware today is the ability to hide itself from detection in a host system. The most commonly used technique to achieve this is obfuscation. Obfuscation, in te context of computer programs, can be defined as a transformation aimed to hide functionality and hinder analysis. As a transformation it can be applied on any form the program takes, from the original source code, down to a binary file. Figure \ref{fig_comp} shows the typical compilation chain of a C--like language with all the representations a program takes. In the case of malware the most common obfuscations are applied to the binary file, but less common classes of malware apply obfuscation on the level of assembly code.
+A crucial part of any malware today is the ability to hide itself from detection in a host system. The most commonly used technique to achieve this is obfuscation, which in te context of computer programs can be defined as a transformation aimed to hide functionality and hinder analysis. As a transformation it can be applied on any form the program takes, from the original source code, down to the binary file. Figure \ref{fig_comp} shows the typical compilation chain of a C--like language with all the representations a program takes. In the case of malware the most common obfuscations are applied to the binary file and on the level of assembly code. It is interesting to note that obfuscations also find use in the field of intellectual property protection in which they protect against unwanted reverse--engineering. In this case the obfuscations are applied on the source code or the intermediate representation used by the compiler or interpreter.
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.25}{\includegraphics{compilation_chain.pdf}}
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
     \caption{Compilation chain of a C--like language}
     \label{fig_comp}
 \end{figure}
 
-It is interesting to note that obfuscations also find use in the field of intellectual property protection in which they help to protect against unwanted reverse--engineering. In this case the obfuscations are applied on the source code or the intermediate representation used by the compiler or interpreter.
-
 A prominent feature when using any kind of obfuscation is that, when applied in a randomized manner, one can generate a number of different versions of the final malware. These versions are referred to as \emph{mutations} and the quality of an obfuscation technique is often measured by the number of possible mutations it allows.
 
 \subsection{Packing, encryption and oligomorphism}
-Simple, yet effective methods of obfuscation, go no further than changing the way a malware binary file looks. A common example is the use of compression and simple encryption algorithms.
+Simple, yet effective methods of obfuscation go no further than changing the way a malware binary file looks. A common example is the use of compression and simple encryption algorithms.
 
 \emph{Packing} is a technique which uses compression algorithms to scramble the content of the binary file\cite{Symatec08}. A decompression procedure is then added to the compressed malware binary so that when the executable is loaded into memory, it will first decompress the malware code and then proceed to execute it. Packing also reduces file size which helps propagation via size--limited channels i.e email attachments. 
 
 Another common way of obfuscating binary files is through encryption. Similarily to packing, the main malware body is encrypted using a simple cipher and a decryption procedure is added to the result. The encryption key is often carried with the decryption procedure or can be easily computed from data available to the decryption procedure. Most commonly used ciphers include XOR ciphers, RC4 or TEA. 
 
-%Oligomorphism is obtained by stacking packers and encryption procedures
 By using multiple packers or encryption procedures and keys one can obtain a sizeable number of possible mutations. Malware that generates it's mutations in this manner is \emph{oligomorphic}. Although the number of possible mutations is high, the decompression and decryption procedures themselves are not mutated. This produces an opportunity for malware analysts to create signatures that target these procedures and detect oligomorphic malware based on them.
 
 \subsection{Polymorphism}
-The solution to the shortcomings of oligomorphic malware is to mutate their decompression and decryption procedures. \emph{Polymorphic} malware achieves this by applying obfuscations to the assembly code of those procedures. Depending on the obfuscations applied the number of possible mutations rises dramatically. The result is malware whose mutations share almost no resemblance to each other as binary files and thus cannot be generally detected by matching against binary file signatures. A list of commonly used obfuscations follows.
+The solution to the shortcomings of oligomorphic malware is to mutate their decompression and decryption procedures. \emph{Polymorphic} malware achieves this by applying obfuscations to the code of those procedures. Depending on the obfuscations applied the number of possible mutations rises dramatically. The result is malware whose mutations share almost no resemblance to each other as binary files and thus cannot be generally detected by matching against byte signatures of binary files. A list of commonly used obfuscations follows.
 
 \paragraph*{Dead code insertion}
 Code with no effect is inserted into the original code. Common examples include inserting \texttt{NOP} instructions between original assembly instructions or performing \texttt{XOR} operations over two identical operands. While very simple to implement, it is also very simple to reverse the transformation and recover the orignal code. Combined with other obfuscations however, the inserted code may be further transformed and made very hard to recognize as dead.
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.25}{\includegraphics{obf_dci.pdf}}
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
     \caption{Example of dead code insertion}
-    \label{fig_comp}
+    \label{fig_obf_dci}
 \end{figure}
 
 \paragraph*{Register reassignment}
-Operands of assembly code instructions are often stored in registers. The obfuscation changes the registers in which the operands of instructions are stored. The number of possible mutations this obfuscations allows can be large depending on the instructions used and number of registers available, however it can be easily circumvented via using inexact syntactic signatures.
+Operands of assembly code instructions are often stored in registers. The obfuscation changes the registers in which the operands of instructions are stored. The number of possible mutations this obfuscations allows can be large depending on the instructions used and number of registers available, however it can be easily circumvented via using inexact byte signatures. This technique was prominently used in the Win95/Regswap virus.
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.25}{\includegraphics{obf_regswap.pdf}}
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
     \caption{Example of register reassignment}
-    \label{fig_comp}
+    \label{fig_obf_regswap}
 \end{figure}
 
 \paragraph*{Subroutine reordering}
-Or code permutation is a transformation where standalone assembly code segments such as subroutines or basic blocks can be randomly reordered to produce up to $N!$ mutations, where $N$ is the number of such segments.
+Or code permutation is a transformation where standalone code segments such as subroutines or basic blocks can be randomly reordered to produce up to $N!$ mutations, where $N$ is the number of such segments. W95/Zperm is the common example of a virus that uses this obfuscation.
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.25}{\includegraphics{obf_perm.pdf}}
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
     \caption{Example of subroutine reordering}
-    \label{fig_comp}
+    \label{fig_obf_perm}
 \end{figure}
 
 \paragraph*{Instruction substitution}
-The effect of a single instruction in assembly code can be often emulated via a sequence of instructions. Typical examples are simple arithmetic and boolean operations which can be emulated in a number of ways each.
+The effect of a single instruction in code can be often emulated via a sequence of instructions. Typical examples are simple arithmetic and boolean operations which can be emulated in a number of ways each. Other substitutions include moves between registers being replaced by \texttt{PUSH} and \texttt{POP} instructions on the assembly level.
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.25}{\includegraphics{obf_instrsub.pdf}}
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
     \caption{Example of instruction substitution}
-    \label{fig_comp}
+    \label{fig_obf_instrsub}
 \end{figure}
 
 \paragraph*{Code transposition}
+Similar to subroutine reodreding, this obfuscation reorders instructions to change the binary file. If the reordered instructions are dependent, original execution order is restored via unconditional jumps. Depending on the code representation, determining whether two instructions are dependent may require a non--trivial analysis.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{Example of code transposition}
+    \label{fig_obf_trans}
+\end{figure}
+
 \paragraph*{Code integration}
+A technique that uses another executable binary file for obfuscation. The malware excutable targets a host executable, disassembles it, inserts it's own code into it and reassembles the host, preserving it's original functionality. This way the malware can generate as many mutations as there are executable binaries in the host system, while providing other advantages like obfuscating the malware's entry point, since the execution of malware code is interleaved with the execution of the host binary. This obfuscation was introduced in the famous W95/Zmist virus.
 
 \subsection{Metamorphism}
+The main weakness of polymorphic malware was the fact that even though the unpacking and decryption procedures were mutated, the main malicious code was not. By allowing the malware to run in a controlled environment, the malicious code would eventually appear in memory and could be matched against a byte signature.
+
+\emph{Metamorphic} malware answers this weakness by applying obfuscating code transformations to the whole code of the malware, including the malicious parts. This way the malware changes significantly from one mutation to another and leaves little space for simple byte signature detection. The downside to this malware is the complexity of a mutation engine capable of such code transformations. Figure \ref{fig_metamorph} shows the process of generating a new mutation from an old one, once a metamorphic malware is executed. The best example of an implementation is the virus Simile and it's MetaPHOR mutation engine.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{Mutation stages of a metamorphic malware}
+    \label{fig_metamorph}
+\end{figure}
+
 \section{Syntactic Detection}
-Historically malware detection techniques were centered around syntactic properties of a binary file under inspection. These methods often look for specific byte sequences in binary files and any file that contains a byte sequence that is deemed malicious is marked as malware. The advantages of this approach are speed and scalability. 
-    \section{Behavioral Detection}
+Historically malware detection techniques were centered around syntactic properties of a binary file under inspection. These methods often look for specific byte sequences in files and any file that contains a byte sequence that is deemed malicious is marked as malware. The detection rates of these methods were heavily dependent on the length of the byte sequence which was looked for and the structure of the malware code. The advantages of this approach, to this day, are speed and scalability. The main disadvantage is that they are easy to bypass using any kind of obfuscation. To circumvent this, several modifications were introduced.
+
+\paragraph*{Wildcards} The modification adds symbols with special semantics into the byte signature. Consider figure \ref{fig_wildcards}. The upper sequence of bytes is a part of the W32/Beast virus and the lower sequence is the wildcard byte signature used to detect it. The \texttt{?} symbol marks an optional occurence of a half--byte, while \texttt{\%2} says that the next byte may occur twice in the following two bytes.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{An example of a wildcard byte signature}
+    \label{fig_wildcards}
+\end{figure}
+
+\paragraph*{Mismatches} Allow an inexact matching of a byte signature. The following example illustrates an algorithm that allows a mismatch of three bytes. After encountering a mismatch, the algorithm notes the mismatch and the next byte of the signature is used for matching. Figure \ref{fig_mismatch} shows a malware byte sequence and three byte signatures that match it.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{An example of mismatch byte signatures}
+    \label{fig_mismatch}
+\end{figure}
+
+\subsection{Algorithmic Scanning}
+As obfuscated malware grew more commonplace, detection moved to methods that used malware--specific heuristics for detection. An example of such a heuristic is \emph{smart scanning} which was able to beat simple obfuscations by ignoring \texttt{NOP} instructions or by performing matching only in the scope of basic blocks. \emph{X--Ray scanning} on the other hand targeted malware encrypted with weak ciphers. The method used a brute--force attack to uncover the encryption key and once uncovered performed a byte signature matching. \emph{Filtering} restricted detection to only those files that could contain malicious code.
+
+Finally a generalized version of heuristic detection was dubbed \emph{algorithmic scanning} and introduced specialized malware description languages that aided the creation of detection procedures. An algorithmic detector was then essentially an interpreter of such a language coupled with a database of detection procedures.
+
+\subsection{Code Emulation}
+Emulation--based detection methods were developed as an answer to strong polymorphic malware. In an emulation--based detector, the suspicious executable is allowed to run in a controlled environment. In case of a polymorphic malware, the packed or encrypted malicious code will eventually be exposed in the memory of the environment, where it can be again detected by a byte signature.
+
+The success of this method is however dependent on how precisely the controlled environment simulates a real host. If the malware detects that it's running in a controlled environment it can halt any malicious activity and perform bening computations. Or the malware can exhibit it's malicious behavior only under certain conditions, such as time or a certain host system language localization.
+
+The main disadvantage however is that an antivirus must not hinder a legitimate user in his use of a system and it's files. Therefore the detection method must be fast, which in the context of an emulation--based detector means that it has only limited time to spend on a single file. So the simplest way for a malware to avoid detection is to perform benign computation until the detector runs out of time.
+
+\section{Behavioral Detection}
+With the advent of strongly polymorphic and metamorphic malware syntactic detectors proved to be insufficient. The reason for this was the large number of syntactic signatures that detection of such malware would require. Research has even proved that a syntactically undetectable malware is possible\cite{Filiol07}. 
+
+The problem of strongly obfuscated malware was further demonstrated by the outbreak of the Storm worm in 2007. The authors of Storm did not equip the worm with it's own mutation engine, instead they released a large number of mutations in bursts into the public internet. This way the antivirus companies were not able to reverse--engineer the worms mutation engine, thus come up with a suitable heuristic detection procedure in time.
+
+The proposed solution to this are behavioral detection methods, which abstract from how the malicious behavior is implemented and aim to detect the malicious behavior itself. Many of the detection methods are directly related to methods used in software testing and quality assurance. The advantage of this approach is it's generality and robustness against any kind of syntactic obfuscation. The main disadvantage is the high computational complexity of these methods. 
+
+Figure \ref{fig_gen_behav_detector} shows a schema of a generic behavioral detector. After initial data collection a higher abstraction is built by interpreting the collected data. This abstraction can now be used to enrich the database of malicious behavior signatures if the input is known to be malicious. If the input is not known to be malicious a matching of the abstraction is done against the database. Finally a prediction whether the input is malicious or not is made. If the input is malicious, it's behavior abstraction can be used to enrich the database further.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{A generalized behavioral detector}
+    \label{fig_gen_behav_detector}
+\end{figure}
+
+Figure \ref{fig_behav_det_tax} shows a taxonomy of behavioral detectors as presented in \cite{Jacob08}. The diagram is vertically split into two parts according to the general approach to detection. The parts themselves are divided further horizontally to describe the data structures and algorithms used in each of the detection stages introduced in figure \ref{fig_gen_behav_detector}. Finally the lower part of the figure shows how behavioral signatures are generated from known malware, while the upper part shows how behavior is extracted from the environment in which malware can appear.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{A taxonomy of behavioral detectors}
+    \label{fig_behav_det_tax}
+\end{figure}
+
+\subsection{Simulation--based Detection}
+Based in black--box testing, this method analyzes malware behavior in a monitored environment during execution. This environment may be controlled, in which case code emulation is employed, or in some applications the malware may be left to run on a live host.
+
+\paragraph*{Data collection} Detectors of this type perform data collection by monitoring events that the malware causes in the host system, be it a controlled environment or a live host. Sequences of these events are called \emph{traces}. An example of a trace is a sequence of system calls or a sequence of sent network packets.
+
+\paragraph*{Interpretation} Traces are then often interpreted into \emph{atomic behaviors}. These often represent a high level event in the host system e.g. opening of a file or establishing a network connection. Atomic behaviors can then be organized into sequences forming a behavioral fingerprint of an inspected process.
+
+\paragraph*{Matching} Matching is performed based on the model of malicious behavior. Common models include weighted rule tables, graphs of atomic behaviors or state machines. The prediction is then made based on a sum of weights and a threshold, existence of a path in a graph or the acceptance of a state machine.
+
+The advantages and disadvantages of this approach are closely tied to it's dynamic nature. One can only observe one of many possible behaviors at once, if code emulation is employed, the malware can simply not perform malicious actions in the controlled environment and allowing execution on a live host presents considerable risks.
+
+\subsection{Detection via Formal Verification}
+Behavioral detection is commonly associated with dynamic analysis. This may seem short--sighted given that the behavior of a program is fully specified by it's code. In the context of information system, formal verification is used to mathematically prove or disprove that the system satisfies a given specification or that the system has a certain property. Applied to malware detection the verified system is a representation of a computer program and the property is the presence of known malicious behavior.
+
+\paragraph*{Data collection} Since binary files are the most common representation of malware data collection is done by static extraction. This task mainly involves disassembling the binary file into assembly code, but unpacking and decryption are often needed as preliminary steps.
+
+\paragraph*{Interpretation} Once a suitable code representation is obtained, methods for formal analysis and verification can be applied to build an abstraction of the program behavior.
+\paragraph*{Matching}
+
 \chapter{Static Analysis}
 \label{ch_s_analysis}
     \section{Posets and Lattices}
