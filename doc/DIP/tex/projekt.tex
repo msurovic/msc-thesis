@@ -26,12 +26,28 @@
 
 %zde muzeme vlozit vlastni balicky
 \usepackage{float}
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
 \usepackage{listings}
 \usepackage[toc,page,header]{appendix}
 \RequirePackage{titletoc}
 \ifczech
   \usepackage{ae}
 \fi
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem*{cor}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example}[section]
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
 
 %---rm---------------
 \renewcommand{\rmdefault}{lmr}%zavede Latin Modern Roman jako rm

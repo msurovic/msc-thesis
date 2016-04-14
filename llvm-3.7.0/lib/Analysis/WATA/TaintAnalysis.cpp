@@ -60,8 +60,11 @@ bool WinAPITaintAnalysis::runOnModule(Module& M){
   for(int i = 0; i < UNFOLDER_CALLS; i++){
     TaintEdgeSet BackEdges;
     findCycle(DepGraph, BackEdges);
-    for(TaintEdge E : BackEdges){
-      unfoldCycle(DepGraph, E, UNFOLDER_ITERS);
+    errs() << "BackEdges: " << BackEdges.size() << '\n';
+    if(BackEdges.size() < 35){
+      for(TaintEdge E : BackEdges){
+        unfoldCycle(DepGraph, E, UNFOLDER_ITERS);
+      }
     }
   }
   errs() << "Checkpoint 3" << '\n';
@@ -81,43 +84,52 @@ bool WinAPITaintAnalysis::runOnModule(Module& M){
 
 void WinAPITaintAnalysis::runTaints(Function& F, TaintMap& TG){
   MapVector<BasicBlock*, TaintMap> AbsContexts;
-  bool Changed = true;
+  SmallSetVector<BasicBlock*, 16> WorkList;
+  // Initialize worlist with all BasicBlocks in F
+  for(BasicBlock& BB : F){
+    WorkList.insert(&BB);
+  }
   // Iteratively compute abstract contexts until a fixpoint is reached.
   // The assumption here is that we have all of the functions inlined already.
-  while(Changed){
-    Changed = false;
-    for(BasicBlock& BB : F){
-      // Create tha abstract context for BB.
-      TaintMap BBT;
-      // Join with all predecessor contexts.
-      for(BasicBlock* P : predecessors(&BB)){
-        MapVector<BasicBlock*, TaintMap>::iterator PT = AbsContexts.find(P);
-        if(PT == AbsContexts.end()){
-          PT = AbsContexts.insert(std::make_pair(P, TaintMap())).first;
-          Changed = true;
-        }
-        taintMapUnion(BBT, PT->second);
+  while(!WorkList.empty()){
+    bool Changed = false;
+    BasicBlock* BB = WorkList.pop_back_val();
+    // Create the abstract context for BB.
+    TaintMap BBT;
+    // Join with all predecessor contexts.
+    for(BasicBlock* P : predecessors(BB)){
+      MapVector<BasicBlock*, TaintMap>::iterator PT = AbsContexts.find(P);
+      if(PT == AbsContexts.end()){
+        PT = AbsContexts.insert(std::make_pair(P, TaintMap())).first;
       }
-      // Analyze BB
-      for(Instruction& I : BB){
-        if(isTaintSink(I)){
-          Changed = sinkTaints(I, BBT, TG) || Changed;
-        }
-        if(isTaintSource(I)){
-          makeTaints(I, BBT);
-        }else{
-          propTaints(I, BBT);
-        }
+      taintMapUnion(BBT, PT->second);
+    }
+    // Analyze BB
+    for(Instruction& I : *BB){
+      if(isTaintSink(I)){
+        Changed = sinkTaints(I, BBT, TG) || Changed;
       }
-      // Determine if there was a change in the abstract context and update
-      // the abstract context if there was.
-      MapVector<BasicBlock*, TaintMap>::iterator CI = AbsContexts.find(&BB);
-      if(CI == AbsContexts.end()){
-        AbsContexts.insert(std::make_pair(&BB, BBT));
-        Changed = true;
-      }else if(!taintMapEquiv(CI->second, BBT)){
-        CI->second = BBT;
-        Changed = true;
+      if(isTaintSource(I)){
+        makeTaints(I, BBT);
+      }else{
+        propTaints(I, BBT);
+      }
+    }
+    // Determine if there was a change in the abstract context and update
+    // the abstract context if there was.
+    MapVector<BasicBlock*, TaintMap>::iterator CI = AbsContexts.find(BB);
+    if(CI == AbsContexts.end()){
+      AbsContexts.insert(std::make_pair(BB, BBT));
+      Changed = true;
+    }else if(!taintMapEquiv(CI->second, BBT)){
+      CI->second.clear();
+      taintMapUnion(CI->second, BBT);
+      Changed = true;
+    }
+    // Add successors to the worklist if there was a change.
+    if(Changed){
+      for(BasicBlock* S : successors(BB)){
+        WorkList.insert(S);
       }
     }
   }
