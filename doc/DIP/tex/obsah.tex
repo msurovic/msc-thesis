@@ -17,17 +17,19 @@
 %Garey79 -- Computers and Intractability
 %Sistla85 -- The complexity of propositional linear temporal logics
 %Cousot77 -- Abstract interpretation: a unified lattice model for static analysis...
+%Lothaire83 -- Combinatorics on words
+%tata07 -- Tree Automata Techniques and Algorithms
 
 \chapter{Introduction}
-Information technologies and systems have found use in almost all aspects of human life. From personal communication and entertainment to industrial manufacturing, services and commerce. Because of this widespread adoption, safety and security of information systems and the data they hold has become a major concern. Throughout the years, development and administration of information systems has shown to be a complex task and errors are a common occurence. These errors may pose a safety risk to anyone using the system. Some of these errors can be abused by malicious parties to achieve goals that are not in alignment with the wishes of a legitimate user. The answer to this problem is twofold. By advancing the processes and technologies that we use to develop information systems we lower the number of errors and weaknesses that the system has prior to it's use. By carefully monitoring usage of the system after deployment, we lower the risk of abuse of errors that were not corrected during developement.
+Information technologies and systems have found use in almost all aspects of human life. From personal communication and entertainment to industrial manufacturing, services and commerce. Because of this widespread adoption, safety and security of information systems and the data they hold has become a major concern. Throughout the years, development and administration of information systems has shown to be a complex task and errors are a common occurence. These errors may pose a safety risk to anyone using the system. Some of these errors can be abused by malicious parties to achieve goals that are not in alignment with the wishes of a legitimate user. The answer to this problem is twofold. By advancing the processes and technologies that we use to develop information systems we lower the number of errors and weaknesses that the system has prior to its use. By carefully monitoring usage of the system after deployment, we lower the risk of abuse of errors that were not corrected during developement.
 
-\emph{Malware} is a term used to describe any software tools primarily designed for malicious use against a host information system. Common uses include causing damage to the host system, denying usage of the host to legitimate users and theft of data and computing resources. Depending on it's purpose and method of transfer, malware can be classified into several families. For example a \emph{trojan} is malware that is introduced into a host, often by a legitimate user, disguising itself as harmless software. On the other hand a \emph{worm} often abuses an error in the host system to gain access. Both of these are examples of malware that function as standalone pieces of software. \emph{Viruses}, in contrast to trojans and worms, need a host file or software to propagate. The term \emph{payload} is often used to describe the code that will carry out the intended use of the malware. A \emph{keylogger} will log keystrokes to gather sensitive information about the systems users, while a \emph{backdoor} will grant access to the host system to an illegitimate user.
+\emph{Malware} is a term used to describe any software tools primarily designed for malicious use against a host information system. Common uses include causing damage to the host system, denying usage of the host to legitimate users and theft of data and computing resources. Depending on its purpose and method of transfer, malware can be classified into several families. For example a \emph{trojan} is malware that is introduced into a host, often by a legitimate user, disguising itself as harmless software. On the other hand a \emph{worm} often abuses an error in the host system to gain access. Both of these are examples of malware that function as standalone pieces of software. \emph{Viruses}, in contrast to trojans and worms, need a host file or software to propagate. The term \emph{payload} is often used to describe the code that will carry out the intended use of the malware. A \emph{keylogger} will log keystrokes to gather sensitive information about the systems users, while a \emph{backdoor} will grant access to the host system to an illegitimate user.
 
 %Malware economy + figure
 
 As a means to protect information systems and user data, security systems were developed. Examples include \emph{firewalls}, which come in the form of hardware and software or \emph{intrusion detection} and \emph{intrusion prevention} systems. But probably the most common security system is an \emph{antivirus} software. The former can be described as passive measures, since they mitigate threats that are already being carried out by a human agent or malware. Antiviruses on the other hand were originally designed to protect against malware by actively scanning files present in the host system.
 
-With the introduction of antiviruses, malware authors had to come up with ways to hide the presence of their malware in a host system. One method of achieving this is \emph{obfuscation}. The goal of obfuscation is to make malware hard to distinguish from legitimate software by changing the malware in a way that preserves it's original functionality or purpose. This also makes detection a per system task if the obfuscations are applied in a randomized manner, since the same malware can differ in some way from system to system. Obfuscations can change the malware on several levels. Obfuscations that primarily change how the malware appears as a file, are called \emph{syntactic}, while those which change how the malware functions while preserving it's intended purpose are referred to as \emph{semantic}. On the other end, antivirus software needs to implement methods that can detect malware despite being obfuscated. As with malware, detectors can be classified as syntactic or \emph{signature based} and semantic or in other words \emph{behavioral}.
+With the introduction of antiviruses, malware authors had to come up with ways to hide the presence of their malware in a host system. One method of achieving this is \emph{obfuscation}. The goal of obfuscation is to make malware hard to distinguish from legitimate software by changing the malware in a way that preserves its original functionality or purpose. This also makes detection a per system task if the obfuscations are applied in a randomized manner, since the same malware can differ in some way from system to system. Obfuscations can change the malware on several levels. Obfuscations that primarily change how the malware appears as a file, are called \emph{syntactic}, while those which change how the malware functions while preserving its intended purpose are referred to as \emph{semantic}. On the other end, antivirus software needs to implement methods that can detect malware despite being obfuscated. As with malware, detectors can be classified as syntactic or \emph{signature based} and semantic or in other words \emph{behavioral}.
 
 The goal of this work is to research applications of formal analysis and verification to behavioral malware detection and present a proof of concept malware detector that applies these methods. The work begins by giving a brief introduction to the challenges of detecting obfuscated malware in chapter \ref{ch_malware}. In order to detect and classify malicious behavior descriptions obtained by static analysis, suitable models and methods are proposed in chapter \ref{ch_math}. The LLVM compiler development framework is introduced in chapter \ref{ch_llvm} as a means to implement the mentioned static analyses. The design and implementation of a proof-of-concept detector prototype is described in chapter \ref{ch_detector}. Finally conclusion with a discussion about choices that were made with possible alternatives and potential for future work is given in chapter \ref{ch_conclusion}.
 
@@ -58,7 +60,7 @@ Simple, yet effective methods of obfuscation go no further than changing the way
 
 Another common way of obfuscating binary files is through encryption. Similarily to packing, the main malware body is encrypted using a simple cipher and a decryption procedure is added to the result. The encryption key is often carried with the decryption procedure or can be easily computed from data available to the decryption procedure. Most commonly used ciphers include XOR ciphers, RC4 or TEA. 
 
-By using multiple packers or encryption procedures and keys one can obtain a sizeable number of possible mutations. Malware that generates it's mutations in this manner is \emph{oligomorphic}. Although the number of possible mutations is high, the decompression and decryption procedures themselves are not mutated. This produces an opportunity for malware analysts to create signatures that target these procedures and detect oligomorphic malware based on them.
+By using multiple packers or encryption procedures and keys one can obtain a sizeable number of possible mutations. Malware that generates its mutations in this manner is \emph{oligomorphic}. Although the number of possible mutations is high, the decompression and decryption procedures themselves are not mutated. This produces an opportunity for malware analysts to create signatures that target these procedures and detect oligomorphic malware based on them.
 
 \subsection{Polymorphism}
 The solution to the shortcomings of oligomorphic malware is to mutate their decompression and decryption procedures. \emph{Polymorphic} malware achieves this by applying obfuscations to the code of those procedures. Depending on the obfuscations applied the number of possible mutations rises dramatically. The result is malware whose mutations share almost no resemblance to each other as binary files and thus cannot be generally detected by matching against byte signatures of binary files. A list of commonly used obfuscations follows.
@@ -114,12 +116,12 @@ Similar to subroutine reodreding, this obfuscation reorders instructions to chan
 \end{figure}
 
 \paragraph*{Code integration}
-A technique that uses another executable binary file for obfuscation. The malware excutable targets a host executable, disassembles it, inserts it's own code into it and reassembles the host, preserving it's original functionality. This way the malware can generate as many mutations as there are executable binaries in the host system, while providing other advantages like obfuscating the malware's entry point, since the execution of malware code is interleaved with the execution of the host binary. This obfuscation was introduced in the famous W95/Zmist virus.
+A technique that uses another executable binary file for obfuscation. The malware excutable targets a host executable, disassembles it, inserts its own code into it and reassembles the host, preserving its original functionality. This way the malware can generate as many mutations as there are executable binaries in the host system, while providing other advantages like obfuscating the malware's entry point, since the execution of malware code is interleaved with the execution of the host binary. This obfuscation was introduced in the famous W95/Zmist virus.
 
 \subsection{Metamorphism}
 The main weakness of polymorphic malware was the fact that even though the unpacking and decryption procedures were mutated, the main malicious code was not. By allowing the malware to run in a controlled environment, the malicious code would eventually appear in memory and could be matched against a byte signature.
 
-\emph{Metamorphic} malware answers this weakness by applying obfuscating code transformations to the whole code of the malware, including the malicious parts. This way the malware changes significantly from one mutation to another and leaves little space for simple byte signature detection. The downside to this malware is the complexity of a mutation engine capable of such code transformations. Figure \ref{fig_metamorph} shows the process of generating a new mutation from an old one, once a metamorphic malware is executed. The best example of an implementation is the virus Simile and it's MetaPHOR mutation engine.
+\emph{Metamorphic} malware answers this weakness by applying obfuscating code transformations to the whole code of the malware, including the malicious parts. This way the malware changes significantly from one mutation to another and leaves little space for simple byte signature detection. The downside to this malware is the complexity of a mutation engine capable of such code transformations. Figure \ref{fig_metamorph} shows the process of generating a new mutation from an old one, once a metamorphic malware is executed. The best example of an implementation is the virus Simile and its MetaPHOR mutation engine.
 
 \begin{figure}[H]
     \centering
@@ -150,25 +152,25 @@ Historically malware detection techniques were centered around syntactic propert
 \end{figure}
 
 \subsection{Algorithmic Scanning}
-As obfuscated malware grew more commonplace, detection moved to methods that used malware-specific heuristics for detection. An example of such a heuristic is \emph{smart scanning} which was able to beat simple obfuscations by ignoring \texttt{NOP} instructions or by performing matching only in the scope of basic blocks. \emph{X-Ray scanning} on the other hand targeted malware encrypted with weak ciphers. The method used a brute-force attack to uncover the encryption key and once uncovered performed a byte signature matching. \emph{Filtering} restricted detection to only those files that could contain malicious code.
+As obfuscated malware grew more commonplace, detection moved to methods that used malware-specific heuristics for detection. An example of such a heuristic is \emph{smart scanning} which was able to beat simple obfuscations by ignoring \texttt{NOP} instructions or by performing matching only in the scope of basic blocks. \emph{X-Ray scanning} on the other hand targeted malware encrypted with weak ciphers. The method used a brute-force attack to uncover the encryption key and once uncovered performed a byte signature matching over the decrypted body. \emph{Filtering} restricted detection to only those files that could contain malicious code.
 
 Finally a generalized version of heuristic detection was dubbed \emph{algorithmic scanning} and introduced specialized malware description languages that aided the creation of detection procedures. An algorithmic detector was then essentially an interpreter of such a language coupled with a database of detection procedures.
 
 \subsection{Code Emulation}
 Emulation-based detection methods were developed as an answer to strong polymorphic malware. In an emulation-based detector, the suspicious executable is allowed to run in a controlled environment. In case of a polymorphic malware, the packed or encrypted malicious code will eventually be exposed in the memory of the environment, where it can be again detected by a byte signature.
 
-The success of this method is however dependent on how precisely the controlled environment simulates a real host. If the malware detects that it's running in a controlled environment it can halt any malicious activity and perform bening computations. Or the malware can exhibit it's malicious behavior only under certain conditions, such as time or a certain host system language localization.
+The success of this method is however dependent on how precisely the controlled environment simulates a real host. If the malware detects that its running in a controlled environment it can halt any malicious activity and perform bening computations. Or the malware can exhibit its malicious behavior only under certain conditions, such as time or a certain host system language localization.
 
-The main disadvantage however is that an antivirus must not hinder a legitimate user in his use of a system and it's files. Therefore the detection method must be fast, which in the context of an emulation-based detector means that it has only limited time to spend on a single file. So the simplest way for a malware to avoid detection is to perform benign computation until the detector runs out of time.
+The main disadvantage however is that an antivirus must not hinder a legitimate user in his use of a system and its files. Therefore the detection method must be fast, which in the context of an emulation-based detector means that it has only limited time to spend on a single file. So the simplest way for a malware to avoid detection is to perform benign computation until the detector runs out of time.
 
 \section{Behavioral Detection}
 With the advent of strongly polymorphic and metamorphic malware syntactic detectors proved to be insufficient. The reason for this was the large number of syntactic signatures that detection of such malware would require. Research has even proved that a syntactically undetectable malware is possible\cite{Filiol07}. 
 
-The problem of strongly obfuscated malware was further demonstrated by the outbreak of the Storm worm in 2007. The authors of Storm did not equip the worm with it's own mutation engine, instead they released a large number of mutations in bursts into the public internet. This way the antivirus companies were not able to reverse-engineer the worms mutation engine, thus come up with a suitable heuristic detection procedure in time.
+The problem of strongly obfuscated malware was further demonstrated by the outbreak of the Storm worm in 2007. The authors of Storm did not equip the worm with its own mutation engine, instead they released a large number of mutations in bursts into the public internet. This way the antivirus companies were not able to reverse-engineer the worms mutation engine, thus come up with a suitable heuristic detection procedure in time.
 
 The proposed solution to this are behavioral detection methods, which abstract from how the malicious behavior is implemented and aim to detect the malicious behavior itself. Many of the detection methods are directly related to methods used in software testing and quality assurance. The advantage of this approach is its generality and robustness against any kind of syntactic obfuscation. The main disadvantage is the high computational complexity of these methods. 
 
-Figure \ref{fig_gen_behav_detector} shows a schema of a generic behavioral detector. After initial data collection a higher abstraction is built by interpreting the collected data. This abstraction can now be used to enrich the database of malicious behavior signatures if the input is known to be malicious. If the input is not known to be malicious a matching of the abstraction is done against the database. Finally a prediction whether the input is malicious or not is made. If the input is malicious, it's behavior abstraction can be used to enrich the database further.
+Figure \ref{fig_gen_behav_detector} shows a schema of a generic behavioral detector. After initial data collection a higher abstraction is built by interpreting the collected data. This abstraction can now be used to enrich the database of malicious behavior signatures if the input is known to be malicious. If the input is not known to be malicious a matching of the abstraction is done against the database. Finally a prediction whether the input is malicious or not is made. If the input is malicious, its behavior abstraction can be used to enrich the database further.
 
 \begin{figure}[H]
     \centering
@@ -195,10 +197,10 @@ Based in black-box testing, this method analyzes malware behavior in a monitored
 
 \paragraph*{Matching} Matching is performed based on the model of malicious behavior. Common models include weighted rule tables, graphs of atomic behaviors or state machines. The prediction is then made based on a sum of weights and a threshold, existence of a path in a graph or the acceptance of a state machine.
 
-The advantages and disadvantages of this approach are closely tied to it's dynamic nature. One can only observe one of many possible behaviors at once, if code emulation is employed, the malware can simply not perform malicious actions in the controlled environment and allowing execution on a live host presents considerable risks.
+The advantages and disadvantages of this approach are closely tied to its dynamic nature. One can only observe one of many possible behaviors at once, if code emulation is employed, the malware can simply not perform malicious actions in the controlled environment and allowing execution on a live host presents considerable risks.
 
 \subsection{Detection via Formal Verification}
-Behavioral detection is commonly associated with dynamic analysis. This may seem short-sighted given that the behavior of a program is fully specified by it's code. In the context of information system, formal verification is used to mathematically prove or disprove that the system satisfies a given specification or that the system has a certain property. Applied to malware detection the verified system is a representation of a computer program and the property is the presence of known malicious behavior.
+Behavioral detection is commonly associated with dynamic analysis. This may seem short-sighted given that the behavior of a program is fully specified by its code. In the context of information system, formal verification is used to mathematically prove or disprove that the system satisfies a given specification or that the system has a certain property. Applied to malware detection the verified system is a representation of a computer program and the property is the presence of known malicious behavior.
 
 \paragraph*{Data collection} Since binary files are the most common representation of malware data collection is done by static extraction. This task mainly involves disassembling the binary file into assembly code, but unpacking and decryption are often needed as preliminary steps.
 
@@ -213,17 +215,13 @@ The main advantage of detection by formal verification is that all possible exec
 This chapter introduces the theoretical concepts that underlie the methods and algorithms used in the behavioral detector presented in chapter \ref{ch_detector}. Abstract interpretation is introduced as a general framework for building static program analyses and tree automata are presented as the formal model used for matching abstracted program behavior with known malicious behavior signatures. The sections on static analysis and abstract interpretation are based on \cite{FAV_Slides16} and corresponding chapters from \cite{Nielson05}. Parts on tree automata and related notions are based on \cite{tata07} and \cite{Babic11}.
 
 \section{Static Analysis}
-The definition of what constitutes a static program analysis varies. Generally the term is used to describe any kind of automated collection of information about a computer program without executing the program. Using this definition, static analyses range from a simple search for syntactic patterns to precise computations over a program abstraction and even model checking which systematically searches the state space of a program.
+The definition of what constitutes a static program analysis varies. Generally the term is used to describe any kind of automated collection of information about a computer program without executing the program. Under this definition, static analyses range from a simple search for syntactic patterns to precise computations over a program abstraction and even model checking which systematically searches the state space of a program.
 
-As a collection of general methods and algorithms, static analysis is traditionally used in compiler optimizations to identify redundant or ineffective code, code generators, where it provides information needed to bridge the gap between code representations and tools for formal verification, where it's used for quality assurance. Recently however information security specialists and malware analysts have also found uses for static analysis when evaluating system vulnerabilities and analyzing malware.
+As a collection of general methods and algorithms, static analysis is traditionally used in compiler optimizations to identify redundant or ineffective code, code generators, where it provides information needed to bridge the gap between code representations and tools for formal verification, where it is used for quality assurance. Recently however information security specialists and malware analysts have also found uses for static analysis when evaluating system vulnerabilities and analyzing malware.
 
 \subsection{Partially Ordered Sets and Lattices}
-\begin{defn}[\emph{Partial Ordering}]
-Let $L$ be a set. A partial ordering $\sqsubseteq \; \subseteq L \times L$ is a relation that is \emph{reflexive} ($\forall l \in L: l \sqsubseteq l$), \emph{transitive} ($\forall l_1, l_2, l_3 \in L: l_1 \sqsubseteq l_2 \; \wedge \; l_2 \sqsubseteq l_3 \Rightarrow l_1 \sqsubseteq l_3$) and \emph{anti-symmetric} ($\forall l_1, l_2 \in L: l_1 \sqsubseteq l_2 \; \wedge \; l_2 \sqsubseteq l_1 \Rightarrow l_1 = l_2$).
-\end{defn}
-
 \begin{defn}[\emph{Partially Ordered Set}]
-Let $L$ be a set and $\sqsubseteq \; \subseteq L \times L$ a partial ordering over $L$, written as $\sqsubseteq$. A partially ordered set is a tuple $(L, \sqsubseteq)$
+Let $L$ be a set. A partial ordering $(\sqsubseteq) \; \subseteq L \times L$ is a relation that is \emph{reflexive} ($\forall l \in L: l \sqsubseteq l$), \emph{transitive} ($\forall l_1, l_2, l_3 \in L: l_1 \sqsubseteq l_2 \; \wedge \; l_2 \sqsubseteq l_3 \Rightarrow l_1 \sqsubseteq l_3$) and \emph{anti-symmetric} ($\forall l_1, l_2 \in L: l_1 \sqsubseteq l_2 \; \wedge \; l_2 \sqsubseteq l_1 \Rightarrow l_1 = l_2$). For $(x,y) \in \; \sqsubseteq$ we shall write $x \sqsubseteq y$, and $x \sqsubset y$ if also $x \neq y$. The tuple $(L, \sqsubseteq)$ is called a \emph{partially ordered set}.
 \end{defn}
 
 \begin{defn}[\emph{Least Upper Bound}]
@@ -245,10 +243,26 @@ A \emph{join-semilattice} or \emph{meet-semilattice} is a partially ordered set 
     \label{fig_absintr_intervals}
 \end{figure}
 
-% TODO Fixed point, monotone function, knaster-tarski
+\begin{defn}[\emph{Chain}]
+Let $(L, \sqsubseteq)$ be a partially ordered set. A \emph{chain} from $x_0$ to $x_n$ is a set $C = \{x_0, x_1, \dots, x_n\} \subseteq L$ where $x_0 \sqsubset x_1 \sqsubset x_2 \sqsubset \dots \sqsubset x_n$. 
+\end{defn}
+
+\begin{defn}[\emph{$\sqcup-$continuous function}]
+Let $(A, \sqsubseteq_A)$ and $(B, \sqsubseteq_B)$ be lattices and $f: A \rightarrow B$ a function. Function $f$ is \emph{monotone} if $\forall x, y \in L: x \sqsubseteq_A y \Rightarrow f(x) \sqsubseteq_B f(y)$. Furthermore $f$ is \emph{$\sqcup-$continuous} if $f(\sqcup C) = \sqcup\{f(c) | c \in C\}$ for every chain $C \subseteq A$.
+\end{defn}
+
+\begin{defn}[\emph{Least Fixed Point}]
+Let $(L, \sqsubseteq)$ be a lattice and $f: L \rightarrow L$ a function. An element $x \in L$ is a \emph{fixed point} of $f$ if $f(x) = x$ and a \emph{least fixed point} if $\forall y \in L: f(y) = y \Rightarrow x \sqsubseteq y$.
+\end{defn}
+
+\begin{thm}[\emph{Kleene Fixed Point}]
+Let $(L, \sqsubseteq, \sqcup, \sqcap, \bot, \top)$ be a lattice and $f: A \rightarrow A$ a $\sqcup-$continuous function. The least fixed point of $f$ is $\mu f = \sqcup\{f^i(\bot)|i \geq 0\}$.
+\end{thm}
+
+The Kleene fixed point theorem essentially tells that by repeatedly applying a $\sqcup-$ continuous function over a lattice starting from the least element of the lattice, one will eventually reach the least fixed point of $f$ while forming a chain along the way. This is very useful when designing iterative algorithms over data that form a lattice. Such an algorithm iteratively refines an approximate solution and is guaranteed to terminate if the lattice is finite and the algorithm has the properties of a $\sqcup-$continuous function.
 
 \subsection{Abstract Interpretation}
-Pioneered by Patric and Radhia Cousot in \cite{Cousot77}, \emph{abstract interpretation} is a framework for building static analyses based on lattices. The basic idea is to model the states a computer program can be in via \emph{abstract contexts} over an \emph{abstract domain} that is suitable for gathering the information that we want from the static analysis. If we wish to know the possible values of integer variables in a program, we may use intervals of natural numbers or convex polyhedra as our abstract domain. If we're collecting information about strings, we will probably use an abstract domain based in formal language theory.
+Pioneered by Patrick and Radhia Cousot in \cite{Cousot77}, \emph{abstract interpretation} is a framework for building static analyses based on lattices. The basic idea is to model the states a computer program can be in via \emph{abstract contexts} over an \emph{abstract domain} that is suitable for gathering the information that we want from the static analysis. If we wish to know the possible values of integer variables in a program, we may use intervals of natural numbers or convex polyhedra as our abstract domain. If we're collecting information about strings, we will probably use an abstract domain based in formal language theory.
 
 Each instruction in the program is assigned an \emph{abstract transformer} which emulates the execution of the instruction in the abstract domain. An addition over two integer variables will modify the intervals corresponding to those variables in the abstract context of the program. Finally the analysis is done by iteratively computing the abstract contexts of the program until the computation reaches a fixed point. In some cases however, e.g. programs with loops, the reaching of a fixed point is not guaranteed. A \emph{widening} operator over abstract contexts which over-approximates the precise iterative solution may be introduced to guarantee termination and speed up the analysis. The application of widening however degrades the results of the analysis. \emph{Narrowing} operators can be applied to the results of a widening to refine the final result of the analysis.
 
@@ -262,17 +276,89 @@ Each instruction in the program is assigned an \emph{abstract transformer} which
 \begin{defn}[\emph{Abstract Interpretation}]
 An \emph{abstract interpretation} $I$ of a program $P$ with the instruction set \texttt{Instr} is a tuple $$I = (Q, \circ, \sqsubseteq, \bot, \top, \tau)$$ where
 \begin{itemize}
-    \item $Q$ is the abstract domain (a set of abstract contexts)
-    \item $\circ: Q \times Q \rightarrow Q$ is the \emph{join operator} for accumulation of abstract contexts and $(Q, \circ, \top)$ is a complete join-semilattice.
-    \item $(\sqsubseteq) \subseteq Q \times Q$ is a partial ordering defined as $\forall x, y \in Q: x \sqsubseteq y \Leftrightarrow x \circ y = y$ in $(Q,\circ, \top)$
-    \item $\bot$ is the least element of $Q$
-    \item $\top$ is the greatest element of $Q$
-    \item $\tau: \text{\texttt{Instr}}\times Q \rightarrow Q$ defines an interpretation of abstract transformers
+    \item $Q$ is the abstract domain (a set of abstract contexts),
+    \item $\circ: Q \times Q \rightarrow Q$ is the \emph{join operator} for accumulation of abstract contexts and $(Q, \circ, \top)$ is a complete join-semilattice,
+    \item $(\sqsubseteq) \subseteq Q \times Q$ is a partial ordering defined as $\forall x, y \in Q: x \sqsubseteq y \Leftrightarrow x \circ y = y$ in $(Q,\circ, \top)$,
+    \item $\bot$ is the least element of $Q$,
+    \item $\top$ is the greatest element of $Q$,
+    \item $\tau: \text{\texttt{Instr}}\times Q \rightarrow Q$ defines an interpretation of abstract transformers.
 \end{itemize}
 \end{defn}
+
+\begin{defn}[\emph{Widening}]
+Let $I = (Q, \circ, \sqsubseteq, \bot, \top, \tau)$ be an abstract interpretation. For the binary \emph{widening} operator $\triangledown$ the following holds:
+\begin{itemize}
+    \item $\triangledown: Q \times Q \rightarrow Q$,
+    \item $\forall C,D \in Q: (C \circ D) \sqsubseteq (C \triangledown D)$,
+    \item for all infinite sequences $(C_0, C_1, \dots, C_n, \dots) \in Q^\omega$, it holds that the infinite sequence $(s_0, s_1, \dots, s_n, \dots)$ defined recursively as $s_0 = C_0, \; s_n = s_{n-1} \triangledown C_n$ is not strictly increasing.
+\end{itemize}
+\end{defn}
+
+\begin{defn}[\emph{Narrowing}]
+Let $I = (Q, \circ, \sqsubseteq, \bot, \top, \tau)$ be an abstract interpretation. For the binary \emph{narrowing} operator $\triangle$ the following holds:
+\begin{itemize}
+    \item $\triangle: Q \times Q \rightarrow Q$,
+    \item $\forall C,D \in Q: D \sqsubseteq C \Rightarrow (D \sqsubseteq (C \triangle D) \sqsubseteq C)$,
+    \item for all infinite sequences $(C_0, C_1, \dots, C_n, \dots) \in Q^\omega$, it holds that the infinite sequence $(s_0, s_1, \dots, s_n, \dots)$ defined recursively as $s_0 = C_0, \; s_n = s_{n-1} \triangle C_n$ is not strictly decreasing.
+\end{itemize}
+\end{defn}
+
+To ensure certain properties of the abstract interpretation with regard to the analyzed program, one may employ \emph{Galois connections}. The most common property investigated is \emph{soundness} which ensures that the abstraction over-approximates the behavior of the analyzed program and thus can only produce false positives. In the context of malware detection, this means that it may find malicious behavior that is present in the abstract domain, but not in the program itself, assuming a precise specification of what malicious behavior is given.
+
 \section{Tree Automata}
+Introduced as a generalization of word languages in formal language theory, tree languages describe sets of directed trees or \emph{terms}. Their defining formalisms \emph{tree automata} and \emph{regular tree grammars} found a wide array of uses. Automata in areas of formal verification and automated reasoning as parts of decision procedures for logics. Grammars in areas of computational linguistics and programming languages.
+
 \subsection{Ranked Alphabets, Terms and Trees}
+\begin{defn}[\emph{Ranked Alphabet}]
+Let $\mathcal{F}$ be a finite set of symbols, $\mathbb{N}$ the set of natural numbers and $Arity: \mathcal{F} \rightarrow \mathbb{N}$ a function. A \emph{ranked alphabet} is the tuple $(\mathcal{F}, Arity)$. The \emph{arity} of a symbol $f \in \mathcal{F}$ is denoted $Arity(f)$ and the set $\mathcal{F}_p = \{f \; | \; f \in F \wedge Arity(f) = p\}$ is the set of symbols of arity $p$. Symbols of arity $0, 1, \dots, p$ are respectively called constants, unary symbols, \dots, $p$-ary symbols.
+\end{defn}
+
+\begin{defn}[\emph{Terms}]
+Let $\mathcal{F}$ be a ranked alphabet and $\mathcal{X}$ a set of constants called \emph{variables}. We assume that $\mathcal{F}_0 \cap \mathcal{X} = \emptyset$. The set $T(\mathcal{F}, \mathcal{X})$ of \emph{terms} over the ranked alphabet $\mathcal{F}$ and variables $\mathcal{X}$ is the smallest set defined by:
+\begin{itemize}
+    \item $\mathcal{F}_0 \subseteq T(\mathcal{F}, \mathcal{X})$,
+    \item $\mathcal{X} \subseteq T(\mathcal{F}, \mathcal{X})$,
+    \item if $p \geq 1, \; f \in \mathcal{F}_p, \; t_1,\dots, t_p \in T(\mathcal{F}, \mathcal{X})$, then $f(t_1,\dots, t_p) \in T(\mathcal{F}, \mathcal{X})$.
+\end{itemize}
+If $\mathcal{X} = \emptyset$ then $T(\mathcal{F}, \mathcal{X})$ is also written as $T(\mathcal{F})$. A term $t \in T(\mathcal{F})$ is called a \emph{ground term}.
+\end{defn}
+
+\begin{defn}[\emph{Tree Domain}]
+Let $\mathbb{N}$ be the set of natural numbers and $\mathbb{N}^*$ the \emph{free monoid}\footnote{for a definition see \cite{Lothaire83}} generated by $\mathbb{N}$ with concatenation $(\cdot)$ as the operation and the empty string $\varepsilon$ as the identity. The \emph{prefix order} $(\leq) \subseteq \mathbb{N}^* \times \mathbb{N}^*$ is defined as: $u \leq v \overset{\text{def}}{\Longleftrightarrow} \exists w \in \mathbb{N}^*: v = u \cdot w$. For $u \in \mathbb{N}^*$ and $n \in \mathbb{N}$, the \emph{length} $|u|$ is defined inductively: $|\varepsilon| = 0, \; |u \cdot n| = |u| + 1$. A set $S$ is \emph{prefix-closed} if $u \leq v \wedge v \in S \Rightarrow u \in S$. A \emph{tree domain} is a finite non-empty prefix-closed set $D \subset \mathbb{N}^*$ satisfying the following property: $u \cdot n \in D \Rightarrow \forall 1 \leq j \leq n: u \cdot j \in D$.
+\end{defn}
+
+\begin{defn}[\emph{Finite Ordered Tree}]
+Let $T(\mathcal{F}, \mathcal{X})$ be a set of terms and $D$ a tree domain. A term $t \in T(\mathcal{F}, \mathcal{X})$ can be represented as a \emph{finite ordered tree} which is a mapping $t: D \rightarrow \mathcal{F} \cup \mathcal{X}$ satisfying the following:
+\begin{itemize}
+    \item $\forall u \in D:$ if $t(u) \in \mathcal{F}_n, \; n \geq 1$ then $\{j \; | \; u \cdot j \in D\} = \{1, \dots, n\}$
+    \item $\forall u \in D:$ if $t(u) \in \mathcal{F}_0$ then $\{j \; | \; u \cdot j \in D\} = \emptyset$
+\end{itemize}
+The domain of tree $t$ shall be written as $dom(t)$ and each element in $dom(t)$ represents a \emph{position} in $t$. The symbol $t(\varepsilon)$ is called the \emph{root symbol} of $t$ and often denoted as $head(t)$.
+\end{defn}
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{An example of a tree $t$ and its tree domain $D$}
+    \label{fig_absintr_intervals}
+\end{figure}
+
 \subsection{Finite Tree Automata}
+An extension of finite automata which work on words, finite tree automata deal with finite ordered ranked trees --- meaning the trees are over a ranked alphabet, or finite ordered trees with bounded rank --- meaning that the trees can be encoded as finite ordered ranked trees. Indeed words over a finite alphabet can be viewed as unary terms. For example the word $xyz$ over the alphabet $\Sigma = \{x,y,z\}$ ca be viewed as the term $t = x(y(z(\#)))$ over the ranked alphabet $\mathcal{F} = \{x(), y(), z(), \#\}$ where $\#$ is added as a constant.
+
+Similarly to finite automata, tree automata can be deterministic and nondeterministic. Tree automata however have different properties depending on how the computation of the automaton is performed. When the computation starts from the leaves of the tree working its way to the root, the automaton is referred to as \emph{bottom-up}. In the opposite case the automaton is a \emph{top-down} one.
+
+Depending on the direction of computation, determinism has different consequences on the expressive power of the automaton. Determnistic bottom-up tree automata have the same power as nondeterministic ones and nondeterministic top-down automata. However deterministic top-down tree automata are less powerful \cite{tata07}. This work will only consider finite bottom-up tree automata onwards, referring to them as FTA.
+
+\begin{defn}[\emph{Nondeterministic Finite Bottom-Up Tree Automaton}]
+A NFTA over a ranked alphabet $\mathcal{F}$ is a tuple $$\mathcal{A} = (Q, \mathcal{F}, Q_f, \Delta)$$ where
+\begin{itemize}
+    \item $Q$ is the set of (unary) states
+    \item $Q_f \subseteq Q$ is the set of final states
+    \item $\Delta$ is the set of transition rules of the form $f(q_1(x_1), \dots, q_n(x_n)) \rightarrow q(f(x_1, \dots, x_n))$, where $n \geq 0$, $f \in \mathcal{F}$, $q_1, \dots, q_n \in Q$, $x_1, \dots, x_n \in \mathcal{X}$.
+\end{itemize}
+\end{defn}
+
 \chapter{The LLVM Compiler Framework}
 \label{ch_llvm}
     \section{Structure and Design}
