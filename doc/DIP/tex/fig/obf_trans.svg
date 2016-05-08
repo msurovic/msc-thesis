@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="641.24658"
+   height="263.14844"
+   id="svg2"
+   inkscape:label="Pozadí"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="obf_trans.svg">
+  <defs
+     id="defs3">
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend"
+       style="overflow:visible">
+      <path
+         id="path3829"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)"
+         inkscape:connector-curvature="0" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="373.51876"
+     inkscape:cy="86.331119"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showborder="true"
+     fit-margin-top="5"
+     fit-margin-left="5"
+     fit-margin-right="5"
+     fit-margin-bottom="5"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="22"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3022"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       originx="-79.320869px"
+       originy="-643.444px" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="686.40019,-81.816778"
+       id="guide7125" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata6">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-79.320869,-145.76976)">
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New"
+       x="248.21429"
+       y="364.50504"
+       id="text3000"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3002"
+         x="248.21429"
+         y="364.50504" /><tspan
+         sodipodi:role="line"
+         id="tspan3004"
+         x="248.21429"
+         y="384.50504" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New"
+       x="84.320869"
+       y="160.90257"
+       id="text2984"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2986"
+         x="84.320869"
+         y="160.90257">instruction4</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="180.90257"
+         id="tspan2990">instruction5</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="200.90257"
+         id="tspan2994">jump out</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="220.90257"
+         id="tspan2996">garbage</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="240.90257"
+         id="tspan3014">_main:</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="260.90259"
+         id="tspan2988">instruction1</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="280.90259"
+         id="tspan3008">instruction2</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="300.90259"
+         id="tspan3010">jump 3</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="320.90259"
+         id="tspan3012">garbage</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="340.90259"
+         id="tspan3016">instruction3</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="360.90259"
+         id="tspan3018">jump 4</tspan><tspan
+         sodipodi:role="line"
+         x="84.320869"
+         y="380.90259"
+         id="tspan3020">garbage</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New"
+       x="343.17465"
+       y="160.90257"
+       id="text5158"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5160"
+         x="343.17465"
+         y="160.90257">instruction2</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="180.90257"
+         id="tspan5162">jump 3</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="200.90257"
+         id="tspan5164">garbage</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="220.90257"
+         id="tspan5166">instruction3</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="240.90257"
+         id="tspan5170">jump 4</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="260.90259"
+         id="tspan5172">garbage</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="280.90259"
+         id="tspan5174">instruction5</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="300.90259"
+         id="tspan5178">jump out</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="320.90259"
+         id="tspan5180">_main:</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="340.90259"
+         id="tspan5182">instruction1</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="360.90259"
+         id="tspan5184">jump 2</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="380.90259"
+         id="tspan5186">instruction4</tspan><tspan
+         sodipodi:role="line"
+         x="343.17465"
+         y="400.90259"
+         id="tspan5188">jump 5</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New"
+       x="602.02838"
+       y="160.90257"
+       id="text6116"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6118"
+         x="602.02838"
+         y="160.90257">instruction3</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="180.90257"
+         id="tspan6120">instruction4</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="200.90257"
+         id="tspan6122">jump 5</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="220.90257"
+         id="tspan6124">garbage</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="240.90257"
+         id="tspan6126">instruction5</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="260.90259"
+         id="tspan6128">jump out</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="280.90259"
+         id="tspan6130">_main:</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="300.90259"
+         id="tspan6132">instruction1</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="320.90259"
+         id="tspan6134">jump 2</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="340.90259"
+         id="tspan6136">garbage</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="360.90259"
+         id="tspan6142">instruction2</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="380.90259"
+         id="tspan6138">jump 3</tspan><tspan
+         sodipodi:role="line"
+         x="602.02838"
+         y="400.90259"
+         id="tspan6140">garbage</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2.32999992;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 241.77769,278.76067 55.55839,0"
+       id="path6939"
+       inkscape:connector-curvature="0" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path7123"
+       d="m 500.63145,278.76067 55.55839,0"
+       style="fill:none;stroke:#000000;stroke-width:2.32999992;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)" />
+  </g>
+</svg>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="636.76172"
+   height="191.69531"
+   id="svg2"
+   inkscape:label="Pozadí"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="obf_instrsub.svg">
+  <defs
+     id="defs3">
+    <marker
+       inkscape:stockid="Arrow2Mstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mstart"
+       style="overflow:visible">
+      <path
+         id="path3890"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(0.6,0.6)"
+         inkscape:connector-curvature="0" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="246.75894"
+     inkscape:cy="126.54297"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="958"
+     inkscape:window-height="1018"
+     inkscape:window-x="-7"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata6">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-36.03516,-260.14243)">
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New"
+       x="35.84766"
+       y="269.49399"
+       id="text2984"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2986"
+         x="35.84766"
+         y="269.49399">MOV  ESI, EAX</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="289.49399"
+         id="tspan2988">MOV  AL,  BYTE PTR DS:[EAX]</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="309.49399"
+         id="tspan2990"
+         style="fill:#800000">TEST AL,  AL</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="329.49399"
+         id="tspan2994">JE SHORT Test.00401054</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="349.49399"
+         id="tspan2996">.</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="369.49399"
+         id="tspan2998">.</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="389.49399"
+         id="tspan3002">.</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="409.49399"
+         id="tspan3006">BSR  EAX, EDX</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="429.49399"
+         id="tspan3010"
+         style="fill:#800000">TEST EAX, DC78A946</tspan><tspan
+         sodipodi:role="line"
+         x="35.84766"
+         y="449.49399"
+         id="tspan3012">MOV  EAX, EDX</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Courier New;-inkscape-font-specification:Courier New"
+       x="418.20313"
+       y="269.49399"
+       id="text3014"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3016"
+         x="418.20313"
+         y="269.49399">MOV  ESI, EAX</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="289.49399"
+         id="tspan3018">MOV  AL,  BYTE PTR DS:[EAX]</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="309.49399"
+         id="tspan3020"
+         style="fill:#800000">OR   AL, AL</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="329.49399"
+         id="tspan3024">JE SHORT Test.00401054</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="349.49399"
+         id="tspan3026">.</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="369.49399"
+         id="tspan3028">.</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="389.49399"
+         id="tspan3030">.</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="409.49399"
+         id="tspan3032">BSR  EAX, EDX</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="429.49399"
+         id="tspan3034"
+         style="fill:#800000">OR   EAX, DC78A946</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="449.49399"
+         id="tspan3036">MOV  EAX, EDX</tspan><tspan
+         sodipodi:role="line"
+         x="418.20313"
+         y="469.49399"
+         id="tspan3022" /></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3.09995341;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:url(#Arrow2Mstart)"
+       d="m 329.8886,356.01987 c 48.27072,0 46.49932,0 46.49932,0"
+       id="path3860-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>
