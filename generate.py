@@ -14,7 +14,7 @@ def main():
         help='Enable bogus control flow.')
     parser.add_argument('-bcf-loop', type=int, default=1,
         help='How many loops will bcf perform on a function.')
-    parser.add_argument('-spli', action='store_true',
+    parser.add_argument('-spli', action='store_false',
         help='Enable basic block splitting.')
     parser.add_argument('-r', action='store_true',
         help='Apply all specified obfuscations randomly.')

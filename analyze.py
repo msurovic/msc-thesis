@@ -35,7 +35,9 @@ def main():
         sdgfile = os.path.join(args.i, inlined + '.sdg')
         outfile = os.path.join(args.o, file.replace('.bc', '.sdg'))
 
-        subprocess.call([opt, '-prep-always-inline', '-always-inline', infile, '-o', inlined])
+        if not os.path.exists(inlined):
+            subprocess.call([opt, '-prep-always-inline', '-always-inline', infile, '-o', inlined])
+        
         subprocess.call([opt, '-winapi-ta', inlined], stdout=open(os.devnull, "w"))
         shutil.move(sdgfile, outfile)
 
