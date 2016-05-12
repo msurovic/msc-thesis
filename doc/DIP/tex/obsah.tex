@@ -573,7 +573,7 @@ Futhermore some junk code is added into the original and the cloned basic block 
 
 \section{Interpretation}
 \label{s_sdg}
-The interpretation phase of the prototype detector analyzes \textsc{LLVM IR} by using static taint anlysis and builds a syscall dependency graph. A syscall dependency graphs (\textsc{SDG}) is a directed graph and acts as a high-level abstraction of program behavior. Nodes of the graph represent calls to functions provided by the operating system and an edge from node $A$ to node $B$ represents a data dependecy between the calls. The dependency can be described as "call $B$ uses data computed from the result of call $A$". Figure \ref{fig_sdg} shows an example of a malware \textsc{SDG}. 
+The interpretation phase of the prototype detector analyzes \textsc{LLVM IR} by using static taint analysis and builds a syscall dependency graph. A syscall dependency graphs (\textsc{SDG}) is a directed graph and acts as a high-level abstraction of program behavior. Nodes of the graph represent calls to functions provided by the operating system and an edge from node $A$ to node $B$ represents a data dependecy between the calls. The dependency can be described as "call $B$ uses data computed from the result of call $A$". Figure \ref{fig_sdg} shows an example of a malware \textsc{SDG}. 
 
 SDGs were chosen as the behavior abstraction because they abstract from all internal computations of the malware (where most obfuscations happen) and focus only on how the malware interacts with its host system. Although some aspects of the interaction be changed through obfuscation, for example, the order in which the syscalls are made, the dependecies between them generally do not change. Static taint analysis provides the information needed to build an \textsc{SDG} by tracking the flow of data between two points in code.
 
@@ -714,8 +714,11 @@ $E \leftarrow E \setminus \{e\}$\;
 
 The graph resulting from using Algorithm \ref{alg_unfolder} introduces significant blowup to the \text{SDG} as a drawback. The blowup can be justified by the fact that when cycles are unfolded this way, it pronounces the behavior a cycle in the \textsc{SDG} would have at runtime. Figure \ref{fig_unfold} shows the two possible approaches to unfolding side by side.
 
-\section{Signature generation}
+\section{Signature generation and Matching}
 \label{s_inference}
+Signature generation is implemented in the detector by using the $k$-testable tree automata inference algorithm presented in \cite{Babic11}. The major advantage of this algorithm is the ability to infer a tree automaton from directed acylic graphs, such as \textsc{SDG}s. This allows the detector to avoid unfolding the \textsc{SDG}s further into trees, which would further increase the size of the graph. 
+
+
 Signature generation is done by inferring a $k$-testable tree automaton from a training set of \textsc{SDG}s. The algorithms for inferring a $k$-testable tree automaton from trees and directed acyclic graphs are taken from \cite{Babic11}. The author also provides an implementation of these algorithms at \cite{BabicWWW}. The detector takes advantage of this implementation and uses it to implement the matching part of the general detector schema.
 This section will provide a brief description of the algorithms using formal terminology established in Chapter \ref{ch_prelim}, Section \ref{s_tree_automata}.
 
