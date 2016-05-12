@@ -25,19 +25,23 @@
 %LLVM14 -- Getting Started with LLVM Core Libraries
 %ollvm -- Obfuscator-{LLVM} -- Software Protection for the Masses
 %rohitab -- 
+%aho86 -- Compilers: Principles, Techniques and Tools
+%BabicWWW -- http://www.domagoj-babic.com/index.php/ResearchProjects/MalwareAnalysis
 
 \chapter{Introduction}
-Information technologies and systems have found use in almost all aspects of human life. From personal communication and entertainment to industrial manufacturing, services and commerce. Because of this widespread adoption, safety and security of information systems and the data they hold has become a major concern. Throughout the years, development and administration of information systems has shown to be a complex task and errors are a common occurence. These errors may pose a safety risk to anyone using the system. Some of these errors can be abused by malicious parties to achieve goals that are not in alignment with the wishes of a legitimate user. The answer to this problem is twofold. By advancing the processes and technologies that we use to develop information systems we lower the number of errors and weaknesses that the system has prior to its use. By carefully monitoring usage of the system after deployment, we lower the risk of abuse of errors that were not corrected during developement.
+Information technologies and systems have found use in almost all aspects of human life. From personal communication and entertainment to industrial manufacturing, services and commerce. Because of this widespread adoption, safety and security of information systems and the data they hold have become a major concern. Throughout the years, development and administration of information systems has shown to be a complex task and errors are a common occurence. These errors may pose a safety risk to anyone using the system. Moreover, some of these errors can be abused by malicious parties to achieve goals that are not in alignment with the wishes of a legitimate user. The answer to this problem is twofold. By advancing the processes and technologies that we use to develop information systems, we lower the number of errors and weaknesses that the system has prior to its use. By carefully monitoring usage of the system after deployment, we lower the risk of abuse of errors that were not discovered and corrected during developement.
 
-\emph{Malware} is a term used to describe any software tools primarily designed for malicious use against a host information system. Common uses include causing damage to the host system, denying usage of the host to legitimate users and theft of data and computing resources. Depending on its purpose and method of transfer, malware can be classified into several families. For example a \emph{trojan} is malware that is introduced into a host, often by a legitimate user, disguising itself as harmless software. On the other hand a \emph{worm} often abuses an error in the host system to gain access. Both of these are examples of malware that function as standalone pieces of software. \emph{Viruses}, in contrast to trojans and worms, need a host file or software to propagate. The term \emph{payload} is often used to describe the code that will carry out the intended use of the malware. A \emph{keylogger} will log keystrokes to gather sensitive information about the systems users, while a \emph{backdoor} will grant access to the host system to an illegitimate user.
+\emph{Malware} is a term used to describe any software primarily designed for malicious use against a host information system. Common uses include causing damage to the host system, denying usage of the host to legitimate users, and theft of data and computing resources. Depending on its purpose and method of transfer, malware can be classified into several families. For example, a \emph{trojan} is malware that is introduced into a host, often by a legitimate user, disguising itself as harmless software. On the other hand, a \emph{worm} often abuses an error in the host system to gain access. Both of these are examples of malware that function as standalone pieces of software. \emph{Viruses}, in contrast to trojans and worms, need a host file or software to propagate. The term \emph{payload} is often used to describe the code that will carry out the intended use of the malware. A \emph{keylogger} will log keystrokes to gather sensitive information about the systems users, while a \emph{backdoor} will grant access to the host system to an illegitimate user.
 
-%Malware economy + figure
+As a means to protect information systems and user data, security systems were developed. Examples include \emph{firewalls}, which come in the form of hardware and software or \emph{intrusion detection} and \emph{intrusion prevention} systems. But probably the most common security system is \emph{antivirus} software. The former can be described as passive measures since they mitigate threats that are already being carried out by a human agent or malware. Antiviruses, on the other hand, were originally designed to protect against malware by actively scanning files present in the host system.
 
-As a means to protect information systems and user data, security systems were developed. Examples include \emph{firewalls}, which come in the form of hardware and software or \emph{intrusion detection} and \emph{intrusion prevention} systems. But probably the most common security system is an \emph{antivirus} software. The former can be described as passive measures, since they mitigate threats that are already being carried out by a human agent or malware. Antiviruses on the other hand were originally designed to protect against malware by actively scanning files present in the host system.
+With the introduction of antiviruses, malware authors had to come up with ways to hide the presence of their malware in a host system. One method of achieving this is \emph{obfuscation}. The goal of obfuscation is to make malware hard to distinguish from legitimate software by changing the malware in a way that preserves its original functionality or purpose. Obfuscations that primarily change how the malware appears as a file, are called \emph{syntactic}, while those which change how the malware functions while preserving its intended purpose are referred to as \emph{semantic}.
 
-With the introduction of antiviruses, malware authors had to come up with ways to hide the presence of their malware in a host system. One method of achieving this is \emph{obfuscation}. The goal of obfuscation is to make malware hard to distinguish from legitimate software by changing the malware in a way that preserves its original functionality or purpose. This also makes detection a per system task if the obfuscations are applied in a randomized manner, since the same malware can differ in some way from system to system. Obfuscations can change the malware on several levels. Obfuscations that primarily change how the malware appears as a file, are called \emph{syntactic}, while those which change how the malware functions while preserving its intended purpose are referred to as \emph{semantic}. On the other end, antivirus software needs to implement methods that can detect malware despite being obfuscated. As with malware, detectors can be classified as syntactic or \emph{signature based} and semantic or in other words \emph{behavioral}.
+As a reponse, antivirus developers needed to implement methods that can detect malware despite being obfuscated. As with malware, detection methods that focus on the appearance of malware as a file in a host system are syntactic, or often referred to as \emph{signature based}, while methods that focus on the functionality of the malware are semantic, or often called \emph{behavioral}. Historically, signature-based detection was preferred for its speed and scalability. However as obfuscation techniques evolved, the number of malware that could bypass signature-based detection increased. Today the focus has shifted towards behavioral detection.
 
-The goal of this work is to research applications of formal analysis and verification to behavioral malware detection and present a proof of concept malware detector that applies these methods. The work begins by giving a brief introduction to the challenges of detecting obfuscated malware in chapter \ref{ch_malware}. In order to detect and classify malicious behavior descriptions obtained by static analysis, suitable models and methods are proposed in chapter \ref{ch_prelim}. The {LLVM} compiler infrastructure and its intermediate representation is also introduced in chapter \ref{ch_prelim} as a means to implement the mentioned static analyses. The design and implementation of a proof-of-concept detector prototype is described in chapter \ref{ch_detector}. Finally conclusion with a discussion about choices that were made with possible alternatives and potential for future work is given in chapter \ref{ch_conclusion}.
+The area of \emph{formal analysis and verification} offers several approaches to behavioral detection. One of these approaches is \emph{static analysis}. The idea behind static analysis is to gather data about possible behaviors of software directly from its code. In the context of behavioral detection, the gathered data can be used to decide whether the analyzed code is malware by comparing it to data gathered from known malware samples.
+
+The goal of this work is to explore applications of static analysis to behavioral malware detection and implement a prototype detector that applies static analysis in its detection process. The work begins by giving a brief introduction to the challenges of detecting obfuscated malware in Chapter \ref{ch_malware}. In order to detect and classify malicious behavior descriptions obtained by static analysis, suitable models and methods are proposed in Chapter \ref{ch_prelim}. The \textsc{LLVM} compiler infrastructure and its intermediate representation is also introduced in Chapter \ref{ch_prelim} as a means to implement the mentioned static analyses. The design and implementation of a detector prototype is described in Chapter \ref{ch_detector}. Finally conclusion with a discussion about choices that were made with possible alternatives and potential for future work is given in chapter \ref{ch_conclusion}.
 
 \chapter{Malware Detection}
 \label{ch_malware}
@@ -174,9 +178,9 @@ With the advent of strongly polymorphic and metamorphic malware syntactic detect
 
 The problem of strongly obfuscated malware was further demonstrated by the outbreak of the Storm worm in 2007. The authors of Storm did not equip the worm with its own mutation engine, instead they released a large number of mutations in bursts into the public internet. This way the antivirus companies were not able to reverse-engineer the worms mutation engine, thus come up with a suitable heuristic detection procedure in time.
 
-The proposed solution to this are behavioral detection methods, which abstract from how the malicious behavior is implemented and aim to detect the malicious behavior itself. Many of the detection methods are directly related to methods used in software testing and quality assurance. The advantage of this approach is its generality and robustness against any kind of syntactic obfuscation. The main disadvantage is the high computational complexity of these methods. 
+The proposed solution to this are behavioral detection methods, which abstract from how the malicious behavior is implemented and aim to detect the malicious behavior itself. Many of the detection methods are directly related to methods used in software testing and quality assurance. The advantage of this approach is its generality and robustness against any kind of syntactic obfuscation. The main disadvantage is the high computational complexity of these methods. Figure \ref{fig_gen_behav_detector} shows the structure of a generic behavioral detector and serves as a reference point when classifying behavioral detectors.
 
-Figure \ref{fig_gen_behav_detector} shows a schema of a generic behavioral detector. After initial data collection a higher abstraction is built by interpreting the collected data. This abstraction can now be used to enrich the database of malicious behavior signatures if the input is known to be malicious. If the input is not known to be malicious a matching of the abstraction is done against the database. Finally a prediction whether the input is malicious or not is made. If the input is malicious, its behavior abstraction can be used to enrich the database further.
+The first phase of the detection process is data collection. In this phase the input malware executable is analyzed, and raw characteristics about its behavior are collected. These characteristics can be logs of actions the malware made while executed in a controlled environment or assembly code obtained by disassembly of the executable file. Raw characteristics tend to be very fine grained and need refining. This is done in the interpretation phase, where the raw characteristics are analyzed and a high-level abstraction is built. Action logs are typically interpreted into high-level events, like establishing a network connection. Assembly code can be further analyzed to obtain dataflow or control flow graphs. High-level abstractions can be used in two ways. If the input executable is known to be malicious, the abstraction is used to generate a behavioral signature to enrich the signature database used for matching. If the abstraction is unknown, it is matched against the signatures in the database. The matching algorithm, the form of a behavioral signature and the high-level abstraction are closely related. If the abstraction is a sequence of high-level events, a state machine can be used as a behavioral signature and matching is performed by checking if the state machine accepts the sequence. In the case of a dataflow graph, the signature is typically a smaller dataflow graph representing malicious dataflow and the matching is done by checking if the malicious dataflow graph is present in the unknown dataflow graph.
 
 \begin{figure}[H]
     \centering
@@ -187,17 +191,17 @@ Figure \ref{fig_gen_behav_detector} shows a schema of a generic behavioral detec
 
 Figure \ref{fig_behav_det_tax} shows a taxonomy of behavioral detectors as presented in \cite{Jacob08}. The diagram is vertically split into two parts according to the general approach to detection. The parts themselves are divided further horizontally to describe the data structures and algorithms used in each of the detection stages introduced in figure \ref{fig_gen_behav_detector}. Finally the lower part of the figure shows how behavioral signatures are generated from known malware, while the upper part shows how behavior is extracted from the environment in which malware can appear.
 
+\begin{figure}[H]
+    \centering
+    \scalebox{0.33}{\includegraphics{fig/gen_behav_tax.pdf}}
+    \caption{A taxonomy of behavioral detectors}
+    \label{fig_behav_det_tax}
+\end{figure}
+
 \subsection{Simulation-based Detection}
 Based in black-box testing, this method analyzes malware behavior in a monitored environment during execution. This environment may be controlled, in which case code emulation is employed, or in some applications the malware may be left to run on a live host.
 
 \paragraph*{Data collection} Detectors of this type perform data collection by monitoring events that the malware causes in the host system, be it a controlled environment or a live host. Sequences of these events are called \emph{traces}. An example of a trace is a sequence of system calls or a sequence of sent network packets.
-
-\begin{figure}[H]
-    \centering
-    \scalebox{0.35}{\includegraphics{fig/gen_behav_tax.pdf}}
-    \caption{A taxonomy of behavioral detectors}
-    \label{fig_behav_det_tax}
-\end{figure}
 
 \paragraph*{Interpretation} Traces are then often interpreted into \emph{atomic behaviors}. These often represent a high level event in the host system e.g. opening of a file or establishing a network connection. Atomic behaviors can then be organized into sequences forming a behavioral fingerprint of an inspected process.
 
@@ -212,13 +216,13 @@ Behavioral detection is commonly associated with dynamic analysis. This may seem
 
 \paragraph*{Interpretation} Once a suitable code representation is obtained, methods for formal analysis and verification can be applied to build an abstraction of the program behavior. The abstraction should model the program behavior in such a way that is robust against obfuscations, but on the other hand should also provide a precise enough description so that false positives stay low. Common abstractions include annotated semantic graphs derived from the program data or control flow, expressions in abstract algebras or the state space of the malware.
 
-\paragraph*{Matching} Algorithms used for matching are directly linked to the chosen abstractions and often can be reduced to solving problems tied to the abstraction. In the case of annotated semantic graphs, matching can be reduced to the subgraph isomorphism problem, where malicious behavior signatures are represented as graph fragments and matched. In the case of abstract algebra, the program abstraction is reduced using rewriting rules and checked for equivalence with signatures represented by expressions as well. Finally in the case of a state space abstraction, model checking algorithms are used to investigate whether malicious properties represented by temporal logic formulae are satisfied by the state space.
+\paragraph*{Matching} Algorithms used for matching are directly linked to the chosen abstractions and often can be reduced to solving problems tied to the abstraction. In the case of annotated semantic graphs, matching can be reduced to the subgraph isomorphism problem, where malicious behavioral signatures are represented as graph fragments and matched. In the case of abstract algebra, the program abstraction is reduced using rewriting rules and checked for equivalence with signatures represented by expressions as well. Finally in the case of a state space abstraction, model checking algorithms are used to investigate whether malicious properties represented by temporal logic formulae are satisfied by the state space.
 
 The main advantage of detection by formal verification is that all possible execution paths, therefore all possible behaviors of a potential malware are analyzed. This means that techniques used to thwart dynamic analysis have little effect. The main disadvantages however are the complexity of static extraction, since binary code is generally difficult to analyze and can be obfuscated easily and the computational complexity of the algorithms used for interpretation and matching. For example general subgraph isomorphism is a NP-complete\cite{Garey79} problem while LTL model checking is a PSPACE-complete problem\cite{Sistla85}.
 
 \chapter{Preliminaries}
 \label{ch_prelim}
-This chapter introduces theoretical concepts that underlie the methods and algorithms used in the behavioral detector presented in chapter \ref{ch_detector} as well as the {LLVM} compiler infrastructure used to implement it. Abstract interpretation is introduced as a general framework for building static program analyses and tree automata are presented as the formal model used for matching abstracted program behavior with known malicious behavior signatures. The sections on static analysis and abstract interpretation are based on \cite{FAV_Slides16} and corresponding chapters from \cite{Nielson05}. Parts on tree automata and related notions are based on \cite{tata07} and \cite{Babic11}. Finally the overview of the {LLVM} project and its intermediate representation is based on \cite{LLVM14}.
+This chapter introduces theoretical concepts that underlie the methods and algorithms used in the behavioral detector presented in chapter \ref{ch_detector} as well as the \textsc{LLVM} compiler infrastructure used to implement it. Abstract interpretation is introduced as a general framework for building static program analyses and tree automata are presented as the formal model used for matching abstracted program behavior with known malicious behavioral signatures. The sections on static analysis and abstract interpretation are based on \cite{FAV_Slides16} and corresponding chapters from \cite{Nielson05}. Parts on tree automata and related notions are based on \cite{tata07} and \cite{Babic11}. Finally the overview of the \textsc{LLVM} project and its intermediate representation is based on \cite{LLVM14}.
 
 \section{Static Analysis}
 The definition of what constitutes a static program analysis varies. Generally the term is used to describe any kind of automated collection of information about a computer program without executing the program. Under this definition, static analyses range from a simple search for syntactic patterns to precise computations over a program abstraction and even model checking which systematically searches the state space of a program.
@@ -305,29 +309,28 @@ Let $I = (Q, \circ, \sqsubseteq, \bot, \top, \tau)$ be an abstract interpretatio
 To ensure certain properties of the abstract interpretation with regard to the analyzed program, one may employ \emph{Galois connections}. The most common property investigated is \emph{soundness} which ensures that the abstraction over-approximates the behavior of the analyzed program and thus can only produce false positives. In the context of malware detection, this means that it may find malicious behavior that is present in the abstract domain, but not in the program itself, assuming a precise specification of what malicious behavior is given.
 
 \section{Tree Automata}
+\label{s_tree_automata}
 Introduced as a generalization of word languages in formal language theory, tree languages describe sets of directed trees or \emph{terms}. Their defining formalisms \emph{tree automata} and \emph{regular tree grammars} found a wide array of uses. Automata in areas of formal verification and automated reasoning as parts of decision procedures for logics. Grammars in areas of computational linguistics and programming languages.
 
 \subsection{Ranked Alphabets, Terms and Trees}
 \begin{defn}[\emph{Ranked Alphabet}]
-Let $\mathcal{F}$ be a finite set of symbols, $\mathbb{N}$ the set of natural numbers and $Arity: \mathcal{F} \rightarrow \mathbb{N}$ a function. A \emph{ranked alphabet} is the tuple $(\mathcal{F}, Arity)$. The \emph{arity} of a symbol $f \in \mathcal{F}$ is denoted $Arity(f)$ and the set $\mathcal{F}_p = \{f \; | \; f \in F \wedge Arity(f) = p\}$ is the set of symbols of arity $p$. Symbols of arity $0, 1, \dots, p$ are respectively called constants, unary symbols, \dots, $p$-ary symbols.
+Let $\mathcal{F}$ be a finite set of symbols, $\mathbb{N}$ the set of natural numbers and $arity: \mathcal{F} \rightarrow \mathbb{N}$ a function. A \emph{ranked alphabet} is the tuple $(\mathcal{F}, arity)$. The \emph{arity} of a symbol $f \in \mathcal{F}$ is denoted $arity(f)$ and the set $\mathcal{F}_n = \{f \; | \; f \in F \wedge arity(f) = n\}$ is the set of symbols of arity $p$. Symbols of arity $0, 1, \dots, p$ are respectively called constants, unary symbols, \dots, $n$-ary symbols.
 \end{defn}
 
 \begin{defn}[\emph{Terms}]
-Let $\mathcal{F}$ be a ranked alphabet and $\mathcal{X}$ a set of constants called \emph{variables}. We assume that $\mathcal{F}_0 \cap \mathcal{X} = \emptyset$. The set $T(\mathcal{F}, \mathcal{X})$ of \emph{terms} over the ranked alphabet $\mathcal{F}$ and variables $\mathcal{X}$ is the smallest set defined by:
+Let $\mathcal{F}$ be a ranked alphabet. The set $T(\mathcal{F})$ of \emph{terms} over the ranked alphabet $\mathcal{F}$ is the smallest set defined by:
 \begin{itemize}
-    \item $\mathcal{F}_0 \subseteq T(\mathcal{F}, \mathcal{X})$,
-    \item $\mathcal{X} \subseteq T(\mathcal{F}, \mathcal{X})$,
-    \item if $p \geq 1, \; f \in \mathcal{F}_p, \; t_1,\dots, t_p \in T(\mathcal{F}, \mathcal{X})$, then $f(t_1,\dots, t_p) \in T(\mathcal{F}, \mathcal{X})$.
+    \item $\mathcal{F}_0 \subseteq T(\mathcal{F})$,
+    \item if $n \geq 1, \; f \in \mathcal{F}_n, \; t_1,\dots, t_n \in T(\mathcal{F})$, then $f(t_1,\dots, t_n) \in T(\mathcal{F})$.
 \end{itemize}
-If $\mathcal{X} = \emptyset$ then $T(\mathcal{F}, \mathcal{X})$ is also written as $T(\mathcal{F})$. A term $t \in T(\mathcal{F})$ is called a \emph{ground term}. A term $t \in T(\mathcal{F}, \mathcal{X})$ is \emph{linear} if each variable occurs at most once in $t$.
 \end{defn}
 
 \begin{defn}[\emph{Tree Domain}]
 Let $\mathbb{N}$ be the set of natural numbers and $\mathbb{N}^*$ the \emph{free monoid}\footnote{for a definition see \cite{Lothaire83}} generated by $\mathbb{N}$ with concatenation $(\cdot)$ as the operation and the empty string $\varepsilon$ as the identity. The \emph{prefix order} $(\leq) \subseteq \mathbb{N}^* \times \mathbb{N}^*$ is defined as: $u \leq v \overset{\text{def}}{\Longleftrightarrow} \exists w \in \mathbb{N}^*: v = u \cdot w$. For $u \in \mathbb{N}^*$ and $n \in \mathbb{N}$, the \emph{length} $|u|$ is defined inductively: $|\varepsilon| = 0, \; |u \cdot n| = |u| + 1$. A set $S$ is \emph{prefix-closed} if $u \leq v \wedge v \in S \Rightarrow u \in S$. A \emph{tree domain} is a finite non-empty prefix-closed set $D \subset \mathbb{N}^*$ satisfying the following property: $u \cdot n \in D \Rightarrow \forall 1 \leq j \leq n: u \cdot j \in D$.
 \end{defn}
 
-\begin{defn}[\emph{Finite Ordered Tree}]
-Let $T(\mathcal{F}, \mathcal{X})$ be a set of terms and $D$ a tree domain. A term $t \in T(\mathcal{F}, \mathcal{X})$ can be represented as a \emph{finite ordered tree} which is a mapping $t: D \rightarrow \mathcal{F} \cup \mathcal{X}$ satisfying the following:
+\begin{defn}[\emph{Finite Tree}]
+Let $T(\mathcal{F})$ be a set of terms and $D$ a tree domain. A term $t \in T(\mathcal{F})$ can be represented as a \emph{finite tree} which is a mapping $t: D \rightarrow \mathcal{F}$ satisfying the following:
 \begin{itemize}
     \item $\forall u \in D:$ if $t(u) \in \mathcal{F}_n, \; n \geq 1$ then $\{j \; | \; u \cdot j \in D\} = \{1, \dots, n\}$
     \item $\forall u \in D:$ if $t(u) \in \mathcal{F}_0$ then $\{j \; | \; u \cdot j \in D\} = \emptyset$
@@ -336,11 +339,10 @@ The domain of tree $t$ shall be written as $dom(t)$ and each element in $dom(t)$
 \end{defn}
 
 \begin{defn}[\emph{Height}]
-Let $t \in T(\mathcal{F}, \mathcal{X})$ be a term. The \emph{height} of the term $t$, denoted $height(t)$ is defined inductively as
+Let $t \in T(\mathcal{F})$ be a term. The \emph{height} of the term $t$, denoted $height(t)$ is defined inductively as
 \begin{equation*}
     height(t) = 
     \begin{cases}
-        0 & \text{ if } t \in \mathcal{X}\\
         1 & \text{ if } t \in \mathcal{F}_0\\
         1 + max(\{height(t_i) \; | \; i \in \{1, \dots, n\}\}) & \text{ if } t(\varepsilon) \in \mathcal{F}_n
     \end{cases}
@@ -355,69 +357,45 @@ Let $t \in T(\mathcal{F}, \mathcal{X})$ be a term. The \emph{height} of the term
 \end{figure}
 
 \begin{defn}[\emph{Subterm}]
-Let $t \in T(\mathcal{F}, \mathcal{X})$ be a term. A \emph{subterm} of $t$ at position $p$ denoted $t|_p$ is defined by the following:
+Let $t \in T(\mathcal{F})$ be a term. A \emph{subterm} of $t$ at position $p$ denoted $t|_p$ is defined by the following:
 \begin{itemize}
     \item $dom(t|_p) = \{j \; | \; pj \in dom(t)\}$,
     \item $\forall q \in dom(t|_p): t|_p(q) = t(pq)$.
 \end{itemize}
 \end{defn}
 
-\begin{defn}[\emph{Substitution}]
-A \emph{substitution} is a mapping $\sigma: \mathcal{X} \rightarrow T(\mathcal{F}, \mathcal{X})$ such that the domain of $\sigma$ is a subset of variables $x \in \mathcal{X}$ and $\sigma(x) \neq x$. The substitution $\{x_1 \leftarrow t_1, \dots, x_n \leftarrow t_n\}$ is an identity on $\mathcal{X} \setminus \{x_1, \dots, x_n\}$ and maps $x_i \in \mathcal{X}$ on $t_i \in T(\mathcal{F}, \mathcal{X})$, for $1 \leq i \leq n$. A \emph{ground substitution} is a substitution into $T(\mathcal{F})$, meaning that all variables in a term $t \in T(\mathcal{F}, \mathcal{X})$ are substituted. Substitutions can be extended to $T(\mathcal{F}, \mathcal{X})$ in the following manner: $$\forall f \in \mathcal{F}_n, \; \forall t_1, \dots, t_n \in T(\mathcal{F}, \mathcal{X}): \sigma(f(t_1, \dots, t_n)) = f(\sigma(t_1), \dots, \sigma(t_n)).$$
-\end{defn}
-
-\begin{figure}[H]
-    \centering
-    \scalebox{0.7}{\includegraphics{fig/tree_sub.pdf}}
-    \caption{An example of a substitution $\sigma = \{x_1 \leftarrow a, x_2 \leftarrow g(b,b)\}$ to a term $t = f(x_1, x_2, x_2)$}
-    \label{fig_tree_sub}
-\end{figure}
-
-\begin{defn}[\emph{Context}]
-Let $\mathcal{X}_n$ be a set of variables. A linear term $C \in T(\mathcal{F}, \mathcal{X}_n)$ is called a \emph{context} and the expression $C[t_1,\dots,t_n]$ denotes the term $C\{x_1 \leftarrow t_1, \dots, x_n \leftarrow t_n\}$ for $t_1, \dots, t_n \in T(\mathcal{F})$. We denote by $\mathcal{C}^n(\mathcal{F})$ the set of contexts over $(x_1, \dots, x_n)$. As a special case we denote by $\mathcal{C}(\mathcal{F})$ the set of contexts over a single variable. A context is \emph{trivial} if it is reduced to a single variable. Given a context $C \in \mathcal{C}(\mathcal{F})$, we denote by $C^0$ the trivial context, $C^1$ is equal to $C$ and $C^n = C^{n-1}[C]$ is a context in $\mathcal{C}(\mathcal{F})$.
-\end{defn}
-
 \subsection{Finite Tree Automata}
-An extension of finite automata which work on words, finite tree automata deal with finite ordered ranked trees --- meaning the trees are over a ranked alphabet, or finite ordered trees with bounded rank --- meaning that the trees can be encoded as finite ordered ranked trees. Indeed words over a finite alphabet can be viewed as terms over a ranked alphabet of unary symbols and a constant acting as a terminator. For example the word $xyz$ over the alphabet $\Sigma = \{x,y,z\}$ ca be viewed as the term $t = x(y(z(\#)))$ over the ranked alphabet $\mathcal{F} = \{x(), y(), z(), \#\}$ where $\#$ is the added constant.
+An extension of finite automata which work on words, finite tree automata deal with finite trees over a ranked alphabet. Indeed words over a finite alphabet can be viewed as terms over a ranked alphabet of unary symbols and a constant acting as a terminator. For example the word $xyz$ over the alphabet $\Sigma = \{x,y,z\}$ ca be viewed as the term $t = x(y(z(\#)))$ over the ranked alphabet $\mathcal{F} = \{x(), y(), z(), \#\}$ where $\#$ is the added constant.
 
 Similarly to finite automata, finite tree automata can be deterministic and nondeterministic. Finite tree automata however have different properties depending on how the computation of the automaton is performed. When the computation starts from the leaves of the tree working its way to the root, the automaton is referred to as \emph{bottom-up}. In the opposite case the automaton is a \emph{top-down} one.
 
-Depending on the direction of computation, determinism has different consequences on the expressive power of the automaton. Determnistic bottom-up finite tree automata have the same power as nondeterministic ones and nondeterministic top-down ones. However deterministic top-down finite tree automata are less powerful \cite{tata07}. This work will only consider finite bottom-up tree automata onwards, referring to them as FTA.
+Depending on the direction of computation, determinism has different consequences on the expressive power of the automaton. Determnistic bottom-up finite tree automata have the same power as nondeterministic ones and nondeterministic top-down ones. However deterministic top-down finite tree automata are less powerful \cite{tata07}. This work will only consider finite deterministic bottom-up tree automata onwards, referring to them as FDTA.
 
-\begin{defn}[\emph{Finite Bottom-Up Tree Automaton}]
-A \emph{nondeterministic} FTA over a ranked alphabet $\mathcal{F}$ is a tuple $$\mathcal{A} = (Q, \mathcal{F}, Q_f, \Delta)$$ where
+\begin{defn}[\emph{Finite Deterministic Bottom-Up Tree Automaton}]
+A FDTA over a ranked alphabet $\mathcal{F}$ is a tuple $$\mathcal{A} = (Q, \mathcal{F}, \delta, Q_f)$$ where
 \begin{itemize}
-    \item $Q$ is the set of (unary) states
-    \item $Q_f \subseteq Q$ is the set of final states
-    \item $\Delta$ is the set of transition rules of the form $f(q_1(x_1), \dots, q_n(x_n)) \rightarrow q(f(x_1, \dots, x_n))$, where $n \geq 0$, $f \in \mathcal{F}$, $q_1, \dots, q_n \in Q$, $x_1, \dots, x_n \in \mathcal{X}$.
+    \item $Q$ is a set of states,
+    \item $Q_f \subseteq Q$ is a set of final states,
+    \item $\delta = \bigcup_i\delta_i$ is a set of transition relations defined $\delta_0:\mathcal{F}_0 \rightarrow Q$ and $\delta_n:(\mathcal{F}_n \times Q^n) \rightarrow Q$ for $n > 0$.
 \end{itemize}
-A FTA is \emph{deterministic} if no two rules in $\Delta$ have the same left-hand side.
 \end{defn}
 
-\begin{defn}[\emph{Move Relation}]
-Let $\mathcal{A} = (Q, \mathcal{F}, Q_f, \Delta)$ be a NFTA over $\mathcal{F}$. The \emph{move relation} $\rightarrow_{\mathcal{A}}$ between terms $t,t' \in T(\mathcal{F} \cup Q)$ is defined by
+\begin{defn}[\emph{Recognized Tree Language}]
+Let $t \in T(\mathcal{F})$ be a term and $\mathcal{A} = (Q, \mathcal{F}, \delta, Q_f)$ an FDTA. The relation $\delta_{\mathcal{A}} : T(\mathcal{F}) \rightarrow Q$ describes the run of FDTA $\mathcal{A}$ on $t$ recursively as:
 \begin{equation*}
-    t \rightarrow_{\mathcal{A}} t' \Leftrightarrow
+    \delta_{\mathcal{A}}(t) = 
     \begin{cases}
-        \exists C \in \mathcal{C}(\mathcal{F} \cup Q), \exists u_1, \dots, u_n \in T(\mathcal{F}),\\
-        \exists f(q_1(x_1), \dots, q_n(x_n)) \rightarrow q(f(x_1, \dots, x_n)) \in \Delta,\\
-        t = C[f(q_1(u_1), \dots, q_n(u_n))],\\
-        t = C[q(f(u_1, \dots, u_n))].
+        \delta_0(f) & \text{ if } t(\varepsilon)=f \wedge f \in \mathcal{F}_0\\
+        \delta_n(f, \delta_{\mathcal{A}}(t_1), \dots, \delta_{\mathcal{A}}(t_n)) & \text{ if } t(\varepsilon)=f(t_1, \dots, t_n) \wedge f \in \mathcal{F}_n
     \end{cases}
-\end{equation*}
-By $\rightarrow_{\mathcal{A}}^{*}$ we denote the transitive and reflective closure of $\rightarrow_{\mathcal{A}}$.
+\end{equation*} 
+The tree language \emph{recognized} by FDTA $\mathcal{A}$ is the set $L(\mathcal{A}) = \{t\; | \; t \in T(\mathcal{F}) \wedge \delta_{\mathcal{A}}(t) \in Q_f\}$.
 \end{defn}
-
-\begin{defn}[\emph{Recognizable Tree Language}]
-A ground term $t \in T(\mathcal{F})$ is \emph{accepted} by a FTA $\mathcal{A} = (Q, \mathcal{F}, Q_f, \Delta)$ if $$t \rightarrow_{\mathcal{A}}^{*} q(t)$$ for some $q \in Q_f$. The set of all ground terms accepted by $\mathcal{A}$, written as $L(\mathcal{A})$, is called the tree language \emph{recognized} by $\mathcal{A}$. A tree language $L$ is \emph{recognizable} if there is a FTA $\mathcal{A}$ for which $L(\mathcal{A}) = L$.
-\end{defn}
-
-Consider a NFTA $\mathcal{A} = (Q, \mathcal{F}, Q_f, \Delta)$ where $Q = \{q_a, q_g, q_f\}$, $\mathcal{F} = \{f(,), g(), a\}$, $Q_f = \{q_f\}$ and $\Delta = \{a \rightarrow q_a(a), \; g(q_a(x)) \rightarrow q_g(g(x)), \; f(q_g(x), q_g(y)) \rightarrow q_f(f(x,y))\}$. Figure \ref{fig_ta_run} shows an accepting run of $\mathcal{A}$ on the term $t = f(g(a), g(a))$.
 
 \begin{figure}[H]
     \centering
     \scalebox{0.6}{\includegraphics{fig/ta_run.pdf}}
-    \caption{An example of an accepting run of a FTA}
+    \caption{An accepting run of a FDTA $\mathcal{A} = (Q, \mathcal{F}, \delta, Q_f)$ on term $t = f(g(a), g(a))$. $Q = \{q_a, q_g, q_f\}, \mathcal{F} = \{f(,), g(), a\}, \delta_0(a) = q_a, \delta_1(g, q_a) = q_g, \delta_2(f, q_g, q_g) = q_f, Q_f = \{q_f\}$.}
     \label{fig_ta_run}
 \end{figure}
 
@@ -429,7 +407,7 @@ The solution is either to learn from positive and negative samples or restrictin
 \emph{K-testable languages} present a subclass of regular languages for which the membership of a string can be decided based on the membership of substrings of a bounded length. This section presents \emph{k-testable tree languages} and the construction of a minimal tree automaton from positive samples only.
 
 \begin{defn}[\emph{Placeholders}]
-Let $\mathcal{F}$ be a ranked alphabet and $\Xi = \{\xi_f \; | \; f \in \bigcup_{i>0} \mathcal{F}_i\}$ be a new set of variables called \emph{placeholders} such that $\Xi \cap \mathcal{F} = \emptyset$. A variable $\xi_f \in \Xi$ can only be substituted with a tree $t$ for which $t(\varepsilon) = f$. Let $T(\mathcal{F}, \Xi)$ denote the set of trees over the ranked alphabet and placeholders.
+Let $\mathcal{F}$ be a ranked alphabet and $\Xi = \{\xi_f \; | \; f \in \bigcup_{i>0} \mathcal{F}_i\}$ be a new set of constants called \emph{placeholders} such that $\Xi \cap \mathcal{F} = \emptyset$. A constant $\xi_f \in \Xi$ can only be substituted with a tree $t$ for which $t(\varepsilon) = f$. Let $T(\mathcal{F}, \Xi)$ denote the set of trees over the ranked alphabet and placeholders.
 \end{defn}
 
 \begin{defn}[\emph{Link}]
@@ -437,15 +415,33 @@ Let $t, t' \in T(\mathcal{F}, \Xi)$ be trees. The link operation $t\#t'$ is defi
 \begin{equation*}
     (t\#t')(n) = 
     \begin{cases}
-        t(n) & \text{ if } t(n) \notin \Xi \vee (t(n) = \xi_f \wedge f = t'(\varepsilon))\\
-        t'(z) & \text{ if } n = y \cdot z, \; t(y) = \xi_{t'(\varepsilon)}, \; y \in dom(y), \; z \in dom(t')
+        t(n) & \text{ if } t(n) \notin \Xi \vee (t(n) = \xi_f \wedge f \neq t'(\varepsilon))\\
+        t'(z) & \text{ if } n = y \cdot z, \; t(y) = \xi_{t'(\varepsilon)}, \; y \in dom(t), \; z \in dom(t')
     \end{cases}
 \end{equation*}
 \end{defn}
 
+Intuitively the link $(t\#t')(n)$ over represents a substitution of tree $t'$ into tree $t$ at point $n$ in $t$. For the operation to be successful $t$ needs to have a placeholder symbol $\xi_f$ on position $n$ and $t$ needs to have symbol $f$ as its root. If these conditions are met, the placeholder symbol in $\xi_f$ in $t$ is replaced by $t'$. Otherwise the operation does nothing and the result is the unchanged tree $t$. An example of a link operation is shown in Figure \ref{fig_link}.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.6}{\includegraphics{todo.pdf}}
+    \caption{Link Operation}
+    \label{fig_link}
+\end{figure}
+
 \begin{defn}[\emph{Tree Quotient}]
 Let $t, t' \in T(\mathcal{F})$ be trees. The \emph{tree quotient} $t^{-1}t'$ is defined as $$t^{-1}t' = \{t'' \in T(\mathcal{F}, \Xi) \; | \; t' = t'' \# t\}$$
 \end{defn}
+
+Given trees $t$ and $t'$ without placeholder symbols, the tree quotient $t^{-1}t$ is set of trees containing placeholder symbols and for each tree $t''$ in the set has the property, that $t$ can be linked into $t''$ to form $t$. Figure \ref{fig_quot} illustrates the construction of a tree quotient. Furthermore, the tree quotient operation can also be extended to sets in the following manner: $t^{-1}S = \{t^{-1}t \; | \; t' \in S\}$.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.6}{\includegraphics{todo.pdf}}
+    \caption{Tree Quotient}
+    \label{fig_quot}
+\end{figure}
 
 \begin{defn}[\emph{K-Root}]
 Let $t \in T(\mathcal{F})$ be a tree. For $k \geq 0$ a \emph{k-root} of $t$ is defined as:
@@ -464,17 +460,17 @@ Let $L \subseteq T(\mathcal{F})$ be a tree language. $L$ is $k$-testable in the 
 \end{thm}
 
 \begin{defn}[\emph{Root Equivalence}]
-Trees $t_1, t_2 \in T(\mathcal{F})$ are \emph{root-equivalent with degree k} for some $k \geq 0$, denoted $t_1 ~_k t_2$ if and only if $root_k(t_1) = root_k(t_2)$. The $\sim_k$ relation is also a congruence of finite index.
+Trees $t_1, t_2 \in T(\mathcal{F})$ are \emph{root-equivalent with degree k} for some $k \geq 0$, denoted $t_1 \sim_k t_2$ if and only if $root_k(t_1) = root_k(t_2)$. The $\sim_k$ relation is also a congruence of finite index.
 \end{defn}
 
-\begin{defn}[\emph{$\sim_k$-induced Tree Automaton}]
-Let $T' \subseteq T(\mathcal{F})$ be finite set of finite trees. The $A^{\sim_k}(T') = (Q, \mathcal{F}, Q_f, \Delta_0 \cup \Delta_n)$ automaton induced by the root equivalence relation $\sim_k$ is defined as:
-\begin{gather*}
-    Q = \{root_k(t') \; | \; \exists t \in T': \exists u \in dom(T'): t'|_u\}\\
-    Q_f = \{root_k(t) \; | \; t \in T'\}\\
-    \Delta_0 = \{f \rightarrow f(f) \; | \; f \in \mathcal{F}_0\}\\
-    \Delta_n = \{f(root_k(t_1)(t_1), \dots, root_k(t_n)(t_n)) \rightarrow root_k(f)(f(t_1, \dots, t_n))\ \; | \; n \geq 1, \; f \in \mathcal{F}_n\}
-\end{gather*}
+\begin{defn}[\emph{$\sim_k$-Induced Tree Automaton}]
+Let $T' \subseteq T(\mathcal{F})$ be finite set of trees. The $A^{\sim_k}(T') = (Q, \mathcal{F}, \delta, Q_f)$ automaton induced by the root equivalence relation $\sim_k$ is defined as:
+\begin{align*}
+    Q &= \{root_k(t') \; | \; \exists t \in T': \exists u \in dom(T'): t'|_u\}\\
+    Q_f &= \{root_k(t) \; | \; t \in T'\}\\
+    \delta_0(f) &= f \text{ for } f \in \mathcal{F}_n\\
+    \delta_n(f, root_k(t_1), \dots, root_k(t_n)) &= root_k(f(t_1, \dots, t_n)) \text{ for } n \geq 1, \; f \in \mathcal{F}_n
+\end{align*}
 \end{defn}
 
 \begin{thm}[\cite{Babic11}]
@@ -485,24 +481,24 @@ $L(A^{\sim_k})$ is $k$-testable in the strict sense.
 $L(A^{\sim_{k+1}}) \subseteq L(A^{\sim_k})$
 \end{thm}
 
-\section{The {LLVM} Compiler Infrastructure}
-{LLVM} is a collection of tools and libraries for building compilers, toolchain technologies and code analyzers. At the core of the framework is the {LLVM} intermediate representation (IR). {LLVM IR} is a SSA-based, RISC-like assembly language used to represent code throughout the framework. The IR code can be serialized into a textual or binary form, which allows for compile-time, link-time and even "idle-time" transformations. The core {LLVM} tools are built around the IR and manipulate it. The tools include an assembler to the binary format of the IR, disassembler to the textual form of the IR, an optimizer that runs transformation passes over the IR, a linker which combines serialized IR files and several others.
+\section{The \textsc{LLVM} Compiler Infrastructure}
+\textsc{LLVM} is a collection of tools and libraries for building compilers, toolchain technologies and code analyzers. At the core of the framework is the \textsc{LLVM} intermediate representation (IR). \textsc{LLVM IR} is a \textsc{SSA}-based, \textsc{RISC}-like assembly language used to represent code throughout the framework. The IR code can be serialized into a textual or binary form, which allows for compile-time, link-time and even "idle-time" transformations. The core \textsc{LLVM} tools are built around the IR and manipulate it. The tools include an assembler to the binary format of the IR, disassembler to the textual form of the IR, an optimizer that runs transformation passes over the IR, a linker which combines serialized IR files and several others.
 
-A number of projects have been made using the {LLVM} framework. The original project is Clang, a compiler front-end for C-like programming languages. However thanks to its language-agnostic nature, front ends for other static and dynamic languages have been made as well as implementations of runtime environments like the Java Virtual Machine.
+A number of projects have been made using the \textsc{LLVM} framework. The original project is Clang, a compiler front-end for C-like programming languages. However thanks to its language-agnostic nature, front ends for other static and dynamic languages have been made as well as implementations of runtime environments like the Java Virtual Machine.
 
-Another group of projects are static and dynamic code analyzers. Clang includes its own built-in static analyzer which aims to highlight common mistakes and inefficiencies a programmer can make. Another static analyzer is {KLEE}, which uses symbolic execution, a form of abstract interpretation, to generate test cases for code represented in {LLVM IR}. The last example of a static analyzer built on {LLVM} is {LLBMC}, a bounded model checker. As for dynamic analysis, {LLVM} includes several code instrumentation tools, called "sanitizers", which generate additional code for runtime analysis.
+Another group of projects are static and dynamic code analyzers. Clang includes its own built-in static analyzer which aims to highlight common mistakes and inefficiencies a programmer can make. Another static analyzer is \textsc{KLEE}, which uses symbolic execution, a form of abstract interpretation, to generate test cases for code represented in \textsc{LLVM IR}. The last example of a static analyzer built on \textsc{LLVM} is \textsc{LLBMC}, a bounded model checker. As for dynamic analysis, \textsc{LLVM} includes several code instrumentation tools, called "sanitizers", which generate additional code for runtime analysis.
 
 \subsection{Intermediate Representation}
-The {LLVM IR} is a target-independent, typed assembly language. The code represented in the IR is in the \emph{single static assignment} form which means that each variable in the IR is only assigned once. This means that each use of a variable can be easily traced back to its definition, which immensely simplifies analysis and transformations of the IR. The number of variables that can be assigned this way is not limited. Figure \ref{fig_llvmir} shows a piece of C code and the corresponding {LLVM IR}.
+The \textsc{LLVM IR} is a target-independent, typed assembly language. The code represented in the IR is in the \emph{single static assignment} form which means that each variable in the IR is only assigned once. This means that each use of a variable can be easily traced back to its definition, which immensely simplifies analysis and transformations of the IR. The number of variables that can be assigned this way is not limited. Figure \ref{fig_llvmir} shows a piece of C code and the corresponding \textsc{LLVM IR}.
 
 \begin{figure}[H]
     \centering
     \scalebox{0.65}{\includegraphics{fig/llvmir.pdf}}
-    \caption{A C function and the {LLVM IR} equivalent}
+    \caption{A C function and the \textsc{LLVM IR} equivalent}
     \label{fig_llvmir}
 \end{figure}
 
-\paragraph*{Module} The contents of a single {LLVM IR} file, be it binary bitcode or textual assembly form a module. A module is the top-level data structure in {LLVM IR}. The module contains information about target architecture, declarations of structured data types, declarations of external functions, global variables and a list of function definitions. The relationships between functions are apparent on this level and form a \emph{call graph}, in which nodes represent functions and an edge from $A$ to $B$ means that function $A$ calls function $B$ in its body.
+\paragraph*{Module} The contents of a single \textsc{LLVM IR} file, be it binary bitcode or textual assembly form a module. A module is the top-level data structure in \textsc{LLVM IR}. The module contains information about target architecture, declarations of structured data types, declarations of external functions, global variables and a list of function definitions. The relationships between functions are apparent on this level and form a \emph{call graph}, in which nodes represent functions and an edge from $A$ to $B$ means that function $A$ calls function $B$ in its body.
 
 \begin{figure}[H]
     \centering
@@ -511,9 +507,9 @@ The {LLVM IR} is a target-independent, typed assembly language. The code represe
     \label{fig_callgraph}
 \end{figure}
 
-\paragraph*{Function} Each function in {LLVM IR} has a list of formal arguments, a return type and a body consisting of basic blocks. Additionally it can have a number of optional attributes specifying a garbage collector, exception information, linkage type and so on. The first basic block in a function is denoted by the \texttt{entry} label. Local variables have a \texttt{\%} prefix while global variables have a \texttt{@} one. Relationships between basic blocks are apparent on this level and form a \emph{control flow graph}.
+\paragraph*{Function} Each function in \textsc{LLVM IR} has a list of formal arguments, a return type and a body consisting of basic blocks. Additionally it can have a number of optional attributes specifying a garbage collector, exception information, linkage type and so on. The first basic block in a function is denoted by the \texttt{entry} label. Local variables have a \texttt{\%} prefix while global variables have a \texttt{@} one. Relationships between basic blocks are apparent on this level and form a \emph{control flow graph}.
 
-\paragraph*{Basic Block} A collection of IR instructions that is always executed sequentially. A basic block begins with a label that is used to reference the basic block in control flow instructions and ends with a terminator instruction, usually a \texttt{br} instruction which jumps to a label of another basic block or a \texttt{ret} instruction, which exits the function. Each basic block has a list of successors and predecessors in the control flow graph. In some cases the value of a variable in the basic block is dependent on the predecessor. To maintain SSA form a \emph{$\phi$-instruction} must be present in the basic block before the use of the variable.
+\paragraph*{Basic Block} A collection of IR instructions that is always executed sequentially. A basic block begins with a label that is used to reference the basic block in control flow instructions and ends with a terminator instruction, usually a \texttt{br} instruction which jumps to a label of another basic block or a \texttt{ret} instruction, which exits the function. Each basic block has a list of successors and predecessors in the control flow graph. In some cases the value of a variable in the basic block is dependent on the predecessor. To maintain \textsc{SSA} form a \emph{$\phi$-instruction} must be present in the basic block before the use of the variable.
 
 \begin{figure}[H]
     \centering
@@ -524,25 +520,27 @@ The {LLVM IR} is a target-independent, typed assembly language. The code represe
 
 \chapter{Detector Implementation}
 \label{ch_detector}
-The general structure of a behavioral malware detector was introduced in chapter \ref{ch_malware}, section~\ref{s_behav_det}. This chapter introduces a proof-of-concept detector prototype which uses methods of formal analysis and verification. Since a robust and complete implementation of a behavioral malware detector exceeds the format of this work, simplifications with regard to the general detector scheme were made.
+This chapter introduces a prototype detector which uses methods of formal analysis and verification. Since a complete implementation of a behavioral detector exceeds the format of this work, the detector only implements the interpretation, signature generation and matching phase of the generic behavioral malware detector defined in Chapter \ref{ch_malware}, Section~\ref{s_behav_det}. Figure \ref{fig_detector} shows a schema of the implemented detector.
 
-Most significantly static extraction has been replaced by an obfuscating compiler\cite{ollvm} capable of generating random mutations of malware written in C and C++. The output of the obfuscating compiler is an {LLVM IR} binary file which represents a raw characterictic in the general detector scheme. A set of mutations can be obtained by repeatedly running the compiler on the same malware source code.
+The data collection phase is replaced by an \textsc{LLVM}-based obfuscating compiler \cite{ollvm}. Given a malware source code written in C or C++, the compiler is used to generate a mutation of the malware by randomly applying the obfuscations implemented in the compiler. The compiler is then set to output an \textsc{LLVM IR} file. This file represents a raw characteristics in the context of the generic detector. A set of mutations can be obtained by running the compiler repeatedly on the same source code. Details about the malware source code and applied obfuscations are given in Section \ref{s_ollvm}.
 
-Interpretation of the raw characteristics is done by static taint analysis, which can be formalized as an abstract interpretation. The goal of the analysis is to provide information about the analyzed malware which is used to form a behavioral signature. The signature needs to represent the malicious behavior precisely enough to minimize false negatives and abstract from other behavior to stay the same across mutations and not produce false positives on bening software. \emph{Syscall dependency graphs} were chosen for this purpose and correspond to the abstraction in the general detector scheme. Section \ref{s_abstractiob} covers details about dependency graphs and static taint analysis.
+The interpretation phase is done by analyzing the obfuscated \textsc{LLVM IR} files using \emph{static taint analysis}. The analysis is formalized as an abstract interpretation of \textsc{LLVM IR} code and implemented as a pass over \textsc{LLVM IR} using the tools and libraries available in the \textsc{LLVM} framework. The analysis outputs a \emph{syscall dependency graph} which is used as the high-level abstraction of the malware's behavior. Section \ref{s_sdg} covers the details about static taint analysis and syscall dependency graphs.
 
-A set of dependency graphs is used to infer a classifier in the form of an automaton accepting a $k$-testable tree language. Since dependency graphs are general directed graphs, post-processing of the graphs needs to be done before inference. The matching phase of the general detector schema is done by checking whether an unknown dependency graph is accepted by an automaton inferred from dependency graphs of known malware. Post-processing of dependency graphs and inference algorithms are described in Section \ref{s_inference}.
+The signature generation phase is done by inferring a $k$-testable tree automaton from a training set of syscall dependency graphs. The matching phase is done by using a $k$-testable tree automaton on a syscall dependency graph. Both of the phases use algorithms presented in \cite{Babic11} and are implemented in a research prototype available at \cite{BabicWWW}. Section \ref{s_inference} covers the details about signature generation and matching.
 
 \begin{figure}[H]
     \centering
     \scalebox{0.65}{\includegraphics{todo.pdf}}
-    \caption{Diagram of the implemented detector}
+    \caption{Schema of the prototype detector}
     \label{fig_detector}
 \end{figure}
 
-\section{Input Generation}
-To reliably design a malware detector, representative inputs were needed. The first challenge when implementing the prototype was to find suitable malware source code. However malware is typically found in the form of binary files and source code is rare. Thankfully various internet community forums, such as \cite{rohitab}, provided examples of C and C++ code that exhibits typical malicious behavior. Three different keyloggers and two file infecting viruses were obtained. The complexity of the samples ranges from simple single-threaded code to multi-threaded code in which each thread is responsible for different malicious behavior.
+\section{Mutation Generation}
+\label{s_ollvm}
+As mentioned in Chapter \ref{ch_malware}, malware is most commonly found in the form of binary executable files. Obtaining malware in the form of C or C++ code was the first challenge. Thankfully various internet community forums, such as \cite{rohitab} host discussion about developing malware and often provide examples for educational and hobbyist purposes. The obtained source code samples target hosts running various versions of the Windows operating system and use various functions of the Windows API. The samples include three implementations of a keylogger and two file infecting viruses. The complexity of the implementations ranges from simple single-threaded code to multi-threaded code in which each thread is responsible for different malicious behavior. 
 
-\subsection{Obfuscator-{LLVM}} A modified {Clang/LLVM} compiler was used to generate mutations of the acquired malware samples. Obfuscator-{LLVM}, or \texttt{ollvm} for short, was built for the purpose of intellectual property protection, however its obfuscating transformations of {LLVM IR} can be well used for generating malware mutations. Four kinds of obfuscations are available in the public version of the compiler, one of which is instruction substitution which is covered in chapter~\ref{ch_malware}, section~\ref{s_polymorph}. The description of the other three follows.
+\subsection{Obfuscator-\textsc{LLVM}}
+Mutations are generated from the obtained malware source code by using Obfuscator-\textsc{LLVM}, or \texttt{ollvm} for short. The obfuscating compiler was built for the purpose of intellectual property protection, but its obfuscating transformations of \textsc{LLVM IR} can be used for the purpose of mutation generation. Four obfuscating transformations are available in the public version of \texttt{ollvm}. One of these is instruction substitution, which is covered in Chapter~\ref{ch_malware}, Section~\ref{s_polymorph}. The description of the other three follows.
 
 \paragraph{Basic Block Splitting} As the name suggests, this transformation splits basic blocks at random locations and recovers original control flow by inserting unconditional branch instructions. The main purpose of this transformation is to amplify the effect of other obfuscations in \texttt{ollvm}.
 
@@ -573,10 +571,11 @@ Futhermore some junk code is added into the original and the cloned basic block 
     \label{fig_bcf}
 \end{figure}
 
-\section{Abstracting Behavior}
-\label{s_abstraction}
-%taint analysis and call dependency graphs, specifying taint sources and sinks in {LLVM IR}, taint analysis formalized as abstract interpretation, algorithm descriptions
-After generating malware mutations the detector builds abstractions of their behavior in the form of \emph{syscall dependency graphs}, or SDGs for short. SDGs are directed graphs where nodes are calls to functions provided by the operating system and an edge from $A$ to $B$ tells that data computed from the result of a $A$ is used by $B$. Figure \ref{fig_sdg} shows an example of a malware SDG.
+\section{Interpretation}
+\label{s_sdg}
+The interpretation phase of the prototype detector analyzes \textsc{LLVM IR} by using static taint anlysis and builds a syscall dependency graph. A syscall dependency graphs (\textsc{SDG}) is a directed graph and acts as a high-level abstraction of program behavior. Nodes of the graph represent calls to functions provided by the operating system and an edge from node $A$ to node $B$ represents a data dependecy between the calls. The dependency can be described as "call $B$ uses data computed from the result of call $A$". Figure \ref{fig_sdg} shows an example of a malware \textsc{SDG}. 
+
+SDGs were chosen as the behavior abstraction because they abstract from all internal computations of the malware (where most obfuscations happen) and focus only on how the malware interacts with its host system. Although some aspects of the interaction be changed through obfuscation, for example, the order in which the syscalls are made, the dependecies between them generally do not change. Static taint analysis provides the information needed to build an \textsc{SDG} by tracking the flow of data between two points in code.
 
 \begin{figure}[H]
     \centering
@@ -585,10 +584,8 @@ After generating malware mutations the detector builds abstractions of their beh
     \label{fig_sdg}
 \end{figure}
 
-The reason why SDGs were chosen is because they abstract from all of the internal computations of the malware, where most obfuscations happen, and focus only on how the malware interacts with its host system. Although certain aspects of the interaction can change between mutations, e.g., the order in which the syscalls are made, the dependecies between them generally do not change. To get the information needed to build an SDG, static taint analysis is performed.
-
 \subsection{Static Taint Analysis}
-The idea behind static taint analysis is to mark the data we wish to track as tainted, mark the origins of tainted data as \emph{taint sources} and mark points beyond which we do not track tainted data as \emph{taint sinks}. Taints then flow through the code according to predefined \emph{propagation rules}. A formalization of this concepts is given in Definition \ref{def_taint} and the implemented algorithm is described in Algorithm \ref{alg_taint}.
+The idea behind static taint analysis is to mark the data we wish to track as tainted, mark the origins of tainted data as \emph{taint sources} and mark points beyond which we do not track tainted data as \emph{taint sinks}. Taints then flow through the code according to predefined \emph{propagation rules}. This notion is formalized in definition \ref{def_taint}.
 
 \begin{defn}
 \label{def_taint}
@@ -617,23 +614,163 @@ For an abstract context $C$ and an instruction \texttt{I}:
 \end{itemize}
 \end{defn}
 
-\begin{algorithm}[H]
-    \begin{algorithmic}
-        \State{\textbf{Input:} Function F in {LLVM IR};}
-        \State{\textbf{Output:} Abstract Context $C_n$ such that $C_{n-1} = C_n$;}
-        \State{}
-        \State$Q_{K} := \{s_{K}\}; \; \Sigma_{K} := \Sigma_{T}; \; R_{K} := \{\}; \; F_{K} := \{\}; \; A~:= \{\}; \; B := \{\}; \; C := \{\}; \; D := \{\}$;
-    \end{algorithmic}
-    \caption{Static taint analysis algorithm over an {LLVM IR} function}
-    \label{alg_taint}
+\paragraph*{Taint Sources and Sinks} The first step when implementing static taint analysis over \textsc{LLVM IR} is to define taint sources and taint sinks. Since the goal is to build an \textsc{SDG}, data flowing from one syscall to another needs to be tracked. In \textsc{LLVM IR}, syscalls can be recognized as calls to functions provided by the Windows API. However \textsc{LLVM IR} does not provide a way to efficiently distinquish between functions from the Windows API and other externally referenced functions. A robust solution to this problem would be to build a list of Windows API functions and check the name of functions against the list. This would however introduce a significant time overhead to the work. A reasonable approximation was found by inspecting the input \textsc{LLVM IR}. All Windows API functions had a \texttt{dllimport} tag associated with them, which made them stand out among other functions.
+
+\paragraph*{Abstract Contexts} After recognizing taint sinks and sources, abstract contexts need to be defined. These are straightforward since \textsc{LLVM} provides map-like data structures for mapping \textsc{LLVM IR} variables onto arbitrary data structures and types, including sets of instruction references. This way every \textsc{LLVM IR} variable has a set of references to call instructions associated with it in a map.
+
+\paragraph*{Abstract Transformers} Finally abstract transformers create, sink and propagate taints between abstract contexts. A call instruction in \textsc{LLVM IR} calls a function with a set of arguments and returns a single result which is assigned according to the \textsc{SSA} form. In this case the transformers can use the explicit def-use chains provided by \textsc{LLVM IR} and easily propagate taints from sources to sinks and tainting variables along the way. However a large number of functions in the Windows API returns results via variables passed by a pointer reference. In these cases the \textsc{SSA} form does not apply and the taints need to be propagated differently. Algorithm \ref{alg_taint} describes the propagation of taints in such a setting. It is also important to note that on line 18, the algorithm updates a whole program SDG $G$. This is done precisely because the output abstract contexts do not reflect the evolution of variables passed into call instructions by a pointer reference. Another solution would be track evolution of such variables in separate abstract contexts or implement a \textsc{SSA} form for memory in \textsc{LLVM IR}.
+
+\begin{algorithm}[hbt]
+\KwIn{Function $F$, Empty abstract contexts $C_{B_1}, \dots, C_{B_n}$, SDG $G$;}
+\KwOut{Filled abstract contexts $\{C_{B_1}, \dots, C_{B_n}\}$, Updated SDG $G$;}
+\BlankLine
+Queue $W \leftarrow \emptyset$\;
+\ForEach{basic block B in F}{
+    $W.enqueue(B)$\;
+}
+\While{$W \neq \emptyset$}{
+    $B \leftarrow W.dequeue()$\;
+    $C_{new} \leftarrow \emptyset$\;
+    \ForEach{predecessor P of B}{
+        $C_{new} \leftarrow C_{new} \circ C_P$\;
+    }
+    \ForEach{instruction I in B}{
+        \If{I is a taint sink}{
+            \ForEach{operand O of I}{
+                \If{O is pointer-type variable}{
+                    $C_{new}(O) \leftarrow \emptyset$\;
+                }
+                \ForEach{taint T in $C_{new}(O)$}{
+                    add edge $(T,I)$ to SDG $G$\;
+                }
+            }
+        }
+        \eIf{I is a taint source}{
+            \ForEach{operand O of I}{
+                \If{O is pointer-type variable}{
+                    $C_{new}(O) \leftarrow C_{new}(O) \cup \{I\}$\;
+                }
+            }
+            $C_{new}(I) \leftarrow C_{new}(I) \cup \{I\}$\;
+        }{
+            \ForEach{operand O of I}{
+                $C_{new}(I) \leftarrow C_{new}(I) \cup C_{new}(O)$\;
+            }
+        }
+    }
+    \If{$C_{new} \neq C_{B}$}{
+        $C_{B} \leftarrow C_{new}$\;
+        \ForEach{successor S of B}{
+            $W.enqueue(S)$\;
+        }
+    }
+}
+\caption{Static Taint Analysis}
+\label{alg_taint}
 \end{algorithm}
 
-In the detector implementation, taint sinks and taint sources coincide and are represented by {LLVM IR} call instructions which call a function that is tagged with \texttt{dllimport}. While the tag isn't tailored to this purpose, it is a good and easy approximation. A precise solution would require an enumeration of all the functions that the operating system provides.
+\subsection{Graph Unfolding}
+After running static taint analysis on all functions in an \textsc{LLVM} module, a complete SDG for that module is obtained. However, the \textsc{SDG} is a general directed graph and in most cases will contain cycles that need to be unfolded before the \textsc{SDG} can be used in the signature generation phase of the detector. The easiest way to unfold cycles in graphs is to use a breadth-first search (\textsc{BFS}) or depth-first search (\textsc{DFS}) algorithm. This results in a set of trees, which is ideal for inference of tree automata, but information about call dependencies is lost from the \textsc{SDG}.
 
-\section{Classifier Inference}
-\ref{s_inference}
-graph post-processing (dir. cyc. graph -> DAG -> Tree), brief desc. of TA inference implementation
-\section{Testing and Results}
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{Unfolding of an SDG using BFS and the custom unfolder}
+    \label{fig_unfold}
+\end{figure}
+
+\begin{algorithm}[H]
+\KwIn{SDG $G = (V,E)$, back edge $(u,v)$, factor $k$}
+\KwOut{SDG $G$ with cycle containing $(u,v)$ unfolded}
+\BlankLine
+\ForEach{$1 \leq i \leq k$}{
+    Queue $Q \leftarrow \{v\}$, $C \leftarrow \{v\}$, $c \leftarrow \emptyset$, $n \leftarrow \emptyset$, $e \leftarrow (u,v)$\;
+    \BlankLine
+    \While{$Q \neq \emptyset$}{
+        $a \leftarrow Q.dequeue()$\;
+        $a' \leftarrow copy(a)$\;
+        \ForEach{node $b$ adjacent to $a$}{
+            $b' \leftarrow copy(b)$\;
+            $V \leftarrow V \cup \{a',b'\}$\;
+            $E \leftarrow E \cup \{(a',b')\}$\;
+            \If{(a,b) = e}{
+                $c \leftarrow (a,b')$\;
+                $n \leftarrow (a',b')$\;
+            }
+            \If{$b \notin C$}{
+                $C \leftarrow C \cup \{b\}$\;
+                $Q.enqueue(b)$\;
+            }
+        }
+    }
+    $E \leftarrow E \setminus \{e\}$\;
+    $E \leftarrow E \cup \{c\}$\;
+    $e \leftarrow n$\;
+}
+$E \leftarrow E \setminus \{e\}$\;
+\caption{Unfolder}
+\label{alg_unfolder}
+\end{algorithm}
+
+The graph resulting from using Algorithm \ref{alg_unfolder} introduces significant blowup to the \text{SDG} as a drawback. The blowup can be justified by the fact that when cycles are unfolded this way, it pronounces the behavior a cycle in the \textsc{SDG} would have at runtime. Figure \ref{fig_unfold} shows the two possible approaches to unfolding side by side.
+
+\section{Signature generation}
+\label{s_inference}
+Signature generation is done by inferring a $k$-testable tree automaton from a training set of \textsc{SDG}s. The algorithms for inferring a $k$-testable tree automaton from trees and directed acyclic graphs are taken from \cite{Babic11}. The author also provides an implementation of these algorithms at \cite{BabicWWW}. The detector takes advantage of this implementation and uses it to implement the matching part of the general detector schema.
+This section will provide a brief description of the algorithms using formal terminology established in Chapter \ref{ch_prelim}, Section \ref{s_tree_automata}.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.65}{\includegraphics{todo.pdf}}
+    \caption{Folding into a maximally-shared graphs}
+    \label{fig_msg}
+\end{figure}
+
+The major advantage of algorithms presented in \cite{Babic11} is the ability to infer $k$-testable tree automata from directed acylic graphs, thus avoiding unfolding to trees, which could cause an exponential blowup of the \textsc{SDG}. The idea of the approach is to eliminate reduntant subgraphs in the input \textsc{SDG} and make symbols share subgraphs they agree on. The result is a \emph{maximally-shared graph}.
+Figure \ref{fig_msg} shows how a tree and a directed acyclic graph can be folded into a maximally-shared graph. Algorithm \ref{alg_kroot}, which describes the computation of $k$-roots on trees, but can be easily extended to work on maximally-shared graphs.
+
+\begin{algorithm}[H]
+\KwIn{Tree $t$, factor $k$}
+\KwOut{Key computed for every subtree of $t$}
+\BlankLine
+$tmp \leftarrow hash(t(\varepsilon))$\;
+\ForEach{$1 \leq i \leq arity(t(\varepsilon))$}{
+    $t_s \leftarrow t|_i$\;
+    $tmp \leftarrow tmp \oplus hash(t_s.key)$\;
+    ComputeKey$(t_s,k)$\;
+}
+$t.key \leftarrow tmp$\;
+\caption{ComputeKey -- Computation of $k$-Root Keys (Hashes)}
+\label{alg_kroot}
+\end{algorithm}
+
+Algorithm \ref{alg_kroot} traverses tree $t$ recursively in postorder. Every subtree has a field $key$ associated with its root and the field is initially set to a zero value. The $\oplus$ operator can be any operation that can combine hashes, e.g., a bitwise XOR. The $hash: \mathcal{F} \rightarrow \mathbb{N}$ function can be any function used to compute integer hashes from string labels of symbols in the ranked alphabet. When the algorithm is called once, $key$ fields of all subtree roots $t_s$ contain a hash of their own symbol only. When called twice, the fields will contain hashes of subtree roots and their children. This way, after $k$ calls, the $key$ fields will contain a hash for the $k$-root of their subtrees. The extension of the algorithm to maximally shared graphs is done by tracking the visited nodes and making sure that each node is visited once. When processing graphs with multiple roots (or a set of graphs), an auxiliary super-root is created, the original roots are connected to the super-root and the algorithm is called $k$ times with the super-root as the operand.
+
+Algorithm \ref{alg_tainfer} constructs the $A^{\sim_k}$ automaton, by traversing the tree (or maximally-shared graph) $t$ in postorder. The algorithm creates states and transition relations of the automaton using representatives of $\sim_k$-induced equivalence classes stored in the $rep$ hash map, with representative of $t$ being the final state. As before, graphs with multiple roots are handled via a super-root.
+
+\begin{algorithm}[h]
+\KwIn{Tree $t$, factor $k$, alphabet $\mathcal{F}$}
+\KwOut{$A^{\sim_k} = (Q, \mathcal{F}, \delta, Q_f)$}
+\BlankLine
+$Q \leftarrow \emptyset, \; \delta \leftarrow \emptyset, \; Q_f \leftarrow \emptyset$\;
+\ForEach{subtree $t_s \in \{t|_u \; | \; u \in dom(t)\}$ traversed in postorder}{
+    \If{$rep[t_s.key]$ = $\emptyset$}{
+        $q \leftarrow root_k(t_s)$\;
+        $rep[t_s.key] \leftarrow q$\;
+        $Q \leftarrow Q \cup \{q\}$\;
+    }
+    $n \leftarrow arity(t_s(\varepsilon))$\;
+    $\delta_n \leftarrow \delta_n \cup \big\{\big((t_s(\varepsilon), rep[(t_s|_1).key], \dots, rep[(t_s|_n).key]), \; rep[t_s.key]\big)\big\}$\;
+    $\delta \leftarrow \delta \cup \delta_n$\;
+}
+$Q_f \leftarrow Q_f \cup \{rep[t.key]\}$\;
+\Return{$(Q, \mathcal{F}, \delta, Q_f)$}
+\caption{$k$-Testable Tree Automaton Inference}
+\label{alg_tainfer}
+\end{algorithm}
+
+\chapter{Detector Testing}
+\label{ch_testing}
 test set, detection threshold, results
 \chapter{Conclusion}
 \label{ch_conclusion}

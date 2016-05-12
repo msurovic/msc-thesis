@@ -25,6 +25,7 @@
 \@writefile{toc}{\contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{loa}{\addvspace {10\p@ }}
 \citation{Cohen86}
 \citation{Filiol12}
 \citation{Christo07}
@@ -37,6 +38,7 @@
 \@writefile{toc}{\contentsline {chapter}{\numberline {2}Malware Detection}{5}{chapter.2}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{loa}{\addvspace {10\p@ }}
 \newlabel{ch_malware}{{2}{5}{Malware Detection}{chapter.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.1}Obfuscation and Malware Taxonomy}{5}{section.2.1}}
 \citation{Symatec08}
@@ -71,9 +73,9 @@
 \citation{Jacob08}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.10}{\ignorespaces A generalized behavioral detector}}{11}{figure.2.10}}
 \newlabel{fig_gen_behav_detector}{{2.10}{11}{A generalized behavioral detector}{figure.2.10}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Simulation-based Detection}{11}{subsection.2.3.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.11}{\ignorespaces A taxonomy of behavioral detectors}}{12}{figure.2.11}}
 \newlabel{fig_behav_det_tax}{{2.11}{12}{A taxonomy of behavioral detectors}{figure.2.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Simulation-based Detection}{12}{subsection.2.3.1}}
 \citation{Garey79}
 \citation{Sistla85}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3.2}Detection via Formal Verification}{13}{subsection.2.3.2}}
@@ -85,6 +87,7 @@
 \@writefile{toc}{\contentsline {chapter}{\numberline {3}Preliminaries}{14}{chapter.3}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{loa}{\addvspace {10\p@ }}
 \newlabel{ch_prelim}{{3}{14}{Preliminaries}{chapter.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.1}Static Analysis}{14}{section.3.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Partially Ordered Sets and Lattices}{14}{subsection.3.1.1}}
@@ -94,40 +97,47 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Abstract Interpretation}{16}{subsection.3.1.2}}
 \citation{Lothaire83}
 \@writefile{toc}{\contentsline {section}{\numberline {3.2}Tree Automata}{17}{section.3.2}}
+\newlabel{s_tree_automata}{{3.2}{17}{Tree Automata}{section.3.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Ranked Alphabets, Terms and Trees}{17}{subsection.3.2.1}}
+\citation{tata07}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces An example of a tree $t$ (left) and its tree domain $D$ (right). $height(t) = 3$}}{18}{figure.3.2}}
 \newlabel{fig_tree_domain}{{3.2}{18}{An example of a tree $t$ (left) and its tree domain $D$ (right). $height(t) = 3$}{figure.3.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces An example of a substitution $\sigma = \{x_1 \leftarrow a, x_2 \leftarrow g(b,b)\}$ to a term $t = f(x_1, x_2, x_2)$}}{18}{figure.3.3}}
-\newlabel{fig_tree_sub}{{3.3}{18}{An example of a substitution $\sigma = \{x_1 \leftarrow a, x_2 \leftarrow g(b,b)\}$ to a term $t = f(x_1, x_2, x_2)$}{figure.3.3}{}}
-\citation{tata07}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Finite Tree Automata}{19}{subsection.3.2.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Finite Tree Automata}{18}{subsection.3.2.2}}
 \citation{Gold78}
 \citation{Gold78}
 \citation{Garcia90}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces An example of an accepting run of a FTA}}{20}{figure.3.4}}
-\newlabel{fig_ta_run}{{3.4}{20}{An example of an accepting run of a FTA}{figure.3.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Tree Automata Inference}{20}{subsection.3.2.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces An accepting run of a FDTA $\mathcal  {A} = (Q, \mathcal  {F}, \delta , Q_f)$ on term $t = f(g(a), g(a))$. $Q = \{q_a, q_g, q_f\}, \mathcal  {F} = \{f(,), g(), a\}, \delta _0(a) = q_a, \delta _1(g, q_a) = q_g, \delta _2(f, q_g, q_g) = q_f, Q_f = \{q_f\}$.}}{19}{figure.3.3}}
+\newlabel{fig_ta_run}{{3.3}{19}{An accepting run of a FDTA $\mathcal {A} = (Q, \mathcal {F}, \delta , Q_f)$ on term $t = f(g(a), g(a))$. $Q = \{q_a, q_g, q_f\}, \mathcal {F} = \{f(,), g(), a\}, \delta _0(a) = q_a, \delta _1(g, q_a) = q_g, \delta _2(f, q_g, q_g) = q_f, Q_f = \{q_f\}$}{figure.3.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Tree Automata Inference}{19}{subsection.3.2.3}}
 \citation{Lopez04}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Link Operation}}{20}{figure.3.4}}
+\newlabel{fig_link}{{3.4}{20}{Link Operation}{figure.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Tree Quotient}}{20}{figure.3.5}}
+\newlabel{fig_quot}{{3.5}{20}{Tree Quotient}{figure.3.5}{}}
 \citation{Babic11}
 \citation{Garcia93}
-\@writefile{toc}{\contentsline {section}{\numberline {3.3}The {LLVM} Compiler Infrastructure}{21}{section.3.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Intermediate Representation}{22}{subsection.3.3.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces A C function and the {LLVM IR} equivalent}}{22}{figure.3.5}}
-\newlabel{fig_llvmir}{{3.5}{22}{A C function and the {LLVM IR} equivalent}{figure.3.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces An example of a call graph}}{22}{figure.3.6}}
-\newlabel{fig_callgraph}{{3.6}{22}{An example of a call graph}{figure.3.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Control flow graph with a $\phi $-instruction}}{23}{figure.3.7}}
-\newlabel{fig_cfg_phi}{{3.7}{23}{Control flow graph with a $\phi $-instruction}{figure.3.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}The \textsc  {LLVM} Compiler Infrastructure}{21}{section.3.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Intermediate Representation}{21}{subsection.3.3.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces A C function and the \textsc  {LLVM IR} equivalent}}{22}{figure.3.6}}
+\newlabel{fig_llvmir}{{3.6}{22}{A C function and the \textsc {LLVM IR} equivalent}{figure.3.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces An example of a call graph}}{22}{figure.3.7}}
+\newlabel{fig_callgraph}{{3.7}{22}{An example of a call graph}{figure.3.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces Control flow graph with a $\phi $-instruction}}{23}{figure.3.8}}
+\newlabel{fig_cfg_phi}{{3.8}{23}{Control flow graph with a $\phi $-instruction}{figure.3.8}{}}
 \citation{ollvm}
+\citation{Babic11}
+\citation{BabicWWW}
 \citation{rohitab}
 \@writefile{toc}{\contentsline {chapter}{\numberline {4}Detector Implementation}{24}{chapter.4}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{loa}{\addvspace {10\p@ }}
 \newlabel{ch_detector}{{4}{24}{Detector Implementation}{chapter.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Diagram of the implemented detector}}{24}{figure.4.1}}
-\newlabel{fig_detector}{{4.1}{24}{Diagram of the implemented detector}{figure.4.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}Input Generation}{25}{section.4.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Obfuscator-{LLVM}}{25}{subsection.4.1.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Schema of the prototype detector}}{24}{figure.4.1}}
+\newlabel{fig_detector}{{4.1}{24}{Schema of the prototype detector}{figure.4.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Mutation Generation}{25}{section.4.1}}
+\newlabel{s_ollvm}{{4.1}{25}{Mutation Generation}{section.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Obfuscator-\textsc  {LLVM}}{25}{subsection.4.1.1}}
 \@writefile{toc}{\contentsline {paragraph}{Basic Block Splitting}{25}{section*.19}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Basic Block Splitting}}{25}{figure.4.2}}
 \newlabel{fig_bb_split}{{4.2}{25}{Basic Block Splitting}{figure.4.2}{}}
@@ -137,26 +147,42 @@
 \@writefile{toc}{\contentsline {paragraph}{Bogus Control Flow}{26}{section*.21}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Bogus Control Flow}}{26}{figure.4.4}}
 \newlabel{fig_bcf}{{4.4}{26}{Bogus Control Flow}{figure.4.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}Abstracting Behavior}{26}{section.4.2}}
-\newlabel{s_abstraction}{{4.2}{26}{Abstracting Behavior}{section.4.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Interpretation}{26}{section.4.2}}
+\newlabel{s_sdg}{{4.2}{26}{Interpretation}{section.4.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Syscall Dependency Graph}}{26}{figure.4.5}}
 \newlabel{fig_sdg}{{4.5}{26}{Syscall Dependency Graph}{figure.4.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}Static Taint Analysis}{27}{subsection.4.2.1}}
 \newlabel{def_taint}{{4.2.1}{27}{}{defn.4.2.1}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Static taint analysis algorithm over an {LLVM IR} function}}{27}{algorithm.1}}
-\newlabel{alg_taint}{{1}{27}{Static Taint Analysis}{algorithm.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.3}Classifier Inference}{28}{section.4.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.4}Testing and Results}{28}{section.4.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}Graph Unfolding}{28}{subsection.4.2.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces Unfolding of an SDG using BFS and the custom unfolder}}{28}{figure.4.6}}
+\newlabel{fig_unfold}{{4.6}{28}{Unfolding of an SDG using BFS and the custom unfolder}{figure.4.6}{}}
+\citation{Babic11}
+\citation{BabicWWW}
+\@writefile{loa}{\contentsline {algocf}{\numberline {2}{\ignorespaces Unfolder}}{29}{algocf.2}}
+\newlabel{alg_unfolder}{{2}{29}{Graph Unfolding}{algocf.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Classifier Inference}{29}{section.4.3}}
+\newlabel{s_inference}{{4.3}{29}{Classifier Inference}{section.4.3}{}}
+\citation{Babic11}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces Folding into a maximally-shared graphs}}{30}{figure.4.7}}
+\newlabel{fig_msg}{{4.7}{30}{Folding into a maximally-shared graphs}{figure.4.7}{}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {3}{\ignorespaces ComputeKey -- Computation of $k$-Root Keys (Hashes)}}{30}{algocf.3}}
+\newlabel{alg_kroot}{{3}{30}{Classifier Inference}{algocf.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Testing and Results}{30}{section.4.4}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Static Taint Analysis}}{31}{algocf.1}}
+\newlabel{alg_taint}{{1}{31}{Abstract Transformers}{algocf.1}{}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {4}{\ignorespaces $k$-Testable Tree Automaton Inference}}{32}{algocf.4}}
+\newlabel{alg_tainfer}{{4}{32}{Classifier Inference}{algocf.4}{}}
 \bibstyle{plain}
 \bibdata{literatura}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{29}{chapter.5}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{33}{chapter.5}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{ch_conclusion}{{5}{29}{Conclusion}{chapter.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Discussion}{29}{section.5.1}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}Future Work}{29}{section.5.2}}
-\@writefile{toc}{\contentsline {chapter}{Literature}{30}{chapter*.22}}
-\@writefile{toc}{\contentsline {chapter}{Appendices}{31}{section*.23}}
-\@writefile{toc}{\contentsline {section}{List of Appendices}{32}{section*.24}}
+\@writefile{loa}{\addvspace {10\p@ }}
+\newlabel{ch_conclusion}{{5}{33}{Conclusion}{chapter.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Discussion}{33}{section.5.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}Future Work}{33}{section.5.2}}
+\@writefile{toc}{\contentsline {chapter}{Literature}{34}{chapter*.25}}
+\@writefile{toc}{\contentsline {chapter}{Appendices}{35}{section*.26}}
+\@writefile{toc}{\contentsline {section}{List of Appendices}{36}{section*.27}}
 \ttl@writefile{ptc}{\ttl@starttoc{chapters@1}}
 \ttl@finishall

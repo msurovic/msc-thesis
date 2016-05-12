@@ -9,7 +9,7 @@
 \contentsline {subsection}{\numberline {2.2.1}Algorithmic Scanning}{10}{subsection.2.2.1}
 \contentsline {subsection}{\numberline {2.2.2}Code Emulation}{10}{subsection.2.2.2}
 \contentsline {section}{\numberline {2.3}Behavioral Detection}{10}{section.2.3}
-\contentsline {subsection}{\numberline {2.3.1}Simulation-based Detection}{11}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.1}Simulation-based Detection}{12}{subsection.2.3.1}
 \contentsline {subsection}{\numberline {2.3.2}Detection via Formal Verification}{13}{subsection.2.3.2}
 \contentsline {chapter}{\numberline {3}Preliminaries}{14}{chapter.3}
 \contentsline {section}{\numberline {3.1}Static Analysis}{14}{section.3.1}
@@ -17,24 +17,25 @@
 \contentsline {subsection}{\numberline {3.1.2}Abstract Interpretation}{16}{subsection.3.1.2}
 \contentsline {section}{\numberline {3.2}Tree Automata}{17}{section.3.2}
 \contentsline {subsection}{\numberline {3.2.1}Ranked Alphabets, Terms and Trees}{17}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}Finite Tree Automata}{19}{subsection.3.2.2}
-\contentsline {subsection}{\numberline {3.2.3}Tree Automata Inference}{20}{subsection.3.2.3}
-\contentsline {section}{\numberline {3.3}The {LLVM} Compiler Infrastructure}{21}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Intermediate Representation}{22}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.2.2}Finite Tree Automata}{18}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Tree Automata Inference}{19}{subsection.3.2.3}
+\contentsline {section}{\numberline {3.3}The \textsc {LLVM} Compiler Infrastructure}{21}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Intermediate Representation}{21}{subsection.3.3.1}
 \contentsline {chapter}{\numberline {4}Detector Implementation}{24}{chapter.4}
-\contentsline {section}{\numberline {4.1}Input Generation}{25}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Obfuscator-{LLVM}}{25}{subsection.4.1.1}
+\contentsline {section}{\numberline {4.1}Mutation Generation}{25}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Obfuscator-\textsc {LLVM}}{25}{subsection.4.1.1}
 \contentsline {paragraph}{Basic Block Splitting}{25}{section*.19}
 \contentsline {paragraph}{Control Flow Flattening}{25}{section*.20}
 \contentsline {paragraph}{Bogus Control Flow}{26}{section*.21}
-\contentsline {section}{\numberline {4.2}Abstracting Behavior}{26}{section.4.2}
+\contentsline {section}{\numberline {4.2}Interpretation}{26}{section.4.2}
 \contentsline {subsection}{\numberline {4.2.1}Static Taint Analysis}{27}{subsection.4.2.1}
-\contentsline {section}{\numberline {4.3}Classifier Inference}{28}{section.4.3}
-\contentsline {section}{\numberline {4.4}Testing and Results}{28}{section.4.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{29}{chapter.5}
-\contentsline {section}{\numberline {5.1}Discussion}{29}{section.5.1}
-\contentsline {section}{\numberline {5.2}Future Work}{29}{section.5.2}
-\contentsline {chapter}{Literature}{30}{chapter*.22}
-\contentsline {chapter}{Appendices}{31}{section*.23}
-\contentsline {section}{List of Appendices}{32}{section*.24}
+\contentsline {subsection}{\numberline {4.2.2}Graph Unfolding}{28}{subsection.4.2.2}
+\contentsline {section}{\numberline {4.3}Classifier Inference}{29}{section.4.3}
+\contentsline {section}{\numberline {4.4}Testing and Results}{30}{section.4.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{33}{chapter.5}
+\contentsline {section}{\numberline {5.1}Discussion}{33}{section.5.1}
+\contentsline {section}{\numberline {5.2}Future Work}{33}{section.5.2}
+\contentsline {chapter}{Literature}{34}{chapter*.25}
+\contentsline {chapter}{Appendices}{35}{section*.26}
+\contentsline {section}{List of Appendices}{36}{section*.27}
 \contentsfinish 

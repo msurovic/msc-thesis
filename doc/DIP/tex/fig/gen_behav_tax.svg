@@ -124,9 +124,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="436.40678"
-     inkscape:cy="629.71652"
+     inkscape:zoom="1.4"
+     inkscape:cx="1428.9636"
+     inkscape:cy="80.503754"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -526,21 +526,21 @@
     <text
        xml:space="preserve"
        style="font-size:36px;font-style:oblique;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#008000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Oblique"
-       x="738.2439"
-       y="1508.6492"
+       x="726.81531"
+       y="1507.9349"
        id="text6058"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         x="738.2439"
-         y="1508.6492"
-         id="tspan4210">Behavior Model</tspan><tspan
+         x="726.81531"
+         y="1507.9349"
+         id="tspan4210">Behavioral Signature</tspan><tspan
          sodipodi:role="line"
-         x="738.2439"
-         y="1553.6492"
+         x="726.81531"
+         y="1552.9349"
          id="tspan4216">Generation</tspan><tspan
          sodipodi:role="line"
-         x="738.2439"
-         y="1598.6492"
+         x="726.81531"
+         y="1597.9349"
          id="tspan4214" /></text>
     <rect
        y="1295.438"
