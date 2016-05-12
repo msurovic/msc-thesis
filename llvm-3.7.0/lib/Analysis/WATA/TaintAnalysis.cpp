@@ -326,7 +326,7 @@ void WinAPITaintAnalysis::unfoldCycle(TaintMap& I, TaintEdge& E, int N){
         Instruction* UI = cast<Instruction>(U.first);
         AI = UI->clone();
         // TODO: Create a temporary BB into which we stash cloned instrs.
-        AI->insertAfter(UI);
+        cast<Instruction>(AI)->insertAfter(UI);
         M.insert(std::make_pair(UI, AI));
         I.insert(std::make_pair(AI, TaintSet()));
       }else{
@@ -340,7 +340,7 @@ void WinAPITaintAnalysis::unfoldCycle(TaintMap& I, TaintEdge& E, int N){
           Instruction* VI = cast<Instruction>(V.first);
           Instruction* BI = VI->clone();
           // TODO: Create a temporary BB into which we stash cloned instrs.
-          BI->insertAfter(VI);
+          cast<Instruction>(BI)->insertAfter(VI);
           M.insert(std::make_pair(VI, BI));
           I.insert(std::make_pair(BI, TaintSet()));
           B = Taint(BI, V.second);
