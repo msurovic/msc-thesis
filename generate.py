@@ -14,11 +14,13 @@ def main():
         help='Enable bogus control flow.')
     parser.add_argument('-bcf-loop', type=int, default=1,
         help='How many loops will bcf perform on a function.')
-    parser.add_argument('-spli', action='store_false',
+    parser.add_argument('-spli', action='store_true',
         help='Enable basic block splitting.')
+    parser.add_argument('-all', action='store_true',
+        help='Enable sub, fla, bcf.')
     parser.add_argument('-r', action='store_true',
         help='Apply all specified obfuscations randomly.')
-    parser.add_argument('-t', type=str, default=os.path.join(os.getcwd(), 'toolchain'),
+    parser.add_argument('-t', type=str, default=os.path.join(os.getcwd(), 'toolchain', 'bin'),
         help='Path to the ollvm toolchain.')
     parser.add_argument('-m', type=int, default=10, 
         help='Number of mutations to generate.')
@@ -31,11 +33,11 @@ def main():
 
     obf = []
 
-    if args.sub:
+    if args.sub or args.all:
         obf.append(['-mllvm', '-sub'])
-    if args.fla:
+    if args.fla or args.all:
         obf.append(['-mllvm', '-fla'])
-    if args.bcf:
+    if args.bcf or args.all:
         obf.append(['-mllvm', '-bcf', '-mllvm', '-boguscf-loop=' + str(args.bcf_loop)])
     if args.spli:
         obf.append(['-mllvm', '-spli'])
@@ -47,7 +49,11 @@ def main():
         sys.exit(1)
 
     if not os.path.exists(args.i):
-        print 'Error: input folder' + args.i + 'does not exist'
+        print 'Error: input folder ' + args.i + ' does not exist'
+        sys.exit(1)
+
+    if len(obf) == 0:
+        print 'Error: no obfuscations specified'
         sys.exit(1)
 
     if not os.path.exists(args.o):
@@ -56,7 +62,7 @@ def main():
     for file in filter(lambda x:x.endswith('.bc'), os.listdir(args.i)):
         print 'Generating for file ' + file
         for i in range(args.m):
-            flags = [['-c', '-emit-llvm']]
+            flags = [['-c', '-emit-llvm', '-Wno-override-module']]
             seed  = os.urandom(16).encode('hex')
             
             if args.r:
@@ -73,6 +79,7 @@ def main():
             outfile = file[:-3] + '-' + seed[:8] + '.bc'
             outpath = os.path.join(args.o, outfile)
 
+            #print obf
             #print [clang, infile] + flags + ['-o', outpath]
             subprocess.call([clang, infile] + flags + ['-o', outpath])
 

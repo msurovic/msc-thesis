@@ -6,7 +6,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='Generate signatures using opt and WATA.')
-    parser.add_argument('-t', type=str, default=os.path.join(os.getcwd(), 'toolchain'),
+    parser.add_argument('-t', type=str, default=os.path.join(os.getcwd(), 'toolchain', 'bin'),
         help='Path to the ollvm toolchain.')
     parser.add_argument('-i', type=str, default=os.path.join(os.getcwd(), 'mutations'),
         help='Specify input folder.')

@@ -19,7 +19,7 @@ def main():
     
     os.chdir(BuildDir)
 
-    subprocess.call(["cmake", "-G", ConfGen, ConfTarget, ConfBuild,ConfSrcDir])
+    subprocess.call(["cmake", "-G", ConfGen, ConfTarget, ConfBuild, ConfSrcDir])
     subprocess.call(["cmake", "--build", '.'])
     
 if __name__ == '__main__':
