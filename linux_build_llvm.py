@@ -9,7 +9,7 @@ def main():
     ConfBuild  = "-DCMAKE_BUILD_TYPE=Release"
     ConfSrcDir = "../llvm-3.7.0"
 
-    BuildDir = "./tools/"
+    BuildDir = "./toolchain/"
 
     if len(sys.argv) == 2 and sys.argv[1] == "clean":
         shutil.rmtree(BuildDir)
