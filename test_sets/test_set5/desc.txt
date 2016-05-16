@@ -1,0 +1,6 @@
+Samples:
+	ZeroX, CTS;
+Obfuscations:
+	fla, bcf, sub;
+Unfolding:
+	no;

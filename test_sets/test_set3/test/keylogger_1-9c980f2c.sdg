@@ -1,0 +1,125 @@
+# node count
+N 51
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 TranslateMessage 1 1
+V 3 DispatchMessageA 1 1
+V 4 GetMessageA 4 1
+V 5 TranslateMessage 1 1
+V 6 DispatchMessageA 1 1
+V 7 GetMessageA 4 1
+V 8 GetMessageA 4 1
+V 9 UnhookWindowsHookEx 1 1
+V 10 TranslateMessage 1 1
+V 11 DispatchMessageA 1 1
+V 12 GetMessageA 4 1
+V 13 SetWindowsHookExA 4 1
+V 14 GetMessageA 4 1
+V 15 UnhookWindowsHookEx 1 1
+V 16 TranslateMessage 1 1
+V 17 DispatchMessageA 1 1
+V 18 GetMessageA 4 1
+V 19 SetWindowsHookExA 4 1
+V 20 GetMessageA 4 1
+V 21 LoadLibraryA 1 1
+V 22 GetModuleHandleA 1 1
+V 23 WaitForSingleObject 2 1
+V 24 CreateThread 6 1
+V 25 %struct.HHOOK__* 0 1
+V 26 i32 0 1
+V 27 i64 0 1
+V 28 i64 0 1
+V 29 i32 0 1
+V 30 i8* 0 1
+V 31 i32 0 1
+V 32 %struct.HHOOK__* 0 1
+V 33 i32 0 1
+V 34 %struct.tagMSG* 0 1
+V 35 %struct.HHOOK__* 0 1
+V 36 %struct.tagMSG* 0 1
+V 37 i32 0 1
+V 38 i64 0 1
+V 39 %struct.HHOOK__* 0 1
+V 40 %struct.HHOOK__* 0 1
+V 41 %struct.HHOOK__* 0 1
+V 42 i8* 0 1
+V 43 i8* 0 1
+V 44 i8* 0 1
+V 45 i32 0 1
+V 46 %struct._SECURITY_ATTRIBUTES* 0 1
+V 47 i64 0 1
+V 48 i32 0 1
+V 49 i8* 0 1
+V 50 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 2:0,3:0
+E 3:0,4:0
+E 4:0,5:0
+E 5:0,6:0
+E 6:0,7:0
+E 8:0,2:0
+E 8:0,5:0
+E 10:0,11:0
+E 11:0,12:0
+E 12:0,14:0
+E 12:0,16:0
+E 12:0,20:0
+E 14:0,16:0
+E 14:0,20:0
+E 16:0,17:0
+E 17:0,18:0
+E 18:0,20:0
+E 25:0,0:0
+E 26:0,0:1
+E 27:0,0:2
+E 28:0,0:3
+E 29:0,1:0
+E 30:0,1:1
+E 31:0,1:2
+E 32:0,4:1
+E 32:0,7:1
+E 32:0,8:1
+E 32:0,12:1
+E 32:0,14:1
+E 32:0,20:1
+E 32:0,18:1
+E 33:0,4:2
+E 33:0,4:3
+E 33:0,7:2
+E 33:0,7:3
+E 33:0,8:2
+E 33:0,8:3
+E 33:0,12:2
+E 33:0,12:3
+E 33:0,14:2
+E 33:0,14:3
+E 33:0,20:2
+E 33:0,20:3
+E 33:0,13:3
+E 33:0,18:2
+E 33:0,18:3
+E 33:0,19:3
+E 33:0,24:4
+E 34:0,8:0
+E 35:0,9:0
+E 36:0,10:0
+E 37:0,13:0
+E 37:0,19:0
+E 38:0,13:1
+E 38:0,19:1
+E 39:0,13:2
+E 40:0,15:0
+E 41:0,19:2
+E 42:0,21:0
+E 43:0,22:0
+E 44:0,23:0
+E 45:0,23:1
+E 46:0,24:0
+E 47:0,24:1
+E 48:0,24:2
+E 49:0,24:3
+E 50:0,24:5
+

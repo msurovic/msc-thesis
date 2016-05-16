@@ -1,0 +1,142 @@
+# node count
+N 50
+
+# nodes declarations: V number label in_arity out_arity
+V 0 Sleep 1 0
+V 1 GetAsyncKeyState 1 1
+V 2 Sleep 1 0
+V 3 RegSetValueExA 6 1
+V 4 Sleep 1 0
+V 5 GetAsyncKeyState 1 1
+V 6 Sleep 1 0
+V 7 RegSetValueExA 6 1
+V 8 RegCreateKeyA 3 1
+V 9 RegQueryValueExA 6 1
+V 10 RegCloseKey 1 1
+V 11 AllocConsole 0 1
+V 12 FindWindowA 2 1
+V 13 ShowWindow 2 1
+V 14 RegOpenKeyExA 5 1
+V 15 RegQueryValueExA 6 1
+V 16 RegCloseKey 1 1
+V 17 RegOpenKeyExA 5 1
+V 18 RegCreateKeyA 3 1
+V 19 RegSetValueExA 6 1
+V 20 RegCreateKeyA 3 1
+V 21 RegSetValueExA 6 1
+V 22 RegSetValueExA 6 1
+V 23 RegCreateKeyA 3 1
+V 24 RegCreateKeyA 3 1
+V 25 RegSetValueExA 6 1
+V 26 i32 0 1
+V 27 i32 0 1
+V 28 i8* 0 1
+V 29 i32 0 1
+V 30 i32 0 1
+V 31 i8* 0 1
+V 32 i32 0 1
+V 33 i32 0 1
+V 34 %struct.HWND__* 0 1
+V 35 i8* 0 1
+V 36 %struct.HWND__** 0 1
+V 37 i32* 0 1
+V 38 i8* 0 1
+V 39 i32* 0 1
+V 40 i8* 0 1
+V 41 i8* 0 1
+V 42 %struct.HWND__** 0 1
+V 43 i8* 0 1
+V 44 i32* 0 1
+V 45 %struct.HWND__** 0 1
+V 46 %struct.HWND__** 0 1
+V 47 i8* 0 1
+V 48 i32 0 1
+V 49 %struct.HWND__** 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 3:0,21:0
+E 7:0,22:0
+E 8:0,3:0
+E 8:0,7:0
+E 12:0,13:0
+E 14:0,9:0
+E 14:0,10:0
+E 17:0,15:0
+E 17:0,16:0
+E 18:0,23:2
+E 20:0,19:0
+E 20:0,24:2
+E 24:0,25:0
+E 26:0,0:0
+E 26:0,2:0
+E 26:0,4:0
+E 26:0,6:0
+E 27:0,1:0
+E 28:0,3:1
+E 28:0,21:1
+E 28:0,7:1
+E 28:0,22:1
+E 28:0,9:1
+E 28:0,15:1
+E 28:0,19:1
+E 28:0,25:1
+E 29:0,3:2
+E 29:0,21:2
+E 29:0,7:2
+E 29:0,22:2
+E 29:0,13:1
+E 29:0,14:2
+E 29:0,17:2
+E 29:0,19:2
+E 29:0,25:2
+E 30:0,3:3
+E 30:0,21:3
+E 30:0,7:3
+E 30:0,22:3
+E 30:0,14:3
+E 30:0,17:3
+E 30:0,19:3
+E 30:0,25:3
+E 31:0,3:4
+E 31:0,21:4
+E 31:0,7:4
+E 31:0,22:4
+E 32:0,3:5
+E 32:0,21:5
+E 32:0,7:5
+E 32:0,22:5
+E 33:0,5:0
+E 34:0,8:0
+E 34:0,14:0
+E 34:0,17:0
+E 34:0,18:0
+E 34:0,23:0
+E 34:0,20:0
+E 34:0,24:0
+E 35:0,8:1
+E 35:0,14:1
+E 35:0,17:1
+E 35:0,18:1
+E 35:0,23:1
+E 35:0,20:1
+E 35:0,24:1
+E 36:0,8:2
+E 37:0,9:2
+E 37:0,9:3
+E 37:0,15:2
+E 37:0,15:3
+E 38:0,9:4
+E 39:0,9:5
+E 40:0,12:0
+E 41:0,12:1
+E 42:0,14:4
+E 43:0,15:4
+E 44:0,15:5
+E 45:0,17:4
+E 46:0,18:2
+E 47:0,19:4
+E 47:0,25:4
+E 48:0,19:5
+E 48:0,25:5
+E 49:0,20:2
+

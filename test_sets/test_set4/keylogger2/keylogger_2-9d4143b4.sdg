@@ -1,0 +1,124 @@
+# node count
+N 51
+
+# nodes declarations: V number label in_arity out_arity
+V 0 AllocConsole 0 1
+V 1 FindWindowA 2 1
+V 2 ShowWindow 2 1
+V 3 RegOpenKeyExA 5 1
+V 4 GetAsyncKeyState 1 1
+V 5 Sleep 1 0
+V 6 RegSetValueExA 6 1
+V 7 RegCreateKeyA 3 1
+V 8 RegQueryValueExA 6 1
+V 9 RegCloseKey 1 1
+V 10 AllocConsole 0 1
+V 11 FindWindowA 2 1
+V 12 ShowWindow 2 1
+V 13 RegOpenKeyExA 5 1
+V 14 RegQueryValueExA 6 1
+V 15 RegCloseKey 1 1
+V 16 RegOpenKeyExA 5 1
+V 17 RegSetValueExA 6 1
+V 18 RegCreateKeyA 3 1
+V 19 RegSetValueExA 6 1
+V 20 RegCreateKeyA 3 1
+V 21 i8* 0 1
+V 22 i8* 0 1
+V 23 i32 0 1
+V 24 %struct.HWND__* 0 1
+V 25 i8* 0 1
+V 26 i32 0 1
+V 27 %struct.HWND__** 0 1
+V 28 i32 0 1
+V 29 i32 0 1
+V 30 %struct.HWND__* 0 1
+V 31 i8* 0 1
+V 32 i8* 0 1
+V 33 i32 0 1
+V 34 %struct.HWND__** 0 1
+V 35 %struct.HWND__* 0 1
+V 36 i32* 0 1
+V 37 i8* 0 1
+V 38 i32* 0 1
+V 39 %struct.HWND__* 0 1
+V 40 %struct.HWND__** 0 1
+V 41 i8* 0 1
+V 42 i32* 0 1
+V 43 %struct.HWND__** 0 1
+V 44 %struct.HWND__* 0 1
+V 45 i8* 0 1
+V 46 i32 0 1
+V 47 %struct.HWND__** 0 1
+V 48 %struct.HWND__* 0 1
+V 49 i32 0 1
+V 50 %struct.HWND__** 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 1:0,2:0
+E 11:0,12:0
+E 16:0,14:0
+E 16:0,15:0
+E 21:0,1:0
+E 21:0,11:0
+E 22:0,1:1
+E 22:0,11:1
+E 23:0,2:1
+E 23:0,3:2
+E 23:0,6:2
+E 23:0,12:1
+E 23:0,13:2
+E 23:0,16:2
+E 23:0,17:2
+E 23:0,19:2
+E 24:0,3:0
+E 24:0,7:0
+E 24:0,13:0
+E 24:0,16:0
+E 24:0,18:0
+E 24:0,20:0
+E 25:0,3:1
+E 25:0,7:1
+E 25:0,13:1
+E 25:0,16:1
+E 25:0,18:1
+E 25:0,20:1
+E 26:0,3:3
+E 26:0,6:3
+E 26:0,13:3
+E 26:0,16:3
+E 26:0,17:3
+E 26:0,19:3
+E 27:0,3:4
+E 28:0,4:0
+E 29:0,5:0
+E 30:0,6:0
+E 31:0,6:1
+E 31:0,8:1
+E 31:0,14:1
+E 31:0,17:1
+E 31:0,19:1
+E 32:0,6:4
+E 33:0,6:5
+E 34:0,7:2
+E 35:0,8:0
+E 36:0,8:2
+E 36:0,8:3
+E 36:0,14:2
+E 36:0,14:3
+E 37:0,8:4
+E 38:0,8:5
+E 39:0,9:0
+E 40:0,13:4
+E 41:0,14:4
+E 42:0,14:5
+E 43:0,16:4
+E 44:0,17:0
+E 45:0,17:4
+E 45:0,19:4
+E 46:0,17:5
+E 47:0,18:2
+E 48:0,19:0
+E 49:0,19:5
+E 50:0,20:2
+

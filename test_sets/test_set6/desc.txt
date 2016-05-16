@@ -1,0 +1,6 @@
+Samples:
+	keylogger1, keylogger2;
+Obfuscations:
+	fla, bcf, sub;
+Unfolding:
+	yes;

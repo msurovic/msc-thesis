@@ -1,0 +1,255 @@
+# node count
+N 90
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 TranslateMessage 1 1
+V 3 DispatchMessageA 1 1
+V 4 GetMessageA 4 1
+V 5 GetMessageA 4 1
+V 6 UnhookWindowsHookEx 1 1
+V 7 TranslateMessage 1 1
+V 8 DispatchMessageA 1 1
+V 9 GetMessageA 4 1
+V 10 SetWindowsHookExA 4 1
+V 11 GetMessageA 4 1
+V 12 UnhookWindowsHookEx 1 1
+V 13 TranslateMessage 1 1
+V 14 DispatchMessageA 1 1
+V 15 GetMessageA 4 1
+V 16 SetWindowsHookExA 4 1
+V 17 GetMessageA 4 1
+V 18 LoadLibraryA 1 1
+V 19 GetModuleHandleA 1 1
+V 20 WaitForSingleObject 2 1
+V 21 CreateThread 6 1
+V 22 TranslateMessage 1 1
+V 23 DispatchMessageA 1 1
+V 24 GetMessageA 4 1
+V 25 UnhookWindowsHookEx 1 1
+V 26 TranslateMessage 1 1
+V 27 DispatchMessageA 1 1
+V 28 GetMessageA 4 1
+V 29 TranslateMessage 1 1
+V 30 DispatchMessageA 1 1
+V 31 GetMessageA 4 1
+V 32 TranslateMessage 1 1
+V 33 DispatchMessageA 1 1
+V 34 GetMessageA 4 1
+V 35 TranslateMessage 1 1
+V 36 DispatchMessageA 1 1
+V 37 GetMessageA 4 1
+V 38 TranslateMessage 1 1
+V 39 DispatchMessageA 1 1
+V 40 GetMessageA 4 1
+V 41 SetWindowsHookExA 4 1
+V 42 SetWindowsHookExA 4 1
+V 43 GetMessageA 4 1
+V 44 GetMessageA 4 1
+V 45 TranslateMessage 1 1
+V 46 TranslateMessage 1 1
+V 47 DispatchMessageA 1 1
+V 48 DispatchMessageA 1 1
+V 49 GetMessageA 4 1
+V 50 GetMessageA 4 1
+V 51 TranslateMessage 1 1
+V 52 TranslateMessage 1 1
+V 53 DispatchMessageA 1 1
+V 54 DispatchMessageA 1 1
+V 55 GetMessageA 4 1
+V 56 GetMessageA 4 1
+V 57 TranslateMessage 1 1
+V 58 TranslateMessage 1 1
+V 59 DispatchMessageA 1 1
+V 60 DispatchMessageA 1 1
+V 61 GetMessageA 4 1
+V 62 GetMessageA 4 1
+V 63 TranslateMessage 1 1
+V 64 DispatchMessageA 1 1
+V 65 GetMessageA 4 1
+V 66 UnhookWindowsHookEx 1 1
+V 67 %struct.HHOOK__* 0 1
+V 68 i32 0 1
+V 69 i64 0 1
+V 70 i64 0 1
+V 71 i32 0 1
+V 72 i8* 0 1
+V 73 i32 0 1
+V 74 %struct.HHOOK__* 0 1
+V 75 i32 0 1
+V 76 %struct.tagMSG* 0 1
+V 77 %struct.HHOOK__* 0 1
+V 78 i32 0 1
+V 79 i64 0 1
+V 80 %struct.tagMSG* 0 1
+V 81 %struct.HHOOK__* 0 1
+V 82 i8* 0 1
+V 83 i8* 0 1
+V 84 i32 0 1
+V 85 %struct._SECURITY_ATTRIBUTES* 0 1
+V 86 i64 0 1
+V 87 i32 0 1
+V 88 i8* 0 1
+V 89 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 2:0,3:0
+E 3:0,4:0
+E 4:0,22:0
+E 5:0,2:0
+E 6:0,25:0
+E 7:0,8:0
+E 8:0,9:0
+E 9:0,13:0
+E 10:0,16:2
+E 11:0,17:0
+E 12:0,66:0
+E 13:0,14:0
+E 14:0,15:0
+E 15:0,26:0
+E 15:0,32:0
+E 16:0,41:2
+E 17:0,7:0
+E 17:0,13:0
+E 17:0,43:0
+E 18:0,10:2
+E 18:0,16:2
+E 19:0,10:2
+E 19:0,16:2
+E 21:0,20:0
+E 22:0,23:0
+E 23:0,24:0
+E 26:0,27:0
+E 27:0,28:0
+E 28:0,29:0
+E 29:0,30:0
+E 30:0,31:0
+E 32:0,33:0
+E 33:0,34:0
+E 34:0,35:0
+E 35:0,36:0
+E 36:0,37:0
+E 37:0,38:0
+E 38:0,39:0
+E 39:0,40:0
+E 41:0,42:2
+E 43:0,44:0
+E 44:0,45:0
+E 44:0,46:0
+E 45:0,47:0
+E 46:0,48:0
+E 47:0,49:0
+E 48:0,50:0
+E 49:0,46:0
+E 50:0,51:0
+E 50:0,52:0
+E 51:0,53:0
+E 52:0,54:0
+E 53:0,55:0
+E 54:0,56:0
+E 55:0,57:0
+E 56:0,58:0
+E 57:0,59:0
+E 58:0,60:0
+E 59:0,61:0
+E 60:0,62:0
+E 62:0,63:0
+E 63:0,64:0
+E 64:0,65:0
+E 67:0,0:0
+E 68:0,0:1
+E 69:0,0:2
+E 70:0,0:3
+E 71:0,1:0
+E 72:0,1:1
+E 73:0,1:2
+E 74:0,4:1
+E 74:0,5:1
+E 74:0,9:1
+E 74:0,11:1
+E 74:0,17:1
+E 74:0,15:1
+E 74:0,43:1
+E 74:0,24:1
+E 74:0,28:1
+E 74:0,31:1
+E 74:0,34:1
+E 74:0,37:1
+E 74:0,40:1
+E 74:0,44:1
+E 74:0,49:1
+E 74:0,50:1
+E 74:0,55:1
+E 74:0,56:1
+E 74:0,61:1
+E 74:0,62:1
+E 74:0,65:1
+E 75:0,4:2
+E 75:0,4:3
+E 75:0,5:2
+E 75:0,5:3
+E 75:0,9:2
+E 75:0,9:3
+E 75:0,10:3
+E 75:0,16:3
+E 75:0,11:2
+E 75:0,11:3
+E 75:0,17:2
+E 75:0,17:3
+E 75:0,15:2
+E 75:0,15:3
+E 75:0,41:3
+E 75:0,43:2
+E 75:0,43:3
+E 75:0,21:4
+E 75:0,24:2
+E 75:0,24:3
+E 75:0,28:2
+E 75:0,28:3
+E 75:0,31:2
+E 75:0,31:3
+E 75:0,34:2
+E 75:0,34:3
+E 75:0,37:2
+E 75:0,37:3
+E 75:0,40:2
+E 75:0,40:3
+E 75:0,42:3
+E 75:0,44:2
+E 75:0,44:3
+E 75:0,49:2
+E 75:0,49:3
+E 75:0,50:2
+E 75:0,50:3
+E 75:0,55:2
+E 75:0,55:3
+E 75:0,56:2
+E 75:0,56:3
+E 75:0,61:2
+E 75:0,61:3
+E 75:0,62:2
+E 75:0,62:3
+E 75:0,65:2
+E 75:0,65:3
+E 76:0,5:0
+E 77:0,6:0
+E 78:0,10:0
+E 78:0,16:0
+E 78:0,41:0
+E 78:0,42:0
+E 79:0,10:1
+E 79:0,16:1
+E 79:0,41:1
+E 79:0,42:1
+E 80:0,11:0
+E 81:0,12:0
+E 82:0,18:0
+E 83:0,19:0
+E 84:0,20:1
+E 85:0,21:0
+E 86:0,21:1
+E 87:0,21:2
+E 88:0,21:3
+E 89:0,21:5
+

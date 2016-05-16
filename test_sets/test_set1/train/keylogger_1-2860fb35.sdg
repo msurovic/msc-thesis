@@ -1,0 +1,245 @@
+# node count
+N 82
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 CallNextHookEx 4 1
+V 3 GetKeyNameTextA 3 1
+V 4 TranslateMessage 1 1
+V 5 DispatchMessageA 1 1
+V 6 GetMessageA 4 1
+V 7 GetMessageA 4 1
+V 8 UnhookWindowsHookEx 1 1
+V 9 LoadLibraryA 1 1
+V 10 UnhookWindowsHookEx 1 1
+V 11 TranslateMessage 1 1
+V 12 DispatchMessageA 1 1
+V 13 GetMessageA 4 1
+V 14 SetWindowsHookExA 4 1
+V 15 GetMessageA 4 1
+V 16 LoadLibraryA 1 1
+V 17 GetModuleHandleA 1 1
+V 18 WaitForSingleObject 2 1
+V 19 CreateThread 6 1
+V 20 WaitForSingleObject 2 1
+V 21 CreateThread 6 1
+V 22 CallNextHookEx 4 1
+V 23 GetKeyNameTextA 3 1
+V 24 CallNextHookEx 4 1
+V 25 GetKeyNameTextA 3 1
+V 26 TranslateMessage 1 1
+V 27 DispatchMessageA 1 1
+V 28 GetMessageA 4 1
+V 29 UnhookWindowsHookEx 1 1
+V 30 UnhookWindowsHookEx 1 1
+V 31 TranslateMessage 1 1
+V 32 DispatchMessageA 1 1
+V 33 GetMessageA 4 1
+V 34 WaitForSingleObject 2 1
+V 35 WaitForSingleObject 2 1
+V 36 CreateThread 6 1
+V 37 CreateThread 6 1
+V 38 CreateThread 6 1
+V 39 CreateThread 6 1
+V 40 WaitForSingleObject 2 1
+V 41 WaitForSingleObject 2 1
+V 42 WaitForSingleObject 2 1
+V 43 WaitForSingleObject 2 1
+V 44 CreateThread 6 1
+V 45 WaitForSingleObject 2 1
+V 46 WaitForSingleObject 2 1
+V 47 CreateThread 6 1
+V 48 WaitForSingleObject 2 1
+V 49 WaitForSingleObject 2 1
+V 50 WaitForSingleObject 2 1
+V 51 WaitForSingleObject 2 1
+V 52 WaitForSingleObject 2 1
+V 53 WaitForSingleObject 2 1
+V 54 %struct.HHOOK__* 0 1
+V 55 i32 0 1
+V 56 i64 0 1
+V 57 i64 0 1
+V 58 i32 0 1
+V 59 i8* 0 1
+V 60 i32 0 1
+V 61 %struct.HHOOK__* 0 1
+V 62 i32 0 1
+V 63 i8* 0 1
+V 64 %struct.HHOOK__* 0 1
+V 65 i32 0 1
+V 66 %struct.tagMSG* 0 1
+V 67 %struct.HHOOK__* 0 1
+V 68 i8* 0 1
+V 69 %struct.HHOOK__* 0 1
+V 70 i32 0 1
+V 71 i64 0 1
+V 72 %struct.tagMSG* 0 1
+V 73 i8* 0 1
+V 74 i32 0 1
+V 75 %struct._SECURITY_ATTRIBUTES* 0 1
+V 76 i64 0 1
+V 77 i32 0 1
+V 78 i8* 0 1
+V 79 i32* 0 1
+V 80 i8* 0 1
+V 81 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 0:0,22:0
+E 1:0,23:1
+E 2:0,24:0
+E 3:0,25:1
+E 4:0,5:0
+E 5:0,6:0
+E 6:0,26:0
+E 7:0,4:0
+E 8:0,29:0
+E 10:0,30:0
+E 11:0,12:0
+E 12:0,13:0
+E 13:0,31:0
+E 15:0,11:0
+E 16:0,14:2
+E 17:0,14:2
+E 18:0,20:0
+E 19:0,36:3
+E 19:0,37:5
+E 20:0,34:0
+E 21:0,18:0
+E 21:0,20:0
+E 21:0,39:3
+E 21:0,44:5
+E 26:0,27:0
+E 27:0,28:0
+E 31:0,32:0
+E 32:0,33:0
+E 34:0,35:0
+E 37:0,38:3
+E 39:0,40:0
+E 39:0,41:0
+E 40:0,41:0
+E 41:0,42:0
+E 42:0,43:0
+E 44:0,45:0
+E 44:0,46:0
+E 44:0,47:3
+E 45:0,46:0
+E 46:0,48:0
+E 47:0,49:0
+E 47:0,50:0
+E 48:0,51:0
+E 49:0,50:0
+E 50:0,52:0
+E 52:0,53:0
+E 54:0,0:0
+E 55:0,0:1
+E 55:0,22:1
+E 55:0,2:1
+E 55:0,24:1
+E 56:0,0:2
+E 56:0,22:2
+E 56:0,2:2
+E 56:0,24:2
+E 57:0,0:3
+E 57:0,22:3
+E 57:0,2:3
+E 57:0,24:3
+E 58:0,1:0
+E 58:0,23:0
+E 59:0,1:1
+E 60:0,1:2
+E 60:0,23:2
+E 60:0,3:2
+E 60:0,25:2
+E 61:0,2:0
+E 62:0,3:0
+E 62:0,25:0
+E 63:0,3:1
+E 64:0,6:1
+E 64:0,7:1
+E 64:0,13:1
+E 64:0,15:1
+E 64:0,28:1
+E 64:0,33:1
+E 65:0,6:2
+E 65:0,6:3
+E 65:0,7:2
+E 65:0,7:3
+E 65:0,13:2
+E 65:0,13:3
+E 65:0,14:3
+E 65:0,15:2
+E 65:0,15:3
+E 65:0,19:4
+E 65:0,36:4
+E 65:0,37:4
+E 65:0,21:4
+E 65:0,39:4
+E 65:0,44:4
+E 65:0,28:2
+E 65:0,28:3
+E 65:0,33:2
+E 65:0,33:3
+E 65:0,38:4
+E 65:0,47:4
+E 66:0,7:0
+E 67:0,8:0
+E 68:0,9:0
+E 68:0,16:0
+E 69:0,10:0
+E 70:0,14:0
+E 71:0,14:1
+E 72:0,15:0
+E 73:0,17:0
+E 74:0,18:1
+E 74:0,20:1
+E 74:0,34:1
+E 74:0,35:1
+E 74:0,40:1
+E 74:0,41:1
+E 74:0,42:1
+E 74:0,43:1
+E 74:0,45:1
+E 74:0,46:1
+E 74:0,48:1
+E 74:0,49:1
+E 74:0,50:1
+E 74:0,51:1
+E 74:0,52:1
+E 74:0,53:1
+E 75:0,19:0
+E 75:0,36:0
+E 75:0,37:0
+E 75:0,21:0
+E 75:0,39:0
+E 75:0,44:0
+E 75:0,38:0
+E 75:0,47:0
+E 76:0,19:1
+E 76:0,36:1
+E 76:0,37:1
+E 76:0,21:1
+E 76:0,39:1
+E 76:0,44:1
+E 76:0,38:1
+E 76:0,47:1
+E 77:0,19:2
+E 77:0,36:2
+E 77:0,37:2
+E 77:0,21:2
+E 77:0,39:2
+E 77:0,44:2
+E 77:0,38:2
+E 77:0,47:2
+E 78:0,19:3
+E 78:0,37:3
+E 79:0,19:5
+E 79:0,36:5
+E 79:0,38:5
+E 80:0,21:3
+E 80:0,44:3
+E 81:0,21:5
+E 81:0,39:5
+E 81:0,47:5
+

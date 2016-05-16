@@ -1,0 +1,162 @@
+# node count
+N 62
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 TranslateMessage 1 1
+V 3 DispatchMessageA 1 1
+V 4 GetMessageA 4 1
+V 5 TranslateMessage 1 1
+V 6 DispatchMessageA 1 1
+V 7 GetMessageA 4 1
+V 8 GetMessageA 4 1
+V 9 UnhookWindowsHookEx 1 1
+V 10 TranslateMessage 1 1
+V 11 DispatchMessageA 1 1
+V 12 GetMessageA 4 1
+V 13 SetWindowsHookExA 4 1
+V 14 GetMessageA 4 1
+V 15 LoadLibraryA 1 1
+V 16 GetModuleHandleA 1 1
+V 17 WaitForSingleObject 2 1
+V 18 WaitForSingleObject 2 1
+V 19 CreateThread 6 1
+V 20 TranslateMessage 1 1
+V 21 DispatchMessageA 1 1
+V 22 GetMessageA 4 1
+V 23 TranslateMessage 1 1
+V 24 DispatchMessageA 1 1
+V 25 GetMessageA 4 1
+V 26 TranslateMessage 1 1
+V 27 DispatchMessageA 1 1
+V 28 GetMessageA 4 1
+V 29 TranslateMessage 1 1
+V 30 DispatchMessageA 1 1
+V 31 GetMessageA 4 1
+V 32 TranslateMessage 1 1
+V 33 DispatchMessageA 1 1
+V 34 GetMessageA 4 1
+V 35 TranslateMessage 1 1
+V 36 DispatchMessageA 1 1
+V 37 GetMessageA 4 1
+V 38 WaitForSingleObject 2 1
+V 39 WaitForSingleObject 2 1
+V 40 %struct.HHOOK__* 0 1
+V 41 i32 0 1
+V 42 i64 0 1
+V 43 i64 0 1
+V 44 i32 0 1
+V 45 i8* 0 1
+V 46 i32 0 1
+V 47 %struct.HHOOK__* 0 1
+V 48 i32 0 1
+V 49 %struct.tagMSG* 0 1
+V 50 %struct.HHOOK__* 0 1
+V 51 i32 0 1
+V 52 i64 0 1
+V 53 %struct.tagMSG* 0 1
+V 54 i8* 0 1
+V 55 i8* 0 1
+V 56 i32 0 1
+V 57 %struct._SECURITY_ATTRIBUTES* 0 1
+V 58 i64 0 1
+V 59 i32 0 1
+V 60 i8* 0 1
+V 61 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 2:0,3:0
+E 3:0,4:0
+E 4:0,5:0
+E 5:0,6:0
+E 6:0,7:0
+E 7:0,20:0
+E 7:0,26:0
+E 8:0,2:0
+E 8:0,5:0
+E 10:0,11:0
+E 11:0,12:0
+E 12:0,35:0
+E 14:0,10:0
+E 15:0,13:2
+E 16:0,13:2
+E 17:0,18:0
+E 18:0,38:0
+E 19:0,17:0
+E 19:0,18:0
+E 20:0,21:0
+E 21:0,22:0
+E 22:0,23:0
+E 23:0,24:0
+E 24:0,25:0
+E 26:0,27:0
+E 27:0,28:0
+E 28:0,29:0
+E 29:0,30:0
+E 30:0,31:0
+E 31:0,32:0
+E 32:0,33:0
+E 33:0,34:0
+E 35:0,36:0
+E 36:0,37:0
+E 38:0,39:0
+E 40:0,0:0
+E 41:0,0:1
+E 42:0,0:2
+E 43:0,0:3
+E 44:0,1:0
+E 45:0,1:1
+E 46:0,1:2
+E 47:0,4:1
+E 47:0,7:1
+E 47:0,8:1
+E 47:0,12:1
+E 47:0,14:1
+E 47:0,22:1
+E 47:0,25:1
+E 47:0,28:1
+E 47:0,31:1
+E 47:0,34:1
+E 47:0,37:1
+E 48:0,4:2
+E 48:0,4:3
+E 48:0,7:2
+E 48:0,7:3
+E 48:0,8:2
+E 48:0,8:3
+E 48:0,12:2
+E 48:0,12:3
+E 48:0,13:3
+E 48:0,14:2
+E 48:0,14:3
+E 48:0,19:4
+E 48:0,22:2
+E 48:0,22:3
+E 48:0,25:2
+E 48:0,25:3
+E 48:0,28:2
+E 48:0,28:3
+E 48:0,31:2
+E 48:0,31:3
+E 48:0,34:2
+E 48:0,34:3
+E 48:0,37:2
+E 48:0,37:3
+E 49:0,8:0
+E 50:0,9:0
+E 51:0,13:0
+E 52:0,13:1
+E 53:0,14:0
+E 54:0,15:0
+E 55:0,16:0
+E 56:0,17:1
+E 56:0,18:1
+E 56:0,38:1
+E 56:0,39:1
+E 57:0,19:0
+E 58:0,19:1
+E 59:0,19:2
+E 60:0,19:3
+E 61:0,19:5
+

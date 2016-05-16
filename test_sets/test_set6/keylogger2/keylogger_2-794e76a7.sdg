@@ -1,0 +1,212 @@
+# node count
+N 65
+
+# nodes declarations: V number label in_arity out_arity
+V 0 GetAsyncKeyState 1 1
+V 1 Sleep 1 0
+V 2 RegSetValueExA 6 1
+V 3 RegCreateKeyA 3 1
+V 4 AllocConsole 0 1
+V 5 FindWindowA 2 1
+V 6 ShowWindow 2 1
+V 7 RegOpenKeyExA 5 1
+V 8 GetAsyncKeyState 1 1
+V 9 Sleep 1 0
+V 10 RegSetValueExA 6 1
+V 11 RegCreateKeyA 3 1
+V 12 RegQueryValueExA 6 1
+V 13 RegCloseKey 1 1
+V 14 AllocConsole 0 1
+V 15 FindWindowA 2 1
+V 16 ShowWindow 2 1
+V 17 RegOpenKeyExA 5 1
+V 18 RegQueryValueExA 6 1
+V 19 RegCloseKey 1 1
+V 20 RegOpenKeyExA 5 1
+V 21 RegCreateKeyA 3 1
+V 22 RegSetValueExA 6 1
+V 23 RegCreateKeyA 3 1
+V 24 RegSetValueExA 6 1
+V 25 RegCreateKeyA 3 1
+V 26 RegCreateKeyA 3 1
+V 27 RegSetValueExA 6 1
+V 28 RegSetValueExA 6 1
+V 29 RegSetValueExA 6 1
+V 30 RegSetValueExA 6 1
+V 31 ShowWindow 2 1
+V 32 RegOpenKeyExA 5 1
+V 33 ShowWindow 2 1
+V 34 RegOpenKeyExA 5 1
+V 35 RegQueryValueExA 6 1
+V 36 RegCloseKey 1 1
+V 37 RegCreateKeyA 3 1
+V 38 RegCreateKeyA 3 1
+V 39 RegSetValueExA 6 1
+V 40 i32 0 1
+V 41 i32 0 1
+V 42 i8* 0 1
+V 43 i32 0 1
+V 44 i32 0 1
+V 45 i8* 0 1
+V 46 i32 0 1
+V 47 %struct.HWND__* 0 1
+V 48 i8* 0 1
+V 49 %struct.HWND__** 0 1
+V 50 i8* 0 1
+V 51 i8* 0 1
+V 52 %struct.HWND__** 0 1
+V 53 i32 0 1
+V 54 i32* 0 1
+V 55 i8* 0 1
+V 56 i32* 0 1
+V 57 %struct.HWND__** 0 1
+V 58 i8* 0 1
+V 59 i32* 0 1
+V 60 %struct.HWND__** 0 1
+V 61 %struct.HWND__** 0 1
+V 62 i8* 0 1
+V 63 i32 0 1
+V 64 %struct.HWND__** 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 2:0,24:0
+E 3:0,11:2
+E 5:0,6:0
+E 6:0,31:0
+E 7:0,32:4
+E 10:0,30:0
+E 11:0,2:0
+E 11:0,10:0
+E 11:0,25:2
+E 15:0,16:0
+E 16:0,33:0
+E 17:0,12:0
+E 17:0,13:0
+E 17:0,34:4
+E 20:0,18:0
+E 20:0,19:0
+E 21:0,37:2
+E 23:0,22:0
+E 23:0,38:2
+E 25:0,26:2
+E 26:0,27:0
+E 26:0,28:0
+E 27:0,29:0
+E 34:0,35:0
+E 34:0,36:0
+E 38:0,39:0
+E 40:0,0:0
+E 41:0,1:0
+E 41:0,9:0
+E 42:0,2:1
+E 42:0,24:1
+E 42:0,10:1
+E 42:0,30:1
+E 42:0,12:1
+E 42:0,18:1
+E 42:0,22:1
+E 42:0,27:1
+E 42:0,28:1
+E 42:0,29:1
+E 42:0,35:1
+E 42:0,39:1
+E 43:0,2:2
+E 43:0,24:2
+E 43:0,6:1
+E 43:0,31:1
+E 43:0,7:2
+E 43:0,32:2
+E 43:0,10:2
+E 43:0,30:2
+E 43:0,16:1
+E 43:0,33:1
+E 43:0,17:2
+E 43:0,34:2
+E 43:0,20:2
+E 43:0,22:2
+E 43:0,27:2
+E 43:0,28:2
+E 43:0,29:2
+E 43:0,39:2
+E 44:0,2:3
+E 44:0,24:3
+E 44:0,7:3
+E 44:0,32:3
+E 44:0,10:3
+E 44:0,30:3
+E 44:0,17:3
+E 44:0,34:3
+E 44:0,20:3
+E 44:0,22:3
+E 44:0,27:3
+E 44:0,28:3
+E 44:0,29:3
+E 44:0,39:3
+E 45:0,2:4
+E 45:0,24:4
+E 45:0,10:4
+E 45:0,30:4
+E 45:0,27:4
+E 45:0,28:4
+E 45:0,29:4
+E 46:0,2:5
+E 46:0,24:5
+E 46:0,10:5
+E 46:0,30:5
+E 46:0,27:5
+E 46:0,28:5
+E 46:0,29:5
+E 47:0,3:0
+E 47:0,11:0
+E 47:0,7:0
+E 47:0,32:0
+E 47:0,25:0
+E 47:0,17:0
+E 47:0,34:0
+E 47:0,20:0
+E 47:0,21:0
+E 47:0,37:0
+E 47:0,23:0
+E 47:0,38:0
+E 47:0,26:0
+E 48:0,3:1
+E 48:0,11:1
+E 48:0,7:1
+E 48:0,32:1
+E 48:0,25:1
+E 48:0,17:1
+E 48:0,34:1
+E 48:0,20:1
+E 48:0,21:1
+E 48:0,37:1
+E 48:0,23:1
+E 48:0,38:1
+E 48:0,26:1
+E 49:0,3:2
+E 50:0,5:0
+E 50:0,15:0
+E 51:0,5:1
+E 51:0,15:1
+E 52:0,7:4
+E 53:0,8:0
+E 54:0,12:2
+E 54:0,12:3
+E 54:0,18:2
+E 54:0,18:3
+E 54:0,35:2
+E 54:0,35:3
+E 55:0,12:4
+E 55:0,35:4
+E 56:0,12:5
+E 56:0,35:5
+E 57:0,17:4
+E 58:0,18:4
+E 59:0,18:5
+E 60:0,20:4
+E 61:0,21:2
+E 62:0,22:4
+E 62:0,39:4
+E 63:0,22:5
+E 63:0,39:5
+E 64:0,23:2
+

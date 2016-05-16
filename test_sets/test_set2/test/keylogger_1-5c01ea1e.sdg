@@ -1,0 +1,122 @@
+# node count
+N 50
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 CallNextHookEx 4 1
+V 3 GetKeyNameTextA 3 1
+V 4 GetMessageA 4 1
+V 5 TranslateMessage 1 1
+V 6 DispatchMessageA 1 1
+V 7 GetMessageA 4 1
+V 8 GetMessageA 4 1
+V 9 TranslateMessage 1 1
+V 10 DispatchMessageA 1 1
+V 11 GetMessageA 4 1
+V 12 LoadLibraryA 1 1
+V 13 UnhookWindowsHookEx 1 1
+V 14 TranslateMessage 1 1
+V 15 DispatchMessageA 1 1
+V 16 GetMessageA 4 1
+V 17 SetWindowsHookExA 4 1
+V 18 GetMessageA 4 1
+V 19 LoadLibraryA 1 1
+V 20 GetModuleHandleA 1 1
+V 21 WaitForSingleObject 2 1
+V 22 WaitForSingleObject 2 1
+V 23 CreateThread 6 1
+V 24 %struct.HHOOK__* 0 1
+V 25 i32 0 1
+V 26 i64 0 1
+V 27 i64 0 1
+V 28 i32 0 1
+V 29 i8* 0 1
+V 30 i32 0 1
+V 31 %struct.HHOOK__* 0 1
+V 32 i32 0 1
+V 33 i8* 0 1
+V 34 %struct.tagMSG* 0 1
+V 35 %struct.HHOOK__* 0 1
+V 36 i32 0 1
+V 37 %struct.tagMSG* 0 1
+V 38 i8* 0 1
+V 39 %struct.HHOOK__* 0 1
+V 40 i32 0 1
+V 41 i64 0 1
+V 42 %struct.tagMSG* 0 1
+V 43 i8* 0 1
+V 44 i32 0 1
+V 45 %struct._SECURITY_ATTRIBUTES* 0 1
+V 46 i64 0 1
+V 47 i32 0 1
+V 48 i8* 0 1
+V 49 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 5:0,6:0
+E 6:0,7:0
+E 8:0,5:0
+E 9:0,10:0
+E 10:0,11:0
+E 11:0,14:0
+E 14:0,15:0
+E 15:0,16:0
+E 18:0,9:0
+E 18:0,14:0
+E 19:0,17:2
+E 20:0,17:2
+E 21:0,22:0
+E 23:0,21:0
+E 23:0,22:0
+E 24:0,0:0
+E 25:0,0:1
+E 25:0,2:1
+E 26:0,0:2
+E 26:0,2:2
+E 27:0,0:3
+E 27:0,2:3
+E 28:0,1:0
+E 29:0,1:1
+E 30:0,1:2
+E 30:0,3:2
+E 31:0,2:0
+E 32:0,3:0
+E 33:0,3:1
+E 34:0,4:0
+E 35:0,4:1
+E 35:0,7:1
+E 35:0,8:1
+E 35:0,11:1
+E 35:0,16:1
+E 35:0,18:1
+E 36:0,4:2
+E 36:0,4:3
+E 36:0,7:2
+E 36:0,7:3
+E 36:0,8:2
+E 36:0,8:3
+E 36:0,11:2
+E 36:0,11:3
+E 36:0,16:2
+E 36:0,16:3
+E 36:0,17:3
+E 36:0,18:2
+E 36:0,18:3
+E 36:0,23:4
+E 37:0,8:0
+E 38:0,12:0
+E 38:0,19:0
+E 39:0,13:0
+E 40:0,17:0
+E 41:0,17:1
+E 42:0,18:0
+E 43:0,20:0
+E 44:0,21:1
+E 44:0,22:1
+E 45:0,23:0
+E 46:0,23:1
+E 47:0,23:2
+E 48:0,23:3
+E 49:0,23:5
+

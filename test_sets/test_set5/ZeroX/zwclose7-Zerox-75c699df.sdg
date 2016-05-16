@@ -1,0 +1,461 @@
+# node count
+N 169
+
+# nodes declarations: V number label in_arity out_arity
+V 0 VirtualFree 3 1
+V 1 VirtualFree 3 1
+V 2 VirtualFree 3 1
+V 3 ReadFile 5 1
+V 4 GetFileSize 2 1
+V 5 VirtualAlloc 4 1
+V 6 FindClose 1 1
+V 7 FindNextFileW 2 1
+V 8 NtDelayExecution 2 1
+V 9 NtClose 1 1
+V 10 NtClose 1 1
+V 11 FlushViewOfFile 2 1
+V 12 UnmapViewOfFile 1 1
+V 13 CheckSumMappedFile 4 1
+V 14 RtlDosPathNameToNtPathName_U 4 1
+V 15 NtDeleteFile 1 1
+V 16 RtlFreeUnicodeString 1 0
+V 17 RtlDosPathNameToNtPathName_U 4 1
+V 18 NtClose 1 1
+V 19 VirtualFree 3 1
+V 20 VirtualFree 3 1
+V 21 VirtualFree 3 1
+V 22 ReadFile 5 1
+V 23 GetFileSize 2 1
+V 24 VirtualAlloc 4 1
+V 25 NtClose 1 1
+V 26 NtClose 1 1
+V 27 FlushViewOfFile 2 1
+V 28 UnmapViewOfFile 1 1
+V 29 CheckSumMappedFile 4 1
+V 30 MapViewOfFile 5 1
+V 31 GetFileSize 2 1
+V 32 CreateFileMappingW 6 1
+V 33 RtlDosPathNameToNtPathName_U 4 1
+V 34 NtDeleteFile 1 1
+V 35 RtlFreeUnicodeString 1 0
+V 36 RtlDosPathNameToNtPathName_U 4 1
+V 37 NtClose 1 1
+V 38 NtClose 1 1
+V 39 VirtualFree 3 1
+V 40 VirtualFree 3 1
+V 41 VirtualFree 3 1
+V 42 ReadFile 5 1
+V 43 GetFileSize 2 1
+V 44 VirtualAlloc 4 1
+V 45 CreateFileW 7 1
+V 46 FindNextFileW 2 1
+V 47 FindFirstFileW 2 1
+V 48 RtlAdjustPrivilege 4 1
+V 49 ExpandEnvironmentStringsW 3 1
+V 50 CopyFileW 3 1
+V 51 SetFileAttributesW 2 1
+V 52 RegCreateKeyW 3 1
+V 53 RegSetValueExW 6 1
+V 54 RegCloseKey 1 1
+V 55 RtlAdjustPrivilege 4 1
+V 56 ExpandEnvironmentStringsW 3 1
+V 57 CopyFileW 3 1
+V 58 SetFileAttributesW 2 1
+V 59 RegCreateKeyW 3 1
+V 60 NtTerminateProcess 2 1
+V 61 NtQueryInformationProcess 5 1
+V 62 NtTerminateProcess 2 1
+V 63 RtlAdjustPrivilege 4 1
+V 64 NtDelayExecution 2 1
+V 65 NtQueryInformationProcess 5 1
+V 66 NtDelayExecution 2 1
+V 67 GetEnvironmentVariableW 3 1
+V 68 NtDelayExecution 2 1
+V 69 GetLogicalDriveStringsW 2 1
+V 70 NtDelayExecution 2 1
+V 71 GetDriveTypeW 1 1
+V 72 GetLogicalDriveStringsW 2 1
+V 73 NtClose 1 1
+V 74 VirtualProtect 4 1
+V 75 NtTerminateProcess 2 1
+V 76 NtDelayExecution 2 1
+V 77 RtlAdjustPrivilege 4 1
+V 78 GetLocalTime 1 0
+V 79 CreateThread 6 1
+V 80 CreateThread 6 1
+V 81 CreateThread 6 1
+V 82 NtClose 1 1
+V 83 VirtualProtect 4 1
+V 84 NtClose 1 1
+V 85 ReadFile 5 1
+V 86 GetFileSize 2 1
+V 87 VirtualAlloc 4 1
+V 88 CreateFileW 7 1
+V 89 NtTerminateProcess 2 1
+V 90 CreateMutexW 3 1
+V 91 GetLastError 0 1
+V 92 i64 0 1
+V 93 i32 0 1
+V 94 i8* 0 1
+V 95 i32* 0 1
+V 96 %struct._OVERLAPPED* 0 1
+V 97 i32* 0 1
+V 98 i8* 0 1
+V 99 i32 0 1
+V 100 i32 0 1
+V 101 i8 0 1
+V 102 %union._LARGE_INTEGER* 0 1
+V 103 i32* 0 1
+V 104 i32* 0 1
+V 105 i16* 0 1
+V 106 %struct._UNICODE_STRING* 0 1
+V 107 i16** 0 1
+V 108 %struct._CURDIR* 0 1
+V 109 %struct._UNICODE_STRING* 0 1
+V 110 %struct._OBJECT_ATTRIBUTES* 0 1
+V 111 %struct._UNICODE_STRING* 0 1
+V 112 %struct._UNICODE_STRING* 0 1
+V 113 i32* 0 1
+V 114 i32 0 1
+V 115 i32 0 1
+V 116 %struct._SECURITY_ATTRIBUTES* 0 1
+V 117 i16* 0 1
+V 118 %struct._OBJECT_ATTRIBUTES* 0 1
+V 119 i32 0 1
+V 120 i32 0 1
+V 121 i32* 0 1
+V 122 i16* 0 1
+V 123 %struct._WIN32_FIND_DATAW* 0 1
+V 124 i32 0 1
+V 125 i8 0 1
+V 126 i8* 0 1
+V 127 i16* 0 1
+V 128 i32 0 1
+V 129 i16* 0 1
+V 130 %struct.HKEY__** 0 1
+V 131 i16* 0 1
+V 132 i32 0 1
+V 133 i16* 0 1
+V 134 i32 0 1
+V 135 i8* 0 1
+V 136 i32 0 1
+V 137 i16* 0 1
+V 138 i8* 0 1
+V 139 i32 0 1
+V 140 i8* 0 1
+V 141 i32 0 1
+V 142 i32 0 1
+V 143 i8* 0 1
+V 144 %union._LARGE_INTEGER* 0 1
+V 145 i8* 0 1
+V 146 %union._LARGE_INTEGER* 0 1
+V 147 i16* 0 1
+V 148 i16* 0 1
+V 149 i32 0 1
+V 150 %union._LARGE_INTEGER* 0 1
+V 151 i32 0 1
+V 152 i16* 0 1
+V 153 i8* 0 1
+V 154 i64 0 1
+V 155 i32 0 1
+V 156 i32* 0 1
+V 157 i8* 0 1
+V 158 i64 0 1
+V 159 %union._LARGE_INTEGER* 0 1
+V 160 i8* 0 1
+V 161 %struct._SYSTEMTIME* 0 1
+V 162 i32 0 1
+V 163 i32 0 1
+V 164 i32 0 1
+V 165 i32 0 1
+V 166 i32* 0 1
+V 167 i32 0 1
+V 168 i16* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 3:0,1:0
+E 3:0,0:0
+E 3:0,2:0
+E 4:0,5:1
+E 4:0,3:2
+E 5:0,3:1
+E 7:0,6:0
+E 9:0,25:0
+E 10:0,26:0
+E 11:0,12:0
+E 12:0,27:0
+E 13:0,29:0
+E 13:0,29:2
+E 13:0,29:3
+E 14:0,17:0
+E 17:0,16:0
+E 17:0,33:0
+E 17:0,36:0
+E 18:0,37:0
+E 22:0,20:0
+E 22:0,19:0
+E 22:0,21:0
+E 22:0,43:0
+E 23:0,24:1
+E 23:0,22:2
+E 23:0,43:0
+E 24:0,22:1
+E 26:0,23:0
+E 26:0,43:0
+E 27:0,28:0
+E 29:0,11:0
+E 29:0,27:0
+E 30:0,13:0
+E 30:0,29:0
+E 30:0,9:0
+E 30:0,25:0
+E 31:0,32:4
+E 31:0,13:1
+E 31:0,29:1
+E 32:0,30:0
+E 32:0,9:0
+E 32:0,25:0
+E 33:0,36:0
+E 36:0,35:0
+E 36:0,45:0
+E 42:0,40:0
+E 42:0,39:0
+E 42:0,41:0
+E 42:0,32:4
+E 42:0,13:1
+E 42:0,29:1
+E 42:0,18:0
+E 42:0,37:0
+E 42:0,38:0
+E 42:0,31:0
+E 43:0,44:1
+E 43:0,42:2
+E 43:0,18:0
+E 43:0,37:0
+E 43:0,38:0
+E 43:0,31:0
+E 44:0,42:1
+E 45:0,23:0
+E 45:0,43:0
+E 45:0,10:0
+E 45:0,26:0
+E 45:0,22:0
+E 45:0,32:0
+E 45:0,42:0
+E 46:0,7:0
+E 46:0,7:1
+E 46:0,6:0
+E 47:0,46:0
+E 47:0,46:1
+E 48:0,49:0
+E 48:0,52:0
+E 48:0,55:3
+E 52:0,59:2
+E 55:0,56:0
+E 55:0,59:0
+E 59:0,53:0
+E 59:0,54:0
+E 68:0,70:1
+E 69:0,72:1
+E 72:0,71:0
+E 73:0,82:0
+E 74:0,83:3
+E 85:0,84:0
+E 85:0,73:0
+E 85:0,82:0
+E 86:0,87:1
+E 86:0,85:0
+E 86:0,73:0
+E 86:0,82:0
+E 87:0,85:1
+E 88:0,86:0
+E 92:0,0:1
+E 92:0,1:1
+E 92:0,2:1
+E 92:0,11:1
+E 92:0,27:1
+E 92:0,19:1
+E 92:0,20:1
+E 92:0,21:1
+E 92:0,30:4
+E 92:0,39:1
+E 92:0,40:1
+E 92:0,41:1
+E 92:0,79:1
+E 92:0,80:1
+E 92:0,81:1
+E 93:0,0:2
+E 93:0,1:2
+E 93:0,2:2
+E 93:0,19:2
+E 93:0,20:2
+E 93:0,21:2
+E 93:0,39:2
+E 93:0,40:2
+E 93:0,41:2
+E 94:0,3:0
+E 94:0,4:0
+E 95:0,3:3
+E 96:0,3:4
+E 96:0,22:4
+E 96:0,42:4
+E 96:0,85:4
+E 97:0,4:1
+E 97:0,43:1
+E 97:0,23:1
+E 97:0,31:1
+E 97:0,61:4
+E 97:0,65:4
+E 97:0,79:5
+E 97:0,80:5
+E 97:0,81:5
+E 97:0,86:1
+E 98:0,5:0
+E 98:0,24:0
+E 98:0,45:6
+E 98:0,44:0
+E 98:0,79:3
+E 98:0,80:3
+E 98:0,81:3
+E 98:0,87:0
+E 98:0,88:6
+E 99:0,5:2
+E 99:0,24:2
+E 99:0,44:2
+E 99:0,87:2
+E 100:0,5:3
+E 100:0,24:3
+E 100:0,32:2
+E 100:0,44:3
+E 100:0,87:3
+E 101:0,8:0
+E 101:0,48:2
+E 101:0,55:2
+E 101:0,63:2
+E 101:0,64:0
+E 101:0,66:0
+E 101:0,68:0
+E 101:0,70:0
+E 101:0,76:0
+E 101:0,77:2
+E 102:0,8:1
+E 103:0,13:2
+E 104:0,13:3
+E 105:0,14:0
+E 106:0,14:1
+E 107:0,14:2
+E 107:0,17:2
+E 107:0,33:2
+E 107:0,36:2
+E 108:0,14:3
+E 108:0,17:3
+E 108:0,33:3
+E 108:0,36:3
+E 109:0,17:1
+E 110:0,15:0
+E 111:0,33:1
+E 112:0,36:1
+E 113:0,22:3
+E 114:0,30:1
+E 115:0,30:2
+E 115:0,30:3
+E 115:0,32:3
+E 115:0,45:5
+E 115:0,50:2
+E 115:0,53:2
+E 115:0,57:2
+E 115:0,60:1
+E 115:0,62:1
+E 115:0,75:1
+E 115:0,79:4
+E 115:0,80:4
+E 115:0,81:4
+E 115:0,88:5
+E 115:0,89:1
+E 116:0,32:1
+E 116:0,45:3
+E 116:0,79:0
+E 116:0,80:0
+E 116:0,81:0
+E 116:0,88:3
+E 116:0,90:0
+E 117:0,32:5
+E 118:0,34:0
+E 119:0,45:1
+E 120:0,45:2
+E 120:0,45:4
+E 120:0,88:4
+E 121:0,42:3
+E 122:0,47:0
+E 123:0,47:1
+E 124:0,48:0
+E 124:0,55:0
+E 125:0,48:1
+E 125:0,55:1
+E 125:0,63:1
+E 125:0,77:1
+E 126:0,48:3
+E 127:0,49:1
+E 127:0,50:1
+E 127:0,51:0
+E 127:0,56:1
+E 127:0,57:1
+E 127:0,58:0
+E 127:0,88:0
+E 128:0,49:2
+E 128:0,56:2
+E 129:0,52:1
+E 129:0,59:1
+E 130:0,52:2
+E 131:0,50:0
+E 132:0,51:1
+E 132:0,58:1
+E 133:0,53:1
+E 134:0,53:3
+E 134:0,88:2
+E 134:0,90:1
+E 135:0,53:4
+E 136:0,53:5
+E 137:0,57:0
+E 138:0,60:0
+E 138:0,61:0
+E 138:0,62:0
+E 138:0,65:0
+E 138:0,75:0
+E 138:0,89:0
+E 139:0,61:1
+E 139:0,65:1
+E 140:0,61:2
+E 141:0,61:3
+E 141:0,65:3
+E 142:0,63:0
+E 142:0,77:0
+E 143:0,63:3
+E 144:0,64:1
+E 145:0,65:2
+E 146:0,66:1
+E 147:0,67:0
+E 148:0,67:1
+E 149:0,67:2
+E 150:0,68:1
+E 151:0,69:0
+E 151:0,72:0
+E 152:0,69:1
+E 153:0,74:0
+E 154:0,74:1
+E 155:0,74:2
+E 155:0,83:2
+E 156:0,74:3
+E 157:0,83:0
+E 158:0,83:1
+E 159:0,76:1
+E 160:0,77:3
+E 161:0,78:0
+E 162:0,79:2
+E 163:0,80:2
+E 164:0,81:2
+E 165:0,85:2
+E 166:0,85:3
+E 167:0,88:1
+E 168:0,90:2
+

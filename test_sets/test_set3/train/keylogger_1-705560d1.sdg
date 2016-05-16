@@ -1,0 +1,101 @@
+# node count
+N 44
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 TranslateMessage 1 1
+V 3 DispatchMessageA 1 1
+V 4 GetMessageA 4 1
+V 5 GetMessageA 4 1
+V 6 TranslateMessage 1 1
+V 7 DispatchMessageA 1 1
+V 8 GetMessageA 4 1
+V 9 LoadLibraryA 1 1
+V 10 UnhookWindowsHookEx 1 1
+V 11 TranslateMessage 1 1
+V 12 DispatchMessageA 1 1
+V 13 GetMessageA 4 1
+V 14 SetWindowsHookExA 4 1
+V 15 GetMessageA 4 1
+V 16 LoadLibraryA 1 1
+V 17 GetModuleHandleA 1 1
+V 18 WaitForSingleObject 2 1
+V 19 CreateThread 6 1
+V 20 %struct.HHOOK__* 0 1
+V 21 i32 0 1
+V 22 i64 0 1
+V 23 i64 0 1
+V 24 i32 0 1
+V 25 i8* 0 1
+V 26 i32 0 1
+V 27 %struct.HHOOK__* 0 1
+V 28 i32 0 1
+V 29 %struct.tagMSG* 0 1
+V 30 %struct.tagMSG* 0 1
+V 31 i8* 0 1
+V 32 %struct.HHOOK__* 0 1
+V 33 i32 0 1
+V 34 i64 0 1
+V 35 %struct.HHOOK__* 0 1
+V 36 i8* 0 1
+V 37 i8* 0 1
+V 38 i32 0 1
+V 39 %struct._SECURITY_ATTRIBUTES* 0 1
+V 40 i64 0 1
+V 41 i32 0 1
+V 42 i8* 0 1
+V 43 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 2:0,3:0
+E 3:0,4:0
+E 5:0,2:0
+E 6:0,7:0
+E 7:0,8:0
+E 8:0,11:0
+E 8:0,15:0
+E 11:0,12:0
+E 12:0,13:0
+E 13:0,15:0
+E 20:0,0:0
+E 21:0,0:1
+E 22:0,0:2
+E 23:0,0:3
+E 24:0,1:0
+E 25:0,1:1
+E 26:0,1:2
+E 27:0,4:1
+E 27:0,5:1
+E 27:0,8:1
+E 27:0,15:1
+E 27:0,13:1
+E 28:0,4:2
+E 28:0,4:3
+E 28:0,5:2
+E 28:0,5:3
+E 28:0,8:2
+E 28:0,8:3
+E 28:0,15:2
+E 28:0,15:3
+E 28:0,13:2
+E 28:0,13:3
+E 28:0,14:3
+E 28:0,19:4
+E 29:0,5:0
+E 30:0,6:0
+E 31:0,9:0
+E 31:0,16:0
+E 32:0,10:0
+E 33:0,14:0
+E 34:0,14:1
+E 35:0,14:2
+E 36:0,17:0
+E 37:0,18:0
+E 38:0,18:1
+E 39:0,19:0
+E 40:0,19:1
+E 41:0,19:2
+E 42:0,19:3
+E 43:0,19:5
+

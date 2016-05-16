@@ -1,0 +1,99 @@
+# node count
+N 38
+
+# nodes declarations: V number label in_arity out_arity
+V 0 RegSetValueExA 6 1
+V 1 GetAsyncKeyState 1 1
+V 2 Sleep 1 0
+V 3 RegSetValueExA 6 1
+V 4 RegCreateKeyA 3 1
+V 5 RegQueryValueExA 6 1
+V 6 RegCloseKey 1 1
+V 7 AllocConsole 0 1
+V 8 FindWindowA 2 1
+V 9 ShowWindow 2 1
+V 10 RegOpenKeyExA 5 1
+V 11 RegQueryValueExA 6 1
+V 12 RegCloseKey 1 1
+V 13 RegOpenKeyExA 5 1
+V 14 RegSetValueExA 6 1
+V 15 RegCreateKeyA 3 1
+V 16 i8* 0 1
+V 17 i32 0 1
+V 18 i32 0 1
+V 19 i8* 0 1
+V 20 i32 0 1
+V 21 i32 0 1
+V 22 i32 0 1
+V 23 %struct.HWND__* 0 1
+V 24 i8* 0 1
+V 25 %struct.HWND__** 0 1
+V 26 i32* 0 1
+V 27 i8* 0 1
+V 28 i32* 0 1
+V 29 i8* 0 1
+V 30 i8* 0 1
+V 31 %struct.HWND__** 0 1
+V 32 i8* 0 1
+V 33 i32* 0 1
+V 34 %struct.HWND__** 0 1
+V 35 i8* 0 1
+V 36 i32 0 1
+V 37 %struct.HWND__** 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 4:0,0:0
+E 4:0,3:0
+E 8:0,9:0
+E 10:0,5:0
+E 10:0,6:0
+E 13:0,11:0
+E 13:0,12:0
+E 15:0,14:0
+E 16:0,0:1
+E 16:0,3:1
+E 16:0,5:1
+E 16:0,11:1
+E 16:0,14:1
+E 17:0,0:2
+E 17:0,3:2
+E 17:0,9:1
+E 17:0,10:2
+E 17:0,13:2
+E 17:0,14:2
+E 18:0,0:3
+E 18:0,3:3
+E 18:0,10:3
+E 18:0,13:3
+E 18:0,14:3
+E 19:0,0:4
+E 19:0,3:4
+E 20:0,0:5
+E 20:0,3:5
+E 21:0,1:0
+E 22:0,2:0
+E 23:0,4:0
+E 23:0,10:0
+E 23:0,13:0
+E 23:0,15:0
+E 24:0,4:1
+E 24:0,10:1
+E 24:0,13:1
+E 24:0,15:1
+E 25:0,4:2
+E 26:0,5:2
+E 26:0,5:3
+E 26:0,11:2
+E 26:0,11:3
+E 27:0,5:4
+E 28:0,5:5
+E 29:0,8:0
+E 30:0,8:1
+E 31:0,10:4
+E 32:0,11:4
+E 33:0,11:5
+E 34:0,13:4
+E 35:0,14:4
+E 36:0,14:5
+E 37:0,15:2
+

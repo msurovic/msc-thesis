@@ -1,0 +1,199 @@
+# node count
+N 84
+
+# nodes declarations: V number label in_arity out_arity
+V 0 CallNextHookEx 4 1
+V 1 GetKeyNameTextA 3 1
+V 2 TranslateMessage 1 1
+V 3 DispatchMessageA 1 1
+V 4 GetMessageA 4 1
+V 5 GetMessageA 4 1
+V 6 TranslateMessage 1 1
+V 7 DispatchMessageA 1 1
+V 8 GetMessageA 4 1
+V 9 GetMessageA 4 1
+V 10 UnhookWindowsHookEx 1 1
+V 11 TranslateMessage 1 1
+V 12 DispatchMessageA 1 1
+V 13 GetMessageA 4 1
+V 14 LoadLibraryA 1 1
+V 15 GetModuleHandleA 1 1
+V 16 UnhookWindowsHookEx 1 1
+V 17 TranslateMessage 1 1
+V 18 DispatchMessageA 1 1
+V 19 GetMessageA 4 1
+V 20 SetWindowsHookExA 4 1
+V 21 GetMessageA 4 1
+V 22 LoadLibraryA 1 1
+V 23 GetModuleHandleA 1 1
+V 24 WaitForSingleObject 2 1
+V 25 CreateThread 6 1
+V 26 GetKeyNameTextA 3 1
+V 27 TranslateMessage 1 1
+V 28 DispatchMessageA 1 1
+V 29 GetMessageA 4 1
+V 30 GetMessageA 4 1
+V 31 TranslateMessage 1 1
+V 32 DispatchMessageA 1 1
+V 33 GetMessageA 4 1
+V 34 GetMessageA 4 1
+V 35 UnhookWindowsHookEx 1 1
+V 36 TranslateMessage 1 1
+V 37 DispatchMessageA 1 1
+V 38 GetMessageA 4 1
+V 39 UnhookWindowsHookEx 1 1
+V 40 TranslateMessage 1 1
+V 41 DispatchMessageA 1 1
+V 42 GetMessageA 4 1
+V 43 SetWindowsHookExA 4 1
+V 44 GetMessageA 4 1
+V 45 WaitForSingleObject 2 1
+V 46 %struct.HHOOK__* 0 1
+V 47 i32 0 1
+V 48 i64 0 1
+V 49 i64 0 1
+V 50 i32 0 1
+V 51 i8* 0 1
+V 52 i32 0 1
+V 53 %struct.tagMSG* 0 1
+V 54 %struct.tagMSG* 0 1
+V 55 %struct.tagMSG* 0 1
+V 56 %struct.HHOOK__* 0 1
+V 57 i32 0 1
+V 58 %struct.tagMSG* 0 1
+V 59 %struct.tagMSG* 0 1
+V 60 %struct.tagMSG* 0 1
+V 61 %struct.tagMSG* 0 1
+V 62 %struct.tagMSG* 0 1
+V 63 %struct.HHOOK__* 0 1
+V 64 %struct.tagMSG* 0 1
+V 65 %struct.tagMSG* 0 1
+V 66 %struct.tagMSG* 0 1
+V 67 i8* 0 1
+V 68 i8* 0 1
+V 69 %struct.HHOOK__* 0 1
+V 70 %struct.tagMSG* 0 1
+V 71 %struct.tagMSG* 0 1
+V 72 %struct.tagMSG* 0 1
+V 73 i32 0 1
+V 74 i64 0 1
+V 75 %struct.HHOOK__* 0 1
+V 76 %struct.tagMSG* 0 1
+V 77 i8* 0 1
+V 78 i32 0 1
+V 79 %struct._SECURITY_ATTRIBUTES* 0 1
+V 80 i64 0 1
+V 81 i32 0 1
+V 82 i8* 0 1
+V 83 i32* 0 1
+
+# edge declarations: E node_from:out_param_from,node_to:in_param_to
+E 1:0,26:1
+E 2:0,27:0
+E 3:0,28:0
+E 4:0,29:0
+E 5:0,30:0
+E 6:0,31:0
+E 7:0,32:0
+E 8:0,33:0
+E 9:0,34:0
+E 10:0,35:0
+E 11:0,36:0
+E 12:0,37:0
+E 13:0,38:0
+E 16:0,39:0
+E 17:0,40:0
+E 18:0,41:0
+E 19:0,42:0
+E 20:0,43:2
+E 21:0,44:0
+E 24:0,45:0
+E 46:0,0:0
+E 47:0,0:1
+E 48:0,0:2
+E 49:0,0:3
+E 50:0,1:0
+E 50:0,26:0
+E 51:0,1:1
+E 52:0,1:2
+E 52:0,26:2
+E 53:0,2:0
+E 54:0,3:0
+E 55:0,4:0
+E 56:0,4:1
+E 56:0,29:1
+E 56:0,5:1
+E 56:0,30:1
+E 56:0,8:1
+E 56:0,33:1
+E 56:0,9:1
+E 56:0,34:1
+E 56:0,13:1
+E 56:0,38:1
+E 56:0,19:1
+E 56:0,42:1
+E 56:0,21:1
+E 56:0,44:1
+E 57:0,4:2
+E 57:0,4:3
+E 57:0,29:2
+E 57:0,29:3
+E 57:0,5:2
+E 57:0,5:3
+E 57:0,30:2
+E 57:0,30:3
+E 57:0,8:2
+E 57:0,8:3
+E 57:0,33:2
+E 57:0,33:3
+E 57:0,9:2
+E 57:0,9:3
+E 57:0,34:2
+E 57:0,34:3
+E 57:0,13:2
+E 57:0,13:3
+E 57:0,38:2
+E 57:0,38:3
+E 57:0,19:2
+E 57:0,19:3
+E 57:0,42:2
+E 57:0,42:3
+E 57:0,20:3
+E 57:0,43:3
+E 57:0,21:2
+E 57:0,21:3
+E 57:0,44:2
+E 57:0,44:3
+E 57:0,25:4
+E 58:0,5:0
+E 59:0,6:0
+E 60:0,7:0
+E 61:0,8:0
+E 62:0,9:0
+E 63:0,10:0
+E 64:0,11:0
+E 65:0,12:0
+E 66:0,13:0
+E 67:0,14:0
+E 67:0,22:0
+E 68:0,15:0
+E 68:0,23:0
+E 69:0,16:0
+E 70:0,17:0
+E 71:0,18:0
+E 72:0,19:0
+E 73:0,20:0
+E 73:0,43:0
+E 74:0,20:1
+E 74:0,43:1
+E 75:0,20:2
+E 76:0,21:0
+E 77:0,24:0
+E 78:0,24:1
+E 78:0,45:1
+E 79:0,25:0
+E 80:0,25:1
+E 81:0,25:2
+E 82:0,25:3
+E 83:0,25:5
+
