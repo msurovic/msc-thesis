@@ -4,3 +4,9 @@ Obfuscations:
 	fla, bcf, sub;
 Unfolding:
 	yes;
+
+Score:
+	0, 0;
+
+Corrected score:
+	0, 0;

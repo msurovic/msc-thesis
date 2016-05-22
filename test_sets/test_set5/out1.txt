@@ -1,0 +1,55 @@
+S ---- Test set ---------------------------
+S Total nodes:      16899
+S Total edges:      26133
+S Roots before CSE: 101
+S Nodes after CSE:  332
+S Roots after CSE:  160
+S Incomplete terms: 0
+S ------------------------------------------
+S Terms with depth 0: 1
+S Terms with depth 1: 15
+S Terms with depth 2: 10
+S Terms with depth 3: 9
+S Terms with depth 4: 19
+S Terms with depth 5: 24
+S Terms with depth 6: 18
+S Terms with depth 7: 24
+S Terms with depth 8: 22
+S Terms with depth 9: 8
+S Terms with depth 10: 6
+S Terms with depth 11: 3
+S Terms with depth 12: 1
+S ------------------------------------------
+S ---- Train set automaton -----------------
+S Merged eq classes:20
+S Congruences:      8
+S Eq classes:       310
+S Eq root classes:  98
+S States created:   14
+S ------------------------------------------
+S Eq rt class with depth 0: 1
+S Eq rt class with depth 1: 6
+S Eq rt class with depth 2: 7
+S Eq rt class with depth 3: 8
+S Eq rt class with depth 4: 8
+S Eq rt class with depth 5: 9
+S Eq rt class with depth 6: 8
+S Eq rt class with depth 7: 7
+S Eq rt class with depth 8: 8
+S Eq rt class with depth 9: 9
+S Eq rt class with depth 10: 7
+S Eq rt class with depth 11: 3
+S Eq rt class with depth 12: 5
+S Eq rt class with depth 13: 9
+S Eq rt class with depth 14: 2
+S Eq rt class with depth 15: 1
+S ------------------------------------------
+S Matched terms:    144
+S Final states hit: 8
+S ------------------------------------------
+S Final matched with depth 0: 1
+S Final matched with depth 1: 3
+S Final matched with depth 2: 1
+S Final matched with depth 3: 2
+S Final matched with depth 4: 1
+S ------------------------------------------

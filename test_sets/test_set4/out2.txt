@@ -1,0 +1,29 @@
+S ---- Test set ---------------------------
+S Total nodes:      4155
+S Total edges:      4807
+S Roots before CSE: 13
+S Nodes after CSE:  35
+S Roots after CSE:  12
+S Incomplete terms: 0
+S ------------------------------------------
+S Terms with depth 1: 7
+S Terms with depth 2: 2
+S Terms with depth 5: 2
+S Terms with depth 8: 1
+S ------------------------------------------
+S ---- Train set automaton -----------------
+S Merged eq classes:0
+S Congruences:      0
+S Eq classes:       22
+S Eq root classes:  12
+S States created:   0
+S ------------------------------------------
+S Eq rt class with depth 0: 1
+S Eq rt class with depth 1: 5
+S Eq rt class with depth 2: 3
+S Eq rt class with depth 3: 3
+S ------------------------------------------
+S Matched terms:    2
+S Final states hit: 0
+S ------------------------------------------
+S ------------------------------------------

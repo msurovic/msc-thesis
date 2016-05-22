@@ -1,0 +1,104 @@
+S ---- Test set ---------------------------
+S Total nodes:      14134
+S Total edges:      26059
+S Roots before CSE: 40
+S Nodes after CSE:  912
+S Roots after CSE:  213
+S Incomplete terms: 0
+S ------------------------------------------
+S Terms with depth 0: 2
+S Terms with depth 1: 8
+S Terms with depth 2: 17
+S Terms with depth 3: 13
+S Terms with depth 4: 16
+S Terms with depth 5: 9
+S Terms with depth 6: 13
+S Terms with depth 7: 13
+S Terms with depth 8: 11
+S Terms with depth 9: 12
+S Terms with depth 10: 11
+S Terms with depth 11: 13
+S Terms with depth 12: 8
+S Terms with depth 13: 4
+S Terms with depth 14: 4
+S Terms with depth 15: 3
+S Terms with depth 16: 3
+S Terms with depth 17: 3
+S Terms with depth 18: 4
+S Terms with depth 19: 6
+S Terms with depth 20: 5
+S Terms with depth 21: 5
+S Terms with depth 22: 3
+S Terms with depth 23: 4
+S Terms with depth 24: 5
+S Terms with depth 25: 2
+S Terms with depth 26: 2
+S Terms with depth 27: 4
+S Terms with depth 28: 2
+S Terms with depth 29: 1
+S Terms with depth 30: 3
+S Terms with depth 31: 2
+S Terms with depth 33: 1
+S Terms with depth 34: 1
+S ------------------------------------------
+S ---- Train set automaton -----------------
+S Merged eq classes:310
+S Congruences:      856
+S Eq classes:       573
+S Eq root classes:  134
+S States created:   63
+S ------------------------------------------
+S Eq rt class with depth 0: 2
+S Eq rt class with depth 1: 8
+S Eq rt class with depth 2: 17
+S Eq rt class with depth 3: 13
+S Eq rt class with depth 4: 16
+S Eq rt class with depth 5: 13
+S Eq rt class with depth 6: 10
+S Eq rt class with depth 7: 14
+S Eq rt class with depth 8: 10
+S Eq rt class with depth 9: 9
+S Eq rt class with depth 10: 8
+S Eq rt class with depth 11: 5
+S Eq rt class with depth 12: 4
+S Eq rt class with depth 13: 3
+S Eq rt class with depth 14: 2
+S ------------------------------------------
+S Matched terms:    2101
+S Final states hit: 194
+S ------------------------------------------
+S Final matched with depth 0: 2
+S Final matched with depth 1: 8
+S Final matched with depth 2: 17
+S Final matched with depth 3: 13
+S Final matched with depth 4: 15
+S Final matched with depth 5: 8
+S Final matched with depth 6: 11
+S Final matched with depth 7: 10
+S Final matched with depth 8: 9
+S Final matched with depth 9: 11
+S Final matched with depth 10: 10
+S Final matched with depth 11: 10
+S Final matched with depth 12: 6
+S Final matched with depth 13: 2
+S Final matched with depth 14: 3
+S Final matched with depth 15: 3
+S Final matched with depth 16: 3
+S Final matched with depth 17: 3
+S Final matched with depth 18: 4
+S Final matched with depth 19: 6
+S Final matched with depth 20: 5
+S Final matched with depth 21: 5
+S Final matched with depth 22: 3
+S Final matched with depth 23: 4
+S Final matched with depth 24: 5
+S Final matched with depth 25: 2
+S Final matched with depth 26: 2
+S Final matched with depth 27: 4
+S Final matched with depth 28: 2
+S Final matched with depth 29: 1
+S Final matched with depth 30: 3
+S Final matched with depth 31: 2
+S Final matched with depth 33: 1
+S Final matched with depth 34: 1
+S ------------------------------------------

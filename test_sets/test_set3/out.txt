@@ -1,0 +1,65 @@
+S ---- Test set ---------------------------
+S Total nodes:      20095
+S Total edges:      30091
+S Roots before CSE: 50
+S Nodes after CSE:  473
+S Roots after CSE:  200
+S Incomplete terms: 0
+S ------------------------------------------
+S Terms with depth 0: 2
+S Terms with depth 1: 29
+S Terms with depth 2: 20
+S Terms with depth 3: 15
+S Terms with depth 4: 24
+S Terms with depth 5: 25
+S Terms with depth 6: 16
+S Terms with depth 7: 19
+S Terms with depth 8: 14
+S Terms with depth 9: 13
+S Terms with depth 10: 7
+S Terms with depth 11: 7
+S Terms with depth 12: 3
+S Terms with depth 13: 4
+S Terms with depth 14: 2
+S ------------------------------------------
+S ---- Train set automaton -----------------
+S Merged eq classes:29
+S Congruences:      20
+S Eq classes:       509
+S Eq root classes:  203
+S States created:   23
+S ------------------------------------------
+S Eq rt class with depth 0: 2
+S Eq rt class with depth 1: 26
+S Eq rt class with depth 2: 20
+S Eq rt class with depth 3: 14
+S Eq rt class with depth 4: 28
+S Eq rt class with depth 5: 21
+S Eq rt class with depth 6: 18
+S Eq rt class with depth 7: 21
+S Eq rt class with depth 8: 11
+S Eq rt class with depth 9: 15
+S Eq rt class with depth 10: 10
+S Eq rt class with depth 11: 8
+S Eq rt class with depth 12: 5
+S Eq rt class with depth 13: 3
+S Eq rt class with depth 14: 1
+S ------------------------------------------
+S Matched terms:    1676
+S Final states hit: 151
+S ------------------------------------------
+S Final matched with depth 0: 2
+S Final matched with depth 1: 26
+S Final matched with depth 2: 20
+S Final matched with depth 3: 14
+S Final matched with depth 4: 22
+S Final matched with depth 5: 17
+S Final matched with depth 6: 12
+S Final matched with depth 7: 10
+S Final matched with depth 8: 6
+S Final matched with depth 9: 10
+S Final matched with depth 10: 4
+S Final matched with depth 11: 4
+S Final matched with depth 12: 2
+S Final matched with depth 13: 2
+S ------------------------------------------
